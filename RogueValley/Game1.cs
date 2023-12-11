@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using RogueValley.Entities.Player;
 
 namespace RogueValley
 {
@@ -10,22 +11,7 @@ namespace RogueValley
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-// PLAYER VARIABLES:
-
-        // Player Sprites:
-
-        private Texture2D playerSprite;
-        private Texture2D[][] playerAniSprites;
-        private Texture2D[] playerIdleSprites;
-
-        // Player Positional Variables:
-
-        private int playerDirection;
-        private int[] playerPosition;
-
-        // Player Animation Variables:
-
-        private int animationCount, animationTimer, animationMaxTime;
+        private Player player;
 
 
 
@@ -39,27 +25,20 @@ namespace RogueValley
         protected override void Initialize()
         {
 
-            // PLAYER VARIABLES:
-
-            // Player Positional Variables:
-            {
-                playerPosition = new int[2];
-                playerPosition[0] = 100;
-                playerPosition[1] = 200;
-            }
-            // Player Animation Variables:
-            {
-                animationCount = 0;
-                animationTimer = 0;
-                animationMaxTime = 8;
-            }
-
+            player = new Player();
+            int[] tempPos = new int[2];
+            tempPos[0] = 100;
+            tempPos[1] = 100;
+            player.Initialize(tempPos);
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            Texture2D playerSprite;
+            Texture2D[][] playerAniSprites;
+            Texture2D[][] playerIdleSprites;
 
             playerSprite = Content.Load<Texture2D>("Entity/Player");
 
@@ -112,14 +91,14 @@ namespace RogueValley
             }
             // Load all Player-Idle-Animation Variables into an Array:
             {
-                playerAniSprites = new Texture2D[4][];
+                playerIdleSprites = new Texture2D[4][];
 
                 for (int i = 0; i < 4; i++)
                 {
 
-                    playerAniSprites[i] = new Texture2D[6];
+                    playerIdleSprites[i] = new Texture2D[6];
 
-                    for (int j = 0; j < 6; j++)
+                    for (int j = 0; j < 4; j++)
                     {
 
                         string name = null;
@@ -146,8 +125,20 @@ namespace RogueValley
                             default:
                                 break;
                         }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            playerIdleSprites[i][j] = Content.Load<Texture2D>(name);
+                        }
                     }
                 }
+            }
+
+            // Send the Sprites to the player Class:
+            {
+
+                player.LoadContent(playerAniSprites, playerIdleSprites, playerSprite);
+
             }
         }
 
@@ -155,28 +146,9 @@ namespace RogueValley
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            // Player-Movement:
-            {
-                //playerPosition[0]--;
-                //playerPosition[1]--;
-            }
-            // Player-Animation:
-            {
-                if (animationTimer == animationMaxTime)
-                {
-                    animationTimer = 0;
-                    animationCount++;
-
-                    if (animationCount > 5)
-                    {
-                        animationCount = 0;
-                    }
-
-                    playerSprite = playerAniSprites[playerDirection][animationCount];
-
-                }
-                animationTimer++;
-            } 
+            
+            player.Movement(1);
+            player.update();
 
             
 
@@ -190,7 +162,7 @@ namespace RogueValley
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(playerSprite, new Rectangle(playerPosition[0], playerPosition[1], 20, 40), Color.White);
+            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.playerPosition[0], player.playerPosition[1], 20, 40), Color.White);
 
             _spriteBatch.End();
 
