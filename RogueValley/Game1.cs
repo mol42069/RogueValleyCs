@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using RogueValley.Entities.Player;
+using RogueValley.Entities;
 
 namespace RogueValley
 {
@@ -148,7 +148,7 @@ namespace RogueValley
                 Exit();
             
             player.Movement(1);
-            player.update();
+            player.Update();
 
             
 

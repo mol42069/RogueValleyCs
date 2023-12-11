@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RogueValley.Entities;
 
-namespace RogueValley.Entities.Player
+namespace RogueValley.Entities
 {
     class Player
     {
@@ -101,7 +102,7 @@ namespace RogueValley.Entities.Player
 
         }
 
-        public void update() {
+        public void Update() {
 
             Animation();            
         
@@ -123,6 +124,25 @@ namespace RogueValley.Entities.Player
 
             }
             animationTimer++;
+
+        }
+
+        public Enemies PrimaryAttack(Enemies enemie) {
+
+
+            return enemie;
+        }
+
+        public Enemies SecondAttack(Enemies enemie) {
+
+
+
+            return enemie;        
+        }
+        public void TakeDamage()
+        {
+
+
 
         }
 
