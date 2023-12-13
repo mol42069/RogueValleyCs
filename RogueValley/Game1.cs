@@ -13,6 +13,8 @@ namespace RogueValley
 
         private Player player;
 
+        private int[] movement;
+
 
 
         public Game1()
@@ -26,11 +28,19 @@ namespace RogueValley
         {
 
             player = new Player();
+
+            movement = new int[2]; // 0=X-Axis | 1=y-Axis
+
             int[] tempPos = new int[2];
+
             tempPos[0] = 100;
             tempPos[1] = 100;
+
             player.Initialize(tempPos);
+
             base.Initialize();
+
+
         }
 
         protected override void LoadContent()
@@ -133,7 +143,6 @@ namespace RogueValley
                     }
                 }
             }
-
             // Send the Sprites to the player Class:
             {
 
@@ -146,8 +155,10 @@ namespace RogueValley
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            
-            player.Movement(1);
+
+            KeyHandler();
+
+            player.Movement(movement);
             player.Update();
 
             
@@ -167,6 +178,38 @@ namespace RogueValley
             _spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+        protected void KeyHandler() {
+
+            KeyboardState state = Keyboard.GetState();
+
+            if (state.IsKeyDown(Keys.Escape)) {
+                Exit();
+            }
+            if (state.IsKeyDown(Keys.A))
+            {
+                movement[0] = -1;
+            }
+            else if (state.IsKeyDown(Keys.D))
+            {
+                movement[0] = 1;
+            }
+            else {
+                movement[0] = 0;
+            }
+            if (state.IsKeyDown(Keys.W))
+            {
+                movement[1] = -1;
+            }
+            else if (state.IsKeyDown(Keys.S))
+            {
+                movement[1] = 1;
+            }
+            else {
+                movement[1] = 0;
+            }
+
+
         }
     }
 }

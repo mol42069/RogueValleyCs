@@ -20,7 +20,7 @@ namespace RogueValley.Entities
 
         // Player Positional Variables:
 
-        private int playerDirection;
+        private int playerDirection, speed;
         public int[] playerPosition;
 
         // Player Animation Variables:
@@ -28,20 +28,24 @@ namespace RogueValley.Entities
         private int animationCount, animationTimer, animationMaxTime;
 
 
-        public void Initialize(int[] pos, int animax=8) {
+        public void Initialize(int[] pos, int animax=8, int speed=10) {
             // PLAYER VARIABLES:
 
             // Player Positional Variables:
             {
-                playerPosition = new int[2];
-                playerPosition[0] = pos[0];
-                playerPosition[1] = pos[1];
+                this.playerPosition = new int[2];
+                this.playerPosition[0] = pos[0];
+                this.playerPosition[1] = pos[1];
             }
             // Player Animation Variables:
             {
-                animationCount = 0;
-                animationTimer = 0;
-                animationMaxTime = 8;
+                this.animationCount = 0;
+                this.animationTimer = 0;
+                this.animationMaxTime = 8;
+            }
+            // other Player Variables:
+            {
+                this.speed = speed;
             }
 
         }
@@ -49,56 +53,16 @@ namespace RogueValley.Entities
 
             // Player Sprites:
 
-            playerAniSprites = pas;
-            playerIdleSprites = pis;
-            playerSprite = ps;
+            this.playerAniSprites = pas;
+            this.playerIdleSprites = pis;
+            this.playerSprite = ps;
 
 
         }
-        public void Movement(int direction) {
+        public void Movement(int[] direction) {
 
-            // 0:Standing | 1:UP | 2:RIGHT | 3:DOWN | 4:LEFT | -1:STANDING_UP | -2:STANDING_RIGHT | -3:STANDING_DOWN | -4:STANDING_LEFT
-
-
-            switch (direction) {
-
-                case 0:
-                    if (playerDirection > 0)
-                    {
-                        playerDirection = playerDirection * -1;
-                    }
-                    break;
-
-                case 1:
-
-                    playerDirection = 1;
-                    playerPosition[1]--;
-                    break;
-
-
-                case 2:
-
-                    playerDirection = 2;
-                    playerPosition[0]++;
-                    break;
-
-                case 3:
-
-                    playerDirection = 3;
-                    playerPosition[1]++;
-                    break;
-
-                case 4:
-
-                    playerDirection = 4;
-                    playerPosition[0]--;
-                    break;
-
-                default:
-                    break;
-
-            }
-
+            this.playerPosition[0] += (this.speed/10) * direction[0];
+            this.playerPosition[1] += (this.speed/10) * direction[1];
 
         }
 
