@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using RogueValley.Entities;
+using RogueValley.Maps;
 
 namespace RogueValley
 {
@@ -10,8 +11,10 @@ namespace RogueValley
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private Texture2D bg;
 
         private Player player;
+        private Map bgSprite;
 
         private int[] movement;
 
@@ -20,6 +23,11 @@ namespace RogueValley
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
+            
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
+            _graphics.IsFullScreen = true;
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -49,6 +57,10 @@ namespace RogueValley
             Texture2D playerSprite;
             Texture2D[][] playerAniSprites;
             Texture2D[][] playerIdleSprites;
+
+            bg = Content.Load<Texture2D>("Background/grass");
+            int[] screenSize = {1920, 1080};
+            bgSprite = new Map(player.playerPosition, screenSize, bg);
 
             playerSprite = Content.Load<Texture2D>("Entity/Player");
 
@@ -161,9 +173,6 @@ namespace RogueValley
             player.Movement(movement);
             player.Update();
 
-            
-
-
             base.Update(gameTime);
         }
 
@@ -173,7 +182,10 @@ namespace RogueValley
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.playerPosition[0], player.playerPosition[1], 20, 40), Color.White);
+            _spriteBatch.Draw(bgSprite.get_map(), new Rectangle(bgSprite.map_position[0], bgSprite.map_position[0], bgSprite.mapSize[0], bgSprite.mapSize[1]), Color.White);
+            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.playerPosition[0], player.playerPosition[1], 40, 80), Color.White);
+
+            
 
             _spriteBatch.End();
 
