@@ -35,8 +35,6 @@ namespace RogueValley
         protected override void Initialize()
         {
 
-            player = new Player();
-
             movement = new int[2]; // 0=X-Axis | 1=y-Axis
 
             int[] tempPos = new int[2];
@@ -44,7 +42,9 @@ namespace RogueValley
             tempPos[0] = 100;
             tempPos[1] = 100;
 
-            player.Initialize(tempPos);
+            player = new Player(tempPos, 8, 100);
+
+
 
             base.Initialize();
 
@@ -60,7 +60,7 @@ namespace RogueValley
 
             bg = Content.Load<Texture2D>("Background/grass");
             int[] screenSize = {1920, 1080};
-            bgSprite = new Map(player.playerPosition, screenSize, bg);
+            bgSprite = new Map(player.playerPosition, screenSize, bg, screenSize);
 
             playerSprite = Content.Load<Texture2D>("Entity/Player");
 
@@ -170,8 +170,10 @@ namespace RogueValley
 
             KeyHandler();
 
-            player.Movement(movement);
+            player.Movement(movement, bgSprite);
             player.Update();
+            
+            bgSprite.Update(player);
 
             base.Update(gameTime);
         }
@@ -182,8 +184,8 @@ namespace RogueValley
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(bgSprite.get_map(), new Rectangle(bgSprite.map_position[0], bgSprite.map_position[0], bgSprite.mapSize[0], bgSprite.mapSize[1]), Color.White);
-            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.playerPosition[0], player.playerPosition[1], 40, 80), Color.White);
+            _spriteBatch.Draw(bgSprite.get_map(), new Rectangle(bgSprite.map_position[0], bgSprite.map_position[1], bgSprite.mapSize[0], bgSprite.mapSize[1]), Color.White);
+            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 40, 80), Color.White);
 
             
 

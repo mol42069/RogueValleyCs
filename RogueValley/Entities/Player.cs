@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RogueValley.Entities;
-
+using RogueValley.Maps;
 namespace RogueValley.Entities
 {
     class Player
@@ -21,14 +21,14 @@ namespace RogueValley.Entities
         // Player Positional Variables:
 
         private int playerDirection, speed;
-        public int[] playerPosition;
+        public int[] playerPosition, drawPosition;
 
         // Player Animation Variables:
 
         private int animationCount, animationTimer, animationMaxTime;
 
 
-        public void Initialize(int[] pos, int animax=8, int speed=10) {
+        public Player(int[] pos, int animax=8, int speed=10) {
             // PLAYER VARIABLES:
 
             // Player Positional Variables:
@@ -36,6 +36,10 @@ namespace RogueValley.Entities
                 this.playerPosition = new int[2];
                 this.playerPosition[0] = pos[0];
                 this.playerPosition[1] = pos[1];
+
+                this.drawPosition = new int[2];
+                this.drawPosition[0] = pos[0];
+                this.drawPosition[1] = pos[1];
             }
             // Player Animation Variables:
             {
@@ -59,10 +63,15 @@ namespace RogueValley.Entities
 
 
         }
-        public void Movement(int[] direction) {
-
-            this.playerPosition[0] += (this.speed/10) * direction[0];
-            this.playerPosition[1] += (this.speed/10) * direction[1];
+        public void Movement(int[] direction, Map map) {
+            if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
+            {
+                this.playerPosition[0] += (this.speed / 10) * direction[0];
+            }
+            if (0 <= (this.playerPosition[1] + (this.speed / 10) * direction[1]) && (this.playerPosition[1] + (this.speed / 10) * direction[1]) <= map.mapSize[1] - 90)
+            {
+                this.playerPosition[1] += (this.speed / 10) * direction[1];
+            }
 
         }
 
