@@ -66,9 +66,9 @@ namespace RogueValley
 
             // Load all Player-Walking-Animation Variables into an Array:
             {
-                playerAniSprites = new Texture2D[4][];
+                playerAniSprites = new Texture2D[2][];
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 2; i++)
                 {
 
                     playerAniSprites[i] = new Texture2D[6];
@@ -82,19 +82,11 @@ namespace RogueValley
                         {
 
                             case 0:
-                                name = "Animations/Player/Down/" + j.ToString();
+                                name = "Animations/Player/Right/" + j.ToString();
                                 break;
 
                             case 1:
-                                name = "Animations/Player/Up/" + j.ToString();
-                                break;
-
-                            case 2:
                                 name = "Animations/Player/Left/" + j.ToString();
-                                break;
-
-                            case 3:
-                                name = "Animations/Player/Right/" + j.ToString();
                                 break;
 
                             default:
@@ -113,9 +105,9 @@ namespace RogueValley
             }
             // Load all Player-Idle-Animation Variables into an Array:
             {
-                playerIdleSprites = new Texture2D[4][];
+                playerIdleSprites = new Texture2D[2][];
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 2; i++)
                 {
 
                     playerIdleSprites[i] = new Texture2D[6];
@@ -129,19 +121,11 @@ namespace RogueValley
                         {
 
                             case 0:
-                                name = "Animations/IdlePlayer/Down/" + j.ToString();
+                                name = "Animations/IdlePlayer/Right/" + j.ToString();
                                 break;
 
                             case 1:
-                                name = "Animations/IdlePlayer/Up/" + j.ToString();
-                                break;
-
-                            case 2:
                                 name = "Animations/IdlePlayer/Left/" + j.ToString();
-                                break;
-
-                            case 3:
-                                name = "Animations/IdlePlayer/Right/" + j.ToString();
                                 break;
 
                             default:
@@ -185,9 +169,11 @@ namespace RogueValley
             _spriteBatch.Begin();
 
             _spriteBatch.Draw(bgSprite.get_map(), new Rectangle(bgSprite.map_position[0], bgSprite.map_position[1], bgSprite.mapSize[0], bgSprite.mapSize[1]), Color.White);
-            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 40, 80), Color.White);
+           
+            // TODO: Draw Particles
+            // TODO: Draw Enemies
 
-            
+            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 40, 80), Color.White);
 
             _spriteBatch.End();
 
@@ -200,22 +186,22 @@ namespace RogueValley
             if (state.IsKeyDown(Keys.Escape)) {
                 Exit();
             }
-            if (state.IsKeyDown(Keys.A))
+            if (state.IsKeyDown(Keys.A)&& !(state.IsKeyDown(Keys.D)))
             {
                 movement[0] = -1;
             }
-            else if (state.IsKeyDown(Keys.D))
+            else if (state.IsKeyDown(Keys.D) && !(state.IsKeyDown(Keys.A)))
             {
                 movement[0] = 1;
             }
             else {
                 movement[0] = 0;
             }
-            if (state.IsKeyDown(Keys.W))
+            if (state.IsKeyDown(Keys.W) && !(state.IsKeyDown(Keys.S)))
             {
                 movement[1] = -1;
             }
-            else if (state.IsKeyDown(Keys.S))
+            else if (state.IsKeyDown(Keys.S) && !(state.IsKeyDown(Keys.W)))
             {
                 movement[1] = 1;
             }
