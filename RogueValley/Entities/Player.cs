@@ -47,7 +47,7 @@ namespace RogueValley.Entities
             {
                 this.animationCount = 0;
                 this.animationTimer = 0;
-                this.animationMaxTime = 8;
+                this.animationMaxTime = 5;
 
                 this.playerLastDir = 1;         // 0 = right | 1 = left
                 this.playerDirection = 1;       // 0 = right | 1 = left
