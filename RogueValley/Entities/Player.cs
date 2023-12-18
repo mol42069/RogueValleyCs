@@ -64,14 +64,14 @@ namespace RogueValley.Entities
             }
 
         }
-        public void LoadContent(Texture2D[][] pas, Texture2D[][] pis, Texture2D ps)
+        public void LoadContent(Texture2D[][] pas, Texture2D[][] pis)
         {
 
             // Player Sprites:
 
             this.playerAniSprites = pas;
             this.playerIdleSprites = pis;
-            this.playerSprite = ps;
+            this.playerSprite = pis[0][0];
 
 
         }
@@ -187,11 +187,8 @@ namespace RogueValley.Entities
 
                 }
 
-                if (this.hp <= 0)
-                {
-
+                if (this.hp <= 0){
                     this.GameOver();
-
                 }
             }
         }

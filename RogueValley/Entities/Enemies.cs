@@ -15,9 +15,10 @@ namespace RogueValley.Entities
     {
 
         protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing;
+        protected int pAttackTimer, pAttackTimerMax;
         protected int[] drawPosition, spriteSize, lastMove;
         protected int[] position, mov;
-        protected Texture2D[][] movSprites, idleSprites, pAttackSprite, chargeSprite, sAttackSprite;
+        protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite;
         protected Texture2D sprite;
 
         public void Init() {
@@ -33,13 +34,14 @@ namespace RogueValley.Entities
             this.spriteSize = new int[2];
             this.spriteSize[0] = 40;
             this.spriteSize[1] = 80;
-
         }
 
-        public void LoadContent(Texture2D[][] movSprites, Texture2D[][] idleSprites) {
+        public void LoadContent(Texture2D[][] movSprites, Texture2D[][] idleSprites, Texture2D[][] pAttackSprite, Texture2D[][] sAttackSprite) {
 
             this.movSprites = movSprites;
             this.idleSprites = idleSprites;
+            this.pAttackSprite = pAttackSprite;
+            this.sAttackSprite = sAttackSprite;
             this.sprite = idleSprites[0][0];
 
         }
@@ -56,9 +58,7 @@ namespace RogueValley.Entities
         public SpriteBatch Draw(SpriteBatch _spriteBatch, Map m) {
 
             this.drawPosition = CalcdrawPos(m);
-
             _spriteBatch.Draw(this.sprite, new Rectangle(this.drawPosition[0], this.drawPosition[1], this.spriteSize[0], this.spriteSize[1]), Color.White);
-
 
             return _spriteBatch;
         }
@@ -114,38 +114,35 @@ namespace RogueValley.Entities
 
         }
 
+        protected virtual Player Ai(Player player){
+            return player;
+        }
+
         public void TakeDamage(int damage, float piercing) {
-
-
 
         }
         public virtual Player PrimaryAttack(Player player)
         {
-
             return player;
         }
 
         public void PrimaryAttackAni() {
-        
                    
         }
 
         public virtual void SecondaryAttack(Player player)
         {
 
-
-
         }
 
     }
     class Zombie : Enemies {
 
-        private int chargeTimer, chargeTimerMax, windup, windupMax;
-
         public Zombie(int[] pos) {
 
-            this.chargeTimer = 0;
-            this.chargeTimerMax = 60;
+
+            base.pAttackTimer = 0;
+            base.pAttackTimerMax = 5;
 
             base.lastMove = new int[2] {0, 0 };
 
@@ -155,7 +152,7 @@ namespace RogueValley.Entities
             base.defence = 10;
             base.reach = 100;
             base.speed = 5;
-            base.piercing = 2;
+            base.piercing = 5;
 
             base.Init();
         }
@@ -169,7 +166,7 @@ namespace RogueValley.Entities
             return player;
         }
 
-        private Player Ai(Player player) {
+        protected override Player Ai(Player player) {
 
             mov = new int[2];
             int x = 0;
@@ -203,35 +200,37 @@ namespace RogueValley.Entities
                 this.PrimaryAttack(player);
             }
             else {
-
+                base.pAttackTimer = 0;
                 base.lastMove[0] = (int)(((float)mov[0] / (float)n) * base.speed);
                 base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
                 base.position[0] += base.lastMove[0];
                 base.position[1] += base.lastMove[1];
             }
-
             base.Animation();
             return player;
         }
 
         public override Player PrimaryAttack(Player player) {
+            base.pAttackTimer++;
 
-
-
-            player.TakeDamage(base.damage, base.piercing);
-
-            return player;
+            if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[base.lastDir].Length - 1)) {
+                base.pAttackTimer = 0;
+                base.sprite = base.movSprites[0][0];
+                player.TakeDamage(base.damage, base.piercing);
             }
 
-        
+            if (base.pAttackTimer % base.pAttackTimerMax == 0) {
+                base.sprite = base.pAttackSprite[base.lastDir][(int)(base.pAttackTimer / base.pAttackTimerMax)];
+            }
 
+            
+
+            return player;
+        }
+                
         public override void SecondaryAttack(Player player)
         {
 
-
         }
-
-
-
     }
 }

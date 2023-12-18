@@ -24,6 +24,10 @@ namespace RogueValley
         private int fps;
         private System.Diagnostics.Stopwatch watch;
 
+        private int gameState;
+
+
+        private Texture2D[][][] zombieSprites;
 
 
         public Game1()
@@ -42,6 +46,8 @@ namespace RogueValley
         {
 
             movement = new int[2]; // 0=X-Axis | 1=y-Axis
+
+            this.gameState = 1;
 
             int[] tempPos = new int[2];
 
@@ -67,33 +73,30 @@ namespace RogueValley
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            Texture2D playerSprite;
-            Texture2D[][] playerAniSprites;
-            Texture2D[][] playerIdleSprites;
+            Texture2D[][] AniSprites;
+            Texture2D[][] IdleSprites;
+            Texture2D[][] spriteArr;
+
+            zombieSprites = new Texture2D[4][][];
 
             bg = Content.Load<Texture2D>("Background/grass");
             int[] screenSize = {1920, 1080};
             bgSprite = new Map(player.playerPosition, screenSize, bg, screenSize);
 
-            playerSprite = Content.Load<Texture2D>("Entity/Player");
-
-            // Load all Player-Walking-Animation Variables into an Array:
+            // Send the Sprites to the player Class:
             {
-                playerAniSprites = new Texture2D[2][];
+                AniSprites = new Texture2D[2][];
 
                 for (int i = 0; i < 2; i++)
                 {
-
-                    playerAniSprites[i] = new Texture2D[6];
+                    AniSprites[i] = new Texture2D[6];
 
                     for (int j = 0; j < 6; j++)
                     {
-
                         string name = null;
 
                         switch (i)
                         {
-
                             case 0:
                                 name = "Animations/Player/Right/" + j.ToString();
                                 break;
@@ -105,29 +108,21 @@ namespace RogueValley
                             default:
                                 break;
                         }
-
                         if (name != null)
                         {
                             Console.WriteLine(name);
-                            playerAniSprites[i][j] = Content.Load<Texture2D>(name);
+                            AniSprites[i][j] = Content.Load<Texture2D>(name);
                         }
-
                     }
-
                 }
-            }
-            // Load all Player-Idle-Animation Variables into an Array:
-            {
-                playerIdleSprites = new Texture2D[2][];
+                IdleSprites = new Texture2D[2][];
 
                 for (int i = 0; i < 2; i++)
                 {
-
-                    playerIdleSprites[i] = new Texture2D[6];
+                    IdleSprites[i] = new Texture2D[6];
 
                     for (int j = 0; j < 4; j++)
                     {
-
                         string name = null;
 
                         switch (i)
@@ -147,17 +142,137 @@ namespace RogueValley
                         if (name != null)
                         {
                             Console.WriteLine(name);
-                            playerIdleSprites[i][j] = Content.Load<Texture2D>(name);
+                            IdleSprites[i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }            
+                player.LoadContent(AniSprites, IdleSprites);
+            }
+
+            // Send Sprites to the Zombie Array:
+
+            {
+                // idleSprites:
+                zombieSprites[0] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    zombieSprites[0][i] = new Texture2D[4];
+
+                    for (int j = 0; j < 4; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Zombie/IdleAni/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Zombie/IdleAni/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            zombieSprites[0][i][j] = Content.Load<Texture2D>(name);
                         }
                     }
                 }
-            }
-            // Send the Sprites to the player Class:
-            {
+                // movSprites
+                zombieSprites[1] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    zombieSprites[1][i] = new Texture2D[6];
 
-                player.LoadContent(playerAniSprites, playerIdleSprites, playerSprite);
-                z.LoadContent(playerAniSprites, playerIdleSprites);
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
 
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Zombie/MoveAni/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Zombie/MoveAni/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            zombieSprites[1][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                // pAttackSprite
+                zombieSprites[2] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    zombieSprites[2][i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Zombie/PAttackAni/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Zombie/PAttackAni/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            zombieSprites[2][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                //sAttackSprite
+                zombieSprites[3] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    zombieSprites[3][i] = new Texture2D[4];
+
+                    for (int j = 0; j < 4; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Zombie/SAttackAni/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Zombie/SAttackAni/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            zombieSprites[3][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                z.LoadContent(zombieSprites[1], zombieSprites[0], zombieSprites[2], zombieSprites[3]);
             }
         }
 
@@ -207,7 +322,7 @@ namespace RogueValley
 
             _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 40, 80), Color.White);
 
-            SpriteFont font = Content.Load<SpriteFont>("gameFont");
+            SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
 
 
             _spriteBatch.DrawString(font, player.hp.ToString(), new Vector2(10, 10), Color.Red);
@@ -217,36 +332,28 @@ namespace RogueValley
             base.Draw(gameTime);
         }
         protected void KeyHandler() {
-
             KeyboardState state = Keyboard.GetState();
-
             if (state.IsKeyDown(Keys.Escape)) {
                 Exit();
             }
-            if (state.IsKeyDown(Keys.A)&& !(state.IsKeyDown(Keys.D)))
-            {
+            if (state.IsKeyDown(Keys.A)&& !(state.IsKeyDown(Keys.D))){
                 movement[0] = -1;
             }
-            else if (state.IsKeyDown(Keys.D) && !(state.IsKeyDown(Keys.A)))
-            {
+            else if (state.IsKeyDown(Keys.D) && !(state.IsKeyDown(Keys.A))){
                 movement[0] = 1;
             }
             else {
                 movement[0] = 0;
             }
-            if (state.IsKeyDown(Keys.W) && !(state.IsKeyDown(Keys.S)))
-            {
+            if (state.IsKeyDown(Keys.W) && !(state.IsKeyDown(Keys.S))){
                 movement[1] = -1;
             }
-            else if (state.IsKeyDown(Keys.S) && !(state.IsKeyDown(Keys.W)))
-            {
+            else if (state.IsKeyDown(Keys.S) && !(state.IsKeyDown(Keys.W))){
                 movement[1] = 1;
             }
             else {
                 movement[1] = 0;
             }
-
-
         }
     }
 }

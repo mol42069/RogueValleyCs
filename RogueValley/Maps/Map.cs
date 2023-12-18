@@ -64,13 +64,7 @@ namespace RogueValley.Maps
             {
                 this.map_position[1] = (this.sSize[1] / 2) - player.playerPosition[1];
                 player.drawPosition[1] = this.sSize[1] / 2;
-            }
-            
-
-            //this.map_position[0]--;
-
-
-
+            }            
         }
         public Texture2D get_map() {
         
