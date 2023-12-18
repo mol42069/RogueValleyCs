@@ -12,6 +12,8 @@ namespace RogueValley.Entities
     {
         // PLAYER VARIABLES:
 
+        private int damage, hp, defence;
+
         // Player Sprites:
 
         public Texture2D playerSprite;
@@ -141,19 +143,17 @@ namespace RogueValley.Entities
            
         }
 
-        public Enemies PrimaryAttack(Enemies enemie) {
+        public void PrimaryAttack(Enemies enemy) {
 
 
-            return enemie;
         }
 
-        public Enemies SecondAttack(Enemies enemie) {
+        public void SecondAttack(Enemies enemy) {
 
 
-
-            return enemie;        
+ 
         }
-        public void TakeDamage()
+        public void TakeDamage(int damage, float piercing)
         {
 
 

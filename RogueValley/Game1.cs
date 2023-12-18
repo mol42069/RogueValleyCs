@@ -17,6 +17,7 @@ namespace RogueValley
         private Map bgSprite;
 
         private int[] movement;
+        private Zombie z;
 
 
 
@@ -41,6 +42,11 @@ namespace RogueValley
 
             tempPos[0] = 100;
             tempPos[1] = 100;
+
+            z = new Zombie(tempPos);
+
+            tempPos[0] = 200;
+            tempPos[1] = 200;
 
             player = new Player(tempPos, 8, 100);
 
@@ -143,6 +149,7 @@ namespace RogueValley
             {
 
                 player.LoadContent(playerAniSprites, playerIdleSprites, playerSprite);
+                z.LoadContent(playerAniSprites, playerIdleSprites);
 
             }
         }
@@ -156,7 +163,9 @@ namespace RogueValley
 
             player.Movement(movement, bgSprite);
             player.Update();
-            
+
+            z.Update();
+
             bgSprite.Update(player);
 
             base.Update(gameTime);
@@ -169,9 +178,10 @@ namespace RogueValley
             _spriteBatch.Begin();
 
             _spriteBatch.Draw(bgSprite.get_map(), new Rectangle(bgSprite.map_position[0], bgSprite.map_position[1], bgSprite.mapSize[0], bgSprite.mapSize[1]), Color.White);
-           
+
             // TODO: Draw Particles
             // TODO: Draw Enemies
+            z.Draw(_spriteBatch);
 
             _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 40, 80), Color.White);
 
