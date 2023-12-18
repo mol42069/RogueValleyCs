@@ -337,3 +337,10 @@
 /processorParam:TextureFormat=Color
 /build:Background/grass.png
 
+#begin gameFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:gameFont.spritefont
+

@@ -1,31 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RogueValley.Entities;
+using RogueValley.Maps;
 
 namespace RogueValley.Entities
 {
     class Enemies
     {
 
-        protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir;
-        protected int[] position, drawPosition, spriteSize, lastMove;
-        protected Texture2D[][] movSprites, idleSprites;
+        protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing;
+        protected int[] drawPosition, spriteSize, lastMove;
+        protected int[] position, mov;
+        protected Texture2D[][] movSprites, idleSprites, pAttackSprite, chargeSprite, sAttackSprite;
         protected Texture2D sprite;
 
-        public void Init() { 
-        
+        public void Init() {
+
+            this.position[0] = 100;
+            this.position[1] = 200;
+
+            this.drawPosition = new int[2];
+
             this.aniCount = 0;
             this.aniTimer = 0;
             this.aniTimerMax = 5;
             this.spriteSize = new int[2];
             this.spriteSize[0] = 40;
             this.spriteSize[1] = 80;
-            this.drawPosition = position;
 
         }
 
@@ -34,12 +41,22 @@ namespace RogueValley.Entities
             this.movSprites = movSprites;
             this.idleSprites = idleSprites;
             this.sprite = idleSprites[0][0];
-        
-        }
-        public SpriteBatch Draw(SpriteBatch _spriteBatch) {
 
-            //this.Animation();
-            this.drawPosition = position;
+        }
+
+        private int[] CalcdrawPos(Map m) {
+            int[] drawPos = new int[2];
+
+            drawPos[0] = this.position[0] + m.map_position[0];
+            drawPos[1] = this.position[1] + m.map_position[1];
+
+            return drawPos;
+        }
+
+        public SpriteBatch Draw(SpriteBatch _spriteBatch, Map m) {
+
+            this.drawPosition = CalcdrawPos(m);
+
             _spriteBatch.Draw(this.sprite, new Rectangle(this.drawPosition[0], this.drawPosition[1], this.spriteSize[0], this.spriteSize[1]), Color.White);
 
 
@@ -48,6 +65,9 @@ namespace RogueValley.Entities
 
         protected void Animation()
         {
+
+
+
             this.aniTimer++;
 
             if (this.aniTimer == this.aniTimerMax)
@@ -65,7 +85,7 @@ namespace RogueValley.Entities
 
                 if (this.lastMove[0] != 0)
                 {
-                    if (this.lastMove[0] == 1)
+                    if (this.lastMove[0] > 0)
                     {
                         this.entityDir = 0;
                         this.lastDir = 0;
@@ -95,14 +115,19 @@ namespace RogueValley.Entities
         }
 
         public void TakeDamage(int damage, float piercing) {
-        
+
 
 
         }
-        public virtual void PrimaryAttack(Player player)
+        public virtual Player PrimaryAttack(Player player)
         {
 
+            return player;
+        }
 
+        public void PrimaryAttackAni() {
+        
+                   
         }
 
         public virtual void SecondaryAttack(Player player)
@@ -114,29 +139,91 @@ namespace RogueValley.Entities
 
     }
     class Zombie : Enemies {
-    
+
+        private int chargeTimer, chargeTimerMax, windup, windupMax;
+
         public Zombie(int[] pos) {
 
-            base.Init();
+            this.chargeTimer = 0;
+            this.chargeTimerMax = 60;
+
+            base.lastMove = new int[2] {0, 0 };
 
             base.hp = 100;
             base.damage = 10;
             base.position = pos;
             base.defence = 10;
-            base.speed = 10;
+            base.reach = 100;
+            base.speed = 5;
+            base.piercing = 2;
 
+            base.Init();
         }
 
-        public void Update() {
+        public Player Update(Player player) {
 
-            base.position[0]++;
-
+            this.Ai(player);
+            Console.WriteLine(this.drawPosition);
+            Console.WriteLine("\n");
+            Console.WriteLine(this.position);
+            return player;
         }
 
-        public override void PrimaryAttack(Player player) {
-            
-            
+        private Player Ai(Player player) {
+
+            mov = new int[2];
+            int x = 0;
+            int y = 0;
+
+            mov[0] = (int)(((float)player.playerPosition[0]) - base.position[0]);
+            mov[1] = (int)(((float)player.playerPosition[1]) - base.position[1]);
+
+            if (mov[0] < 0)
+            {
+                x = mov[0] * -1;
             }
+            else {
+                x = mov[0];
+            }
+
+            if (mov[1] < 0)
+            {
+                y = mov[1] * -1;
+            }
+            else
+            {
+                y = mov[1];
+            }
+
+            int n = x + y;
+            if (n <= base.reach && n >= -base.reach)
+            {
+                base.lastMove[0] = 0;
+                base.lastMove[1] = 0;
+                this.PrimaryAttack(player);
+            }
+            else {
+
+                base.lastMove[0] = (int)(((float)mov[0] / (float)n) * base.speed);
+                base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
+                base.position[0] += base.lastMove[0];
+                base.position[1] += base.lastMove[1];
+            }
+
+            base.Animation();
+            return player;
+        }
+
+        public override Player PrimaryAttack(Player player) {
+
+
+
+            player.TakeDamage(base.damage, base.piercing);
+
+            return player;
+            }
+
+        
 
         public override void SecondaryAttack(Player player)
         {

@@ -12,7 +12,7 @@ namespace RogueValley.Entities
     {
         // PLAYER VARIABLES:
 
-        private int damage, hp, defence;
+        public int damage, hp, defence;
 
         // Player Sprites:
 
@@ -27,11 +27,11 @@ namespace RogueValley.Entities
 
         // Player Animation Variables:
 
-        private int animationCount, animationTimer, animationMaxTime;
+        private int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames;
 
 
 
-        public Player(int[] pos, int animax = 8, int speed = 10)
+        public Player(int[] pos, int animax = 8, int speed = 20)
         {
             // PLAYER VARIABLES:
 
@@ -57,6 +57,10 @@ namespace RogueValley.Entities
             // other Player Variables:
             {
                 this.speed = speed;
+                this.hp = 100;
+                this.defence = 5;
+                this.immunityFrames = 0;
+                this.maxImmFrames = 20;
             }
 
         }
@@ -92,13 +96,22 @@ namespace RogueValley.Entities
 
             this.Animation();
 
+            if (immunityFrames > 0)
+            {
+                immunityFrames--;
+            }
+            else
+            {
+                immunityFrames = 0;
+            }
+
 
         }
 
         protected void Animation()
-        { 
+        {
             this.animationTimer++;
-            
+
             if (this.animationTimer == this.animationMaxTime)
             {
                 this.animationTimer = 0;
@@ -115,7 +128,7 @@ namespace RogueValley.Entities
                 if (this.lastMovement[0] != 0)
                 {
                     if (this.lastMovement[0] == 1)
-                        {
+                    {
                         this.playerDirection = 0;
                         this.playerLastDir = 0;
                     }
@@ -129,8 +142,8 @@ namespace RogueValley.Entities
                 {
                     this.playerDirection = this.playerLastDir;
                 }
-                this.playerSprite = this.playerAniSprites[this.playerDirection][this.animationCount];            
-            }            
+                this.playerSprite = this.playerAniSprites[this.playerDirection][this.animationCount];
+            }
             else
             {
                 if (this.animationCount > 3)
@@ -140,26 +153,52 @@ namespace RogueValley.Entities
                 this.playerSprite = this.playerIdleSprites[this.playerDirection][this.animationCount];
             }
 
-           
-        }
-
-        public void PrimaryAttack(Enemies enemy) {
-
 
         }
 
-        public void SecondAttack(Enemies enemy) {
+        public void PrimaryAttack(Enemies enemy)
+        {
 
 
- 
         }
-        public void TakeDamage(int damage, float piercing)
+
+        public void SecondAttack(Enemies enemy)
         {
 
 
 
         }
+        public void TakeDamage(int damage, int piercing)
+        {
+            if (this.immunityFrames == 0)
+            {
+                this.immunityFrames = this.maxImmFrames;
 
 
+
+                if (piercing < this.defence)
+                {
+                    this.hp -= (int)((float)damage * ((float)piercing/(float)this.defence));
+                }
+                else
+                {
+
+                    this.hp -= damage;
+
+                }
+
+                if (this.hp <= 0)
+                {
+
+                    this.GameOver();
+
+                }
+            }
+        }
+
+        public void GameOver()
+        {
+            return;
+        }
     }
 }

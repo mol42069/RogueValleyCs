@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using RogueValley.Entities;
 using RogueValley.Maps;
+using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RogueValley
 {
@@ -18,6 +20,9 @@ namespace RogueValley
 
         private int[] movement;
         private Zombie z;
+
+        private int fps;
+        private System.Diagnostics.Stopwatch watch;
 
 
 
@@ -40,17 +45,19 @@ namespace RogueValley
 
             int[] tempPos = new int[2];
 
-            tempPos[0] = 100;
-            tempPos[1] = 100;
+            int[] tp = new int[2];
+            tp[0] = 100;
+            tp[1] = 200;
 
-            z = new Zombie(tempPos);
+            z = new Zombie(tp);
 
-            tempPos[0] = 200;
-            tempPos[1] = 200;
+            tempPos[0] = 400;
+            tempPos[1] = 400;
 
             player = new Player(tempPos, 8, 100);
 
-
+            this.fps = 60;
+            watch = System.Diagnostics.Stopwatch.StartNew();
 
             base.Initialize();
 
@@ -159,12 +166,27 @@ namespace RogueValley
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            if (player.hp <= 0) {
+                Exit();
+            }
             KeyHandler();
+
+            // watch.Stop();
+
+            long lost = (1 / this.fps) * 1000 - watch.ElapsedMilliseconds;
+
+            if (lost >= 0 ) {
+            
+                Thread.Sleep((int)lost);
+                watch = System.Diagnostics.Stopwatch.StartNew();
+            }
+
+            // watch = System.Diagnostics.Stopwatch.StartNew();
 
             player.Movement(movement, bgSprite);
             player.Update();
 
-            z.Update();
+            z.Update(player);
 
             bgSprite.Update(player);
 
@@ -181,9 +203,14 @@ namespace RogueValley
 
             // TODO: Draw Particles
             // TODO: Draw Enemies
-            z.Draw(_spriteBatch);
+            z.Draw(_spriteBatch, bgSprite);
 
             _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 40, 80), Color.White);
+
+            SpriteFont font = Content.Load<SpriteFont>("gameFont");
+
+
+            _spriteBatch.DrawString(font, player.hp.ToString(), new Vector2(10, 10), Color.Red);
 
             _spriteBatch.End();
 
