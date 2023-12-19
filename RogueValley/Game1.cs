@@ -98,11 +98,11 @@ namespace RogueValley
                         switch (i)
                         {
                             case 0:
-                                name = "Animations/Player/Right/" + j.ToString();
+                                name = "Entity/Player/move/Right/" + j.ToString();
                                 break;
 
                             case 1:
-                                name = "Animations/Player/Left/" + j.ToString();
+                                name = "Entity/Player/move/Left/" + j.ToString();
                                 break;
 
                             default:
@@ -121,7 +121,7 @@ namespace RogueValley
                 {
                     IdleSprites[i] = new Texture2D[6];
 
-                    for (int j = 0; j < 4; j++)
+                    for (int j = 0; j < 6; j++)
                     {
                         string name = null;
 
@@ -129,11 +129,11 @@ namespace RogueValley
                         {
 
                             case 0:
-                                name = "Animations/IdlePlayer/Right/" + j.ToString();
+                                name = "Entity/Player/idle/Right/" + j.ToString();
                                 break;
 
                             case 1:
-                                name = "Animations/IdlePlayer/Left/" + j.ToString();
+                                name = "Entity/Player/idle/Left/" + j.ToString();
                                 break;
 
                             default:
@@ -156,20 +156,20 @@ namespace RogueValley
                 zombieSprites[0] = new Texture2D[2][];
                 for (int i = 0; i < 2; i++)
                 {
-                    zombieSprites[0][i] = new Texture2D[4];
+                    zombieSprites[0][i] = new Texture2D[6];
 
-                    for (int j = 0; j < 4; j++)
+                    for (int j = 0; j < 6; j++)
                     {
                         string name = null;
 
                         switch (i)
                         {
                             case 0:
-                                name = "Entity/Enemies/Zombie/IdleAni/Right/" + j.ToString();
+                                name = "Entity/Enemies/Zombie/idle/Right/" + j.ToString();
                                 break;
 
                             case 1:
-                                name = "Entity/Enemies/Zombie/IdleAni/Left/" + j.ToString();
+                                name = "Entity/Enemies/Zombie/idle/Left/" + j.ToString();
                                 break;
 
                             default:
@@ -195,11 +195,11 @@ namespace RogueValley
                         switch (i)
                         {
                             case 0:
-                                name = "Entity/Enemies/Zombie/MoveAni/Right/" + j.ToString();
+                                name = "Entity/Enemies/Zombie/move/Right/" + j.ToString();
                                 break;
 
                             case 1:
-                                name = "Entity/Enemies/Zombie/MoveAni/Left/" + j.ToString();
+                                name = "Entity/Enemies/Zombie/move/Left/" + j.ToString();
                                 break;
 
                             default:
@@ -225,11 +225,11 @@ namespace RogueValley
                         switch (i)
                         {
                             case 0:
-                                name = "Entity/Enemies/Zombie/PAttackAni/Right/" + j.ToString();
+                                name = "Entity/Enemies/Zombie/pAttack/Right/" + j.ToString();
                                 break;
 
                             case 1:
-                                name = "Entity/Enemies/Zombie/PAttackAni/Left/" + j.ToString();
+                                name = "Entity/Enemies/Zombie/pAttack/Left/" + j.ToString();
                                 break;
 
                             default:
@@ -246,20 +246,20 @@ namespace RogueValley
                 zombieSprites[3] = new Texture2D[2][];
                 for (int i = 0; i < 2; i++)
                 {
-                    zombieSprites[3][i] = new Texture2D[4];
+                    zombieSprites[3][i] = new Texture2D[6];
 
-                    for (int j = 0; j < 4; j++)
+                    for (int j = 0; j < 6; j++)
                     {
                         string name = null;
 
                         switch (i)
                         {
                             case 0:
-                                name = "Entity/Enemies/Zombie/SAttackAni/Right/" + j.ToString();
+                                name = "Entity/Enemies/Zombie/sAttack/Right/" + j.ToString();
                                 break;
 
                             case 1:
-                                name = "Entity/Enemies/Zombie/SAttackAni/Left/" + j.ToString();
+                                name = "Entity/Enemies/Zombie/sAttack/Left/" + j.ToString();
                                 break;
 
                             default:
@@ -320,7 +320,7 @@ namespace RogueValley
             // TODO: Draw Enemies
             z.Draw(_spriteBatch, bgSprite);
 
-            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 40, 80), Color.White);
+            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 100, 100), Color.White);
 
             SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
 

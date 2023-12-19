@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -15,11 +16,13 @@ namespace RogueValley.Entities
     {
 
         protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing;
-        protected int pAttackTimer, pAttackTimerMax;
+        protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer;
+        protected float sAttackMult;
         protected int[] drawPosition, spriteSize, lastMove;
         protected int[] position, mov;
         protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite;
         protected Texture2D sprite;
+        protected Random rnd;
 
         public void Init() {
 
@@ -32,8 +35,10 @@ namespace RogueValley.Entities
             this.aniTimer = 0;
             this.aniTimerMax = 5;
             this.spriteSize = new int[2];
-            this.spriteSize[0] = 40;
-            this.spriteSize[1] = 80;
+            this.spriteSize[0] = 100;
+            this.spriteSize[1] = 100;
+
+            rnd = new Random();
         }
 
         public void LoadContent(Texture2D[][] movSprites, Texture2D[][] idleSprites, Texture2D[][] pAttackSprite, Texture2D[][] sAttackSprite) {
@@ -65,9 +70,6 @@ namespace RogueValley.Entities
 
         protected void Animation()
         {
-
-
-
             this.aniTimer++;
 
             if (this.aniTimer == this.aniTimerMax)
@@ -104,14 +106,12 @@ namespace RogueValley.Entities
             }
             else
             {
-                if (this.aniCount > 3)
+                if (this.aniCount > 5)
                 {
                     this.aniCount = 0;
                 }
                 this.sprite = this.idleSprites[this.entityDir][this.aniCount];
             }
-
-
         }
 
         protected virtual Player Ai(Player player){
@@ -130,13 +130,15 @@ namespace RogueValley.Entities
                    
         }
 
-        public virtual void SecondaryAttack(Player player)
+        public virtual Player SecondaryAttack(Player player)
         {
-
+            return player;
         }
 
     }
     class Zombie : Enemies {
+
+        int random;
 
         public Zombie(int[] pos) {
 
@@ -144,10 +146,15 @@ namespace RogueValley.Entities
             base.pAttackTimer = 0;
             base.pAttackTimerMax = 5;
 
+            base.sAttackTimer = 0;
+            base.sAttackTimerMax = 10;
+
             base.lastMove = new int[2] {0, 0 };
 
             base.hp = 100;
             base.damage = 10;
+            base.sAttackMult = 1.3f;
+
             base.position = pos;
             base.defence = 10;
             base.reach = 100;
@@ -155,6 +162,8 @@ namespace RogueValley.Entities
             base.piercing = 5;
 
             base.Init();
+            
+            this.random = rnd.Next(0, 6);
         }
 
         public Player Update(Player player) {
@@ -197,7 +206,15 @@ namespace RogueValley.Entities
             {
                 base.lastMove[0] = 0;
                 base.lastMove[1] = 0;
-                this.PrimaryAttack(player);
+
+                if (random != 0)
+                {
+                    this.PrimaryAttack(player);
+                }
+                else {
+                    this.SecondaryAttack(player);
+                }
+
             }
             else {
                 base.pAttackTimer = 0;
@@ -206,31 +223,53 @@ namespace RogueValley.Entities
                 base.position[0] += base.lastMove[0];
                 base.position[1] += base.lastMove[1];
             }
+            if (base.pAttackTimer == 0 && base.sAttackTimer == 0) {
             base.Animation();
+            }
             return player;
         }
-
         public override Player PrimaryAttack(Player player) {
-            base.pAttackTimer++;
 
-            if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[base.lastDir].Length - 1)) {
-                base.pAttackTimer = 0;
-                base.sprite = base.movSprites[0][0];
-                player.TakeDamage(base.damage, base.piercing);
+            if (base.AttackCooldown == 0)
+            {
+                base.pAttackTimer++;
+                if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[base.lastDir].Length - 1))
+                {
+                    base.pAttackTimer = 0;
+                    player.TakeDamage(base.damage, base.piercing);
+                    this.random = rnd.Next(0, 6);
+                    base.AttackCooldown = 20;
+                }
+                if (base.pAttackTimer % base.pAttackTimerMax == 0)
+                {
+                    base.sprite = base.pAttackSprite[base.lastDir][(int)(base.pAttackTimer / base.pAttackTimerMax)];
+                }
+                return player;
             }
-
-            if (base.pAttackTimer % base.pAttackTimerMax == 0) {
-                base.sprite = base.pAttackSprite[base.lastDir][(int)(base.pAttackTimer / base.pAttackTimerMax)];
-            }
-
-            
-
+            base.AttackCooldown--;
             return player;
         }
                 
-        public override void SecondaryAttack(Player player)
+        public override Player SecondaryAttack(Player player)
         {
-
+            if (base.AttackCooldown == 0)
+            {
+                base.sAttackTimer++;
+                if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[base.lastDir].Length - 1))
+                {
+                    base.sAttackTimer = 0;
+                    player.TakeDamage((int)(base.damage* base.sAttackMult), base.piercing);
+                    this.random = rnd.Next(0, 6);
+                    base.AttackCooldown = 20;
+                }
+                if (base.sAttackTimer % base.sAttackTimerMax == 0)
+                {
+                    base.sprite = base.sAttackSprite[base.lastDir][(int)(base.sAttackTimer / base.sAttackTimerMax)];
+                }
+                return player;
+            }
+            base.AttackCooldown--;
+            return player;
         }
     }
 }
