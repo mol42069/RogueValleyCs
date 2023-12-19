@@ -36,7 +36,7 @@ namespace RogueValley
             
             _graphics.PreferredBackBufferWidth = 1920;
             _graphics.PreferredBackBufferHeight = 1080;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -300,10 +300,9 @@ namespace RogueValley
 
             player.Movement(movement, bgSprite);
             player.Update();
-
-            z.Update(player);
-
+                        
             bgSprite.Update(player);
+            this.mobManager.Update(this.player);
 
             base.Update(gameTime);
         }
@@ -353,6 +352,11 @@ namespace RogueValley
             }
             else {
                 movement[1] = 0;
+            }
+            if (state.IsKeyDown(Keys.L)) {
+                int[] a = new int[2];
+                a[(int)enums.Entitiy.Zombie] = 100;
+                mobManager.Spawn(a, player);
             }
         }
     }

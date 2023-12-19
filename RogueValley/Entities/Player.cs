@@ -93,9 +93,7 @@ namespace RogueValley.Entities
 
         public void Update()
         {
-
             this.Animation();
-
             if (immunityFrames > 0)
             {
                 immunityFrames--;
@@ -117,14 +115,12 @@ namespace RogueValley.Entities
                 this.animationTimer = 0;
                 this.animationCount++;
             }
-
             if (this.lastMovement[0] != 0 || this.lastMovement[1] != 0)
             {
                 if (this.animationCount > 5)
                 {
                     this.animationCount = 0;
                 }
-
                 if (this.lastMovement[0] != 0)
                 {
                     if (this.lastMovement[0] == 1)

@@ -19,16 +19,13 @@ namespace RogueValley.Entities
         protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer;
         protected float sAttackMult;
         protected int[] drawPosition, spriteSize, lastMove;
-        protected int[] position, mov;
+        protected int[] mov;
+        public int[] position;
         protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite;
         protected Texture2D sprite;
         protected Random rnd;
 
         public void Init() {
-
-            this.position[0] = 100;
-            this.position[1] = 200;
-
             this.drawPosition = new int[2];
 
             this.aniCount = 0;
@@ -149,7 +146,7 @@ namespace RogueValley.Entities
             base.sAttackTimer = 0;
             base.sAttackTimerMax = 10;
 
-            base.lastMove = new int[2] {0, 0 };
+            base.lastMove = new int[2] {0, 0};
 
             base.hp = 100;
             base.damage = 10;
@@ -176,7 +173,6 @@ namespace RogueValley.Entities
         }
 
         protected override Player Ai(Player player) {
-
             mov = new int[2];
             int x = 0;
             int y = 0;
