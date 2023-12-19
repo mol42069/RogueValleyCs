@@ -30,13 +30,6 @@ namespace RogueValley.Entities
             x = rnd.Next(0, 14000);
             if (x == player.playerPosition[0])
                 x = this.GetPosX(x, player);
-            /*for (int i = 0; i < this.mobList.Count; i++)
-            {
-                if (this.mobList[i].position[0] - 10 < x && x < this.mobList[i].position[0] + 110)
-                {
-                    x = this.GetPosX(x, player);
-                }
-            }*/
             return x;
         }
         private int GetPosY(int y, Player player)
@@ -44,12 +37,6 @@ namespace RogueValley.Entities
             y = rnd.Next(0, 7000);
             if (y == player.playerPosition[1])
                 y = this.GetPosX(y, player);
-
-            /*for (int i = 0; i < this.mobList.Count; i++) {
-                if (this.mobList[i].position[1] - 10 < y && y < this.mobList[i].position[1] + 110) {
-                    y = this.GetPosX(y, player);
-                }
-            }*/
             return y;
         }
 
