@@ -20,20 +20,23 @@ namespace RogueValley.Entities
         }
 
         public void LoadContent(Texture2D[][][][] sprites) {
-            this.sprites = sprites;        
+            this.sprites = sprites;
+        }
+        public void RmList() {
+            this.mobList.Clear();
         }
         private int GetPosX(int x, Player player) {
 
             x = rnd.Next(0, 14000);
             if (x == player.playerPosition[0])
                 x = this.GetPosX(x, player);
-            for (int i = 0; i < this.mobList.Count; i++)
+            /*for (int i = 0; i < this.mobList.Count; i++)
             {
                 if (this.mobList[i].position[0] - 10 < x && x < this.mobList[i].position[0] + 110)
                 {
                     x = this.GetPosX(x, player);
                 }
-            }
+            }*/
             return x;
         }
         private int GetPosY(int y, Player player)
@@ -42,17 +45,16 @@ namespace RogueValley.Entities
             if (y == player.playerPosition[1])
                 y = this.GetPosX(y, player);
 
-            for (int i = 0; i < this.mobList.Count; i++) {
+            /*for (int i = 0; i < this.mobList.Count; i++) {
                 if (this.mobList[i].position[1] - 10 < y && y < this.mobList[i].position[1] + 110) {
                     y = this.GetPosX(y, player);
                 }
-            }
+            }*/
             return y;
         }
 
         public void Spawn(int[] ammount, Player player) {
             
-            this.mobList = new List<Enemies>();
             for (int i = 0; i < ammount[(int)enums.Entitiy.Zombie]; i++) {
                 int[] pos = new int[2];
 

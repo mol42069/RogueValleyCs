@@ -316,6 +316,9 @@ namespace RogueValley
             if (this.player.hp <= 0)
             {
                 this.gameState = 0;
+
+                // Delete the Enemies on death:
+                this.mobManager.RmList();
             }
             InGameKeyHandler();
             this.player.Movement(movement, bgSprite);
