@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using RogueValley.Entities;
 using RogueValley.Maps;
+
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -17,26 +18,25 @@ namespace RogueValley
 
         private Player player;
         private Map bgSprite;
+        private MobManager mobManager;
+        private UI ui;
 
         private int[] movement;
-        private Zombie z;
 
         private int fps;
         private System.Diagnostics.Stopwatch watch;
 
-        private int gameState;
+        public int gameState;
 
-
-        private Texture2D[][][] zombieSprites;
 
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
-            
+
             _graphics.PreferredBackBufferWidth = 1920;
             _graphics.PreferredBackBufferHeight = 1080;
-            _graphics.IsFullScreen = false;
+            _graphics.IsFullScreen = true;
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -47,15 +47,11 @@ namespace RogueValley
 
             movement = new int[2]; // 0=X-Axis | 1=y-Axis
 
-            this.gameState = 1;
+            this.gameState = 0;
+
+            ui = new UI();
 
             int[] tempPos = new int[2];
-
-            int[] tp = new int[2];
-            tp[0] = 100;
-            tp[1] = 200;
-
-            z = new Zombie(tp);
 
             tempPos[0] = 400;
             tempPos[1] = 400;
@@ -65,9 +61,9 @@ namespace RogueValley
             this.fps = 60;
             watch = System.Diagnostics.Stopwatch.StartNew();
 
+            mobManager = new MobManager(this.player);
+
             base.Initialize();
-
-
         }
 
         protected override void LoadContent()
@@ -75,15 +71,15 @@ namespace RogueValley
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Texture2D[][] AniSprites;
             Texture2D[][] IdleSprites;
-            Texture2D[][] spriteArr;
+            Texture2D[][][][] sprites = new Texture2D[1][][][];
 
-            zombieSprites = new Texture2D[4][][];
+
 
             bg = Content.Load<Texture2D>("Background/grass");
-            int[] screenSize = {1920, 1080};
+            int[] screenSize = { 1920, 1080 };
             bgSprite = new Map(player.playerPosition, screenSize, bg, screenSize);
 
-            // Send the Sprites to the player Class:
+            // Load the Player Sprites:
             {
                 AniSprites = new Texture2D[2][];
 
@@ -145,18 +141,19 @@ namespace RogueValley
                             IdleSprites[i][j] = Content.Load<Texture2D>(name);
                         }
                     }
-                }            
+                }
                 player.LoadContent(AniSprites, IdleSprites);
             }
 
-            // Send Sprites to the Zombie Array:
-
+            // Load the Zombie Sprites:
             {
+                Texture2D[][][] zombieSprites = new Texture2D[4][][];
+
                 // idleSprites:
-                zombieSprites[0] = new Texture2D[2][];
+                zombieSprites[(int)enums.Movement.IDLE] = new Texture2D[2][];
                 for (int i = 0; i < 2; i++)
                 {
-                    zombieSprites[0][i] = new Texture2D[6];
+                    zombieSprites[(int)enums.Movement.IDLE][i] = new Texture2D[6];
 
                     for (int j = 0; j < 6; j++)
                     {
@@ -178,15 +175,15 @@ namespace RogueValley
                         if (name != null)
                         {
                             Console.WriteLine(name);
-                            zombieSprites[0][i][j] = Content.Load<Texture2D>(name);
+                            zombieSprites[(int)enums.Movement.IDLE][i][j] = Content.Load<Texture2D>(name);
                         }
                     }
                 }
                 // movSprites
-                zombieSprites[1] = new Texture2D[2][];
+                zombieSprites[(int)enums.Movement.MOVE] = new Texture2D[2][];
                 for (int i = 0; i < 2; i++)
                 {
-                    zombieSprites[1][i] = new Texture2D[6];
+                    zombieSprites[(int)enums.Movement.MOVE][i] = new Texture2D[6];
 
                     for (int j = 0; j < 6; j++)
                     {
@@ -208,15 +205,15 @@ namespace RogueValley
                         if (name != null)
                         {
                             Console.WriteLine(name);
-                            zombieSprites[1][i][j] = Content.Load<Texture2D>(name);
+                            zombieSprites[(int)enums.Movement.MOVE][i][j] = Content.Load<Texture2D>(name);
                         }
                     }
                 }
                 // pAttackSprite
-                zombieSprites[2] = new Texture2D[2][];
+                zombieSprites[(int)enums.Movement.PATTACK] = new Texture2D[2][];
                 for (int i = 0; i < 2; i++)
                 {
-                    zombieSprites[2][i] = new Texture2D[6];
+                    zombieSprites[(int)enums.Movement.PATTACK][i] = new Texture2D[6];
 
                     for (int j = 0; j < 6; j++)
                     {
@@ -238,15 +235,15 @@ namespace RogueValley
                         if (name != null)
                         {
                             Console.WriteLine(name);
-                            zombieSprites[2][i][j] = Content.Load<Texture2D>(name);
+                            zombieSprites[(int)enums.Movement.PATTACK][i][j] = Content.Load<Texture2D>(name);
                         }
                     }
                 }
                 //sAttackSprite
-                zombieSprites[3] = new Texture2D[2][];
+                zombieSprites[(int)enums.Movement.SATTACK] = new Texture2D[2][];
                 for (int i = 0; i < 2; i++)
                 {
-                    zombieSprites[3][i] = new Texture2D[6];
+                    zombieSprites[(int)enums.Movement.SATTACK][i] = new Texture2D[6];
 
                     for (int j = 0; j < 6; j++)
                     {
@@ -268,12 +265,27 @@ namespace RogueValley
                         if (name != null)
                         {
                             Console.WriteLine(name);
-                            zombieSprites[3][i][j] = Content.Load<Texture2D>(name);
+                            zombieSprites[(int)enums.Movement.SATTACK][i][j] = Content.Load<Texture2D>(name);
                         }
                     }
                 }
-                z.LoadContent(zombieSprites[1], zombieSprites[0], zombieSprites[2], zombieSprites[3]);
+                sprites[(int)enums.Entitiy.Zombie] = zombieSprites;
             }
+
+            // Load the StartScreen Sprites:
+            {
+                Texture2D[] textures = new Texture2D[2];
+                textures[(int)enums.StartScreen.bg] = Content.Load<Texture2D>("Utility/StartScreen/StartGame");
+                textures[(int)enums.StartScreen.sButton] = Content.Load<Texture2D>("Utility/StartScreen/StartButton");
+                ui.LoadContent(textures);
+            }
+
+            // Load the GameOverScreen Sprites:
+            {
+
+            }
+
+            this.mobManager.LoadContent(sprites);
         }
 
         protected override void Update(GameTime gameTime)
@@ -281,30 +293,56 @@ namespace RogueValley
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (player.hp <= 0) {
-                Exit();
+            switch (this.gameState) {
+                case 0:
+                    StartScreen();
+                    break;
+
+                case 1:
+                    InGameUpdate();
+                    break;
+
+                default:
+                    break;
+
+
             }
-            KeyHandler();
-
-            // watch.Stop();
-
-            long lost = (1 / this.fps) * 1000 - watch.ElapsedMilliseconds;
-
-            if (lost >= 0 ) {
-            
-                Thread.Sleep((int)lost);
-                watch = System.Diagnostics.Stopwatch.StartNew();
-            }
-
-            // watch = System.Diagnostics.Stopwatch.StartNew();
-
-            player.Movement(movement, bgSprite);
-            player.Update();
-                        
-            bgSprite.Update(player);
-            this.mobManager.Update(this.player);
 
             base.Update(gameTime);
+
+        }
+
+        protected void InGameUpdate() {
+            if (this.player.hp <= 0)
+            {
+                this.gameState = 0;
+            }
+            InGameKeyHandler();
+            this.player.Movement(movement, bgSprite);
+            this.player.Update();
+
+            this.mobManager.Update(this.player);
+
+            bgSprite.Update(this.player);
+        }
+        protected void StartScreen() {
+            var mouseState = Mouse.GetState();
+            if (mouseState.LeftButton == ButtonState.Pressed) {
+                Point mousePos = new Point(mouseState.X, mouseState.Y);
+                this.gameState = ui.Click(mousePos);
+
+                // Reset Player:
+
+                this.player.hp = 100;
+                this.player.playerPosition[0] = 500;
+                this.player.playerPosition[1] = 500;
+
+                // Spawn Zombies:
+                int[] a = new int[2];
+                a[(int)enums.Entitiy.Zombie] = 10;
+                mobManager.Spawn(a, player);
+            }
+
         }
 
         protected override void Draw(GameTime gameTime)
@@ -313,49 +351,79 @@ namespace RogueValley
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(bgSprite.get_map(), new Rectangle(bgSprite.map_position[0], bgSprite.map_position[1], bgSprite.mapSize[0], bgSprite.mapSize[1]), Color.White);
+            switch (this.gameState) {
+                case 0:
+                    StartScreenDraw();
+                    break;
 
-            // TODO: Draw Particles
-            // TODO: Draw Enemies
-            z.Draw(_spriteBatch, bgSprite);
+                case 1:
+                    InGameDraw();
+                    break;
 
-            _spriteBatch.Draw(player.playerSprite, new Rectangle(player.drawPosition[0], player.drawPosition[1], 100, 100), Color.White);
+                default:
+                    break;
 
-            SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
+            }
 
 
-            _spriteBatch.DrawString(font, player.hp.ToString(), new Vector2(10, 10), Color.Red);
 
             _spriteBatch.End();
 
             base.Draw(gameTime);
         }
-        protected void KeyHandler() {
+
+        protected void InGameDraw() {
+            _spriteBatch.Draw(this.bgSprite.get_map(), new Rectangle(this.bgSprite.map_position[0], this.bgSprite.map_position[1], this.bgSprite.mapSize[0], this.bgSprite.mapSize[1]), Color.White);
+
+            // TODO: Draw Particles
+            // TODO: Draw Enemies
+            this.mobManager.Draw(_spriteBatch, this.bgSprite);
+
+            _spriteBatch.Draw(this.player.playerSprite, new Rectangle(this.player.drawPosition[0], this.player.drawPosition[1], 100, 100), Color.White);
+
+            SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
+
+            _spriteBatch.DrawString(font, player.hp.ToString(), new Vector2(10, 10), Color.Red);
+        }
+        protected void StartScreenDraw() {
+            ui.Draw(_spriteBatch);        
+        }
+
+        protected void InGameKeyHandler()
+        {
             KeyboardState state = Keyboard.GetState();
-            if (state.IsKeyDown(Keys.Escape)) {
+            if (state.IsKeyDown(Keys.Escape))
+            {
                 Exit();
             }
-            if (state.IsKeyDown(Keys.A)&& !(state.IsKeyDown(Keys.D))){
+            if (state.IsKeyDown(Keys.A) && !(state.IsKeyDown(Keys.D)))
+            {
                 movement[0] = -1;
             }
-            else if (state.IsKeyDown(Keys.D) && !(state.IsKeyDown(Keys.A))){
+            else if (state.IsKeyDown(Keys.D) && !(state.IsKeyDown(Keys.A)))
+            {
                 movement[0] = 1;
             }
-            else {
+            else
+            {
                 movement[0] = 0;
             }
-            if (state.IsKeyDown(Keys.W) && !(state.IsKeyDown(Keys.S))){
+            if (state.IsKeyDown(Keys.W) && !(state.IsKeyDown(Keys.S)))
+            {
                 movement[1] = -1;
             }
-            else if (state.IsKeyDown(Keys.S) && !(state.IsKeyDown(Keys.W))){
+            else if (state.IsKeyDown(Keys.S) && !(state.IsKeyDown(Keys.W)))
+            {
                 movement[1] = 1;
             }
-            else {
+            else
+            {
                 movement[1] = 0;
             }
-            if (state.IsKeyDown(Keys.L)) {
+            if (state.IsKeyDown(Keys.L))
+            {
                 int[] a = new int[2];
-                a[(int)enums.Entitiy.Zombie] = 100;
+                a[(int)enums.Entitiy.Zombie] = 10;
                 mobManager.Spawn(a, player);
             }
         }

@@ -60,9 +60,8 @@ namespace RogueValley.Entities
                 this.hp = 100;
                 this.defence = 5;
                 this.immunityFrames = 0;
-                this.maxImmFrames = 20;
+                this.maxImmFrames = 10;
             }
-
         }
         public void LoadContent(Texture2D[][] pas, Texture2D[][] pis)
         {
@@ -73,11 +72,9 @@ namespace RogueValley.Entities
             this.playerIdleSprites = pis;
             this.playerSprite = pis[0][0];
 
-
         }
         public void Movement(int[] direction, Map map)
         {
-
             this.lastMovement = direction;
 
             if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
@@ -88,7 +85,6 @@ namespace RogueValley.Entities
             {
                 this.playerPosition[1] += (this.speed / 10) * direction[1];
             }
-
         }
 
         public void Update()
@@ -102,14 +98,11 @@ namespace RogueValley.Entities
             {
                 immunityFrames = 0;
             }
-
-
         }
 
         protected void Animation()
         {
             this.animationTimer++;
-
             if (this.animationTimer == this.animationMaxTime)
             {
                 this.animationTimer = 0;
@@ -148,8 +141,6 @@ namespace RogueValley.Entities
                 }
                 this.playerSprite = this.playerIdleSprites[this.playerDirection][this.animationCount];
             }
-
-
         }
 
         public void PrimaryAttack(Enemies enemy)
@@ -169,20 +160,14 @@ namespace RogueValley.Entities
             if (this.immunityFrames == 0)
             {
                 this.immunityFrames = this.maxImmFrames;
-
-
-
                 if (piercing < this.defence)
                 {
                     this.hp -= (int)((float)damage * ((float)piercing/(float)this.defence));
                 }
                 else
                 {
-
                     this.hp -= damage;
-
                 }
-
                 if (this.hp <= 0){
                     this.GameOver();
                 }

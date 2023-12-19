@@ -25,7 +25,9 @@ namespace RogueValley.Entities
         protected Texture2D sprite;
         protected Random rnd;
 
-        public void Init() {
+        public void Init()
+        {
+
             this.drawPosition = new int[2];
 
             this.aniCount = 0;
@@ -38,17 +40,19 @@ namespace RogueValley.Entities
             rnd = new Random();
         }
 
-        public void LoadContent(Texture2D[][] movSprites, Texture2D[][] idleSprites, Texture2D[][] pAttackSprite, Texture2D[][] sAttackSprite) {
+        public void LoadContent(Texture2D[][][] sprites)
+        {
 
-            this.movSprites = movSprites;
-            this.idleSprites = idleSprites;
-            this.pAttackSprite = pAttackSprite;
-            this.sAttackSprite = sAttackSprite;
+            this.movSprites = sprites[(int)enums.Movement.MOVE];
+            this.idleSprites = sprites[(int)enums.Movement.IDLE];
+            this.pAttackSprite = sprites[(int)enums.Movement.PATTACK];
+            this.sAttackSprite = sprites[(int)enums.Movement.SATTACK];
             this.sprite = idleSprites[0][0];
 
         }
 
-        private int[] CalcdrawPos(Map m) {
+        private int[] CalcdrawPos(Map m)
+        {
             int[] drawPos = new int[2];
 
             drawPos[0] = this.position[0] + m.map_position[0];
@@ -57,7 +61,8 @@ namespace RogueValley.Entities
             return drawPos;
         }
 
-        public SpriteBatch Draw(SpriteBatch _spriteBatch, Map m) {
+        public SpriteBatch Draw(SpriteBatch _spriteBatch, Map m)
+        {
 
             this.drawPosition = CalcdrawPos(m);
             _spriteBatch.Draw(this.sprite, new Rectangle(this.drawPosition[0], this.drawPosition[1], this.spriteSize[0], this.spriteSize[1]), Color.White);
@@ -111,11 +116,18 @@ namespace RogueValley.Entities
             }
         }
 
-        protected virtual Player Ai(Player player){
+        public virtual Player Update(Player player)
+        {
             return player;
         }
 
-        public void TakeDamage(int damage, float piercing) {
+        protected virtual Player Ai(Player player)
+        {
+            return player;
+        }
+
+        public void TakeDamage(int damage, float piercing)
+        {
 
         }
         public virtual Player PrimaryAttack(Player player)
@@ -123,8 +135,9 @@ namespace RogueValley.Entities
             return player;
         }
 
-        public void PrimaryAttackAni() {
-                   
+        public void PrimaryAttackAni()
+        {
+
         }
 
         public virtual Player SecondaryAttack(Player player)
@@ -133,11 +146,13 @@ namespace RogueValley.Entities
         }
 
     }
-    class Zombie : Enemies {
+    class Zombie : Enemies
+    {
 
         int random;
 
-        public Zombie(int[] pos) {
+        public Zombie(int[] pos)
+        {
 
 
             base.pAttackTimer = 0;
@@ -146,7 +161,7 @@ namespace RogueValley.Entities
             base.sAttackTimer = 0;
             base.sAttackTimerMax = 10;
 
-            base.lastMove = new int[2] {0, 0};
+            base.lastMove = new int[2] { 0, 0 };
 
             base.hp = 100;
             base.damage = 10;
@@ -159,11 +174,12 @@ namespace RogueValley.Entities
             base.piercing = 5;
 
             base.Init();
-            
+
             this.random = rnd.Next(0, 6);
         }
 
-        public Player Update(Player player) {
+        public override Player Update(Player player)
+        {
 
             this.Ai(player);
             Console.WriteLine(this.drawPosition);
@@ -172,7 +188,9 @@ namespace RogueValley.Entities
             return player;
         }
 
-        protected override Player Ai(Player player) {
+        protected override Player Ai(Player player)
+        {
+
             mov = new int[2];
             int x = 0;
             int y = 0;
@@ -184,7 +202,8 @@ namespace RogueValley.Entities
             {
                 x = mov[0] * -1;
             }
-            else {
+            else
+            {
                 x = mov[0];
             }
 
@@ -207,24 +226,29 @@ namespace RogueValley.Entities
                 {
                     this.PrimaryAttack(player);
                 }
-                else {
+                else
+                {
                     this.SecondaryAttack(player);
                 }
-
             }
-            else {
+            else
+            {
                 base.pAttackTimer = 0;
                 base.lastMove[0] = (int)(((float)mov[0] / (float)n) * base.speed);
                 base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
                 base.position[0] += base.lastMove[0];
                 base.position[1] += base.lastMove[1];
+
+                base.Animation();
             }
-            if (base.pAttackTimer == 0 && base.sAttackTimer == 0) {
-            base.Animation();
+            if (base.pAttackTimer == 0 && base.sAttackTimer == 0)
+            {
+                base.Animation();
             }
             return player;
         }
-        public override Player PrimaryAttack(Player player) {
+        public override Player PrimaryAttack(Player player)
+        {
 
             if (base.AttackCooldown == 0)
             {
@@ -245,7 +269,7 @@ namespace RogueValley.Entities
             base.AttackCooldown--;
             return player;
         }
-                
+
         public override Player SecondaryAttack(Player player)
         {
             if (base.AttackCooldown == 0)
@@ -254,7 +278,7 @@ namespace RogueValley.Entities
                 if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[base.lastDir].Length - 1))
                 {
                     base.sAttackTimer = 0;
-                    player.TakeDamage((int)(base.damage* base.sAttackMult), base.piercing);
+                    player.TakeDamage((int)(base.damage * base.sAttackMult), base.piercing);
                     this.random = rnd.Next(0, 6);
                     base.AttackCooldown = 20;
                 }
