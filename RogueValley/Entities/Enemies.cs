@@ -18,9 +18,9 @@ namespace RogueValley.Entities
         protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing;
         protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer;
         protected float sAttackMult;
-        protected int[] drawPosition, spriteSize, lastMove;
+        protected int[] spriteSize, lastMove;
         protected int[] mov;
-        public int[] position;
+        public int[] position, drawPosition;
         protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite;
         protected Texture2D sprite;
         protected Random rnd;

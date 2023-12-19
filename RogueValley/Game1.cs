@@ -426,7 +426,7 @@ namespace RogueValley
             if (state.IsKeyDown(Keys.L))
             {
                 int[] a = new int[2];
-                a[(int)enums.Entitiy.Zombie] = 10;
+                a[(int)enums.Entitiy.Zombie] = 100;
                 mobManager.Spawn(a, player);
             }
         }
