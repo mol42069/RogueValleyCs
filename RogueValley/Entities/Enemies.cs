@@ -41,12 +41,12 @@ namespace RogueValley.Entities
             rnd = new Random();
         }
 
-        public void LoadContent(Texture2D[][] movSprites, Texture2D[][] idleSprites, Texture2D[][] pAttackSprite, Texture2D[][] sAttackSprite) {
+        public void LoadContent(Texture2D[][][] sprites) {
 
-            this.movSprites = movSprites;
-            this.idleSprites = idleSprites;
-            this.pAttackSprite = pAttackSprite;
-            this.sAttackSprite = sAttackSprite;
+            this.movSprites = sprites[(int)enums.Movement.MOVE];
+            this.idleSprites = sprites[(int)enums.Movement.IDLE];
+            this.pAttackSprite = sprites[(int)enums.Movement.PATTACK];
+            this.sAttackSprite = sprites[(int)enums.Movement.SATTACK];
             this.sprite = idleSprites[0][0];
 
         }
@@ -114,6 +114,11 @@ namespace RogueValley.Entities
             }
         }
 
+        public virtual Player Update(Player player)
+        {
+            return player;
+        }
+
         protected virtual Player Ai(Player player){
             return player;
         }
@@ -166,7 +171,7 @@ namespace RogueValley.Entities
             this.random = rnd.Next(0, 6);
         }
 
-        public Player Update(Player player) {
+        public override Player Update(Player player) {
 
             this.Ai(player);
             Console.WriteLine(this.drawPosition);
@@ -214,7 +219,6 @@ namespace RogueValley.Entities
                 else {
                     this.SecondaryAttack(player);
                 }
-
             }
             else {
                 base.pAttackTimer = 0;
@@ -222,6 +226,8 @@ namespace RogueValley.Entities
                 base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
                 base.position[0] += base.lastMove[0];
                 base.position[1] += base.lastMove[1];
+
+                base.Animation();
             }
             if (base.pAttackTimer == 0 && base.sAttackTimer == 0) {
             base.Animation();

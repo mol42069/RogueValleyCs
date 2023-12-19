@@ -59,6 +59,7 @@ namespace RogueValley.Entities
                 this.speed = speed;
                 this.hp = 100;
                 this.defence = 5;
+                this.damage = 10;
                 this.immunityFrames = 0;
                 this.maxImmFrames = 20;
             }
@@ -77,7 +78,6 @@ namespace RogueValley.Entities
         }
         public void Movement(int[] direction, Map map)
         {
-
             this.lastMovement = direction;
 
             if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
@@ -88,7 +88,6 @@ namespace RogueValley.Entities
             {
                 this.playerPosition[1] += (this.speed / 10) * direction[1];
             }
-
         }
 
         public void Update()
@@ -104,8 +103,6 @@ namespace RogueValley.Entities
             {
                 immunityFrames = 0;
             }
-
-
         }
 
         protected void Animation()
@@ -152,8 +149,6 @@ namespace RogueValley.Entities
                 }
                 this.playerSprite = this.playerIdleSprites[this.playerDirection][this.animationCount];
             }
-
-
         }
 
         public void PrimaryAttack(Enemies enemy)
@@ -166,25 +161,19 @@ namespace RogueValley.Entities
         {
 
 
-
         }
         public void TakeDamage(int damage, int piercing)
         {
             if (this.immunityFrames == 0)
             {
                 this.immunityFrames = this.maxImmFrames;
-
-
-
                 if (piercing < this.defence)
                 {
                     this.hp -= (int)((float)damage * ((float)piercing/(float)this.defence));
                 }
                 else
                 {
-
                     this.hp -= damage;
-
                 }
 
                 if (this.hp <= 0){
