@@ -12,7 +12,7 @@ namespace RogueValley.Entities
     {
         // PLAYER VARIABLES:
 
-        public int damage, hp, defence;
+        public int damage, hp, defence, maxhp;
 
         // Player Sprites:
 
@@ -58,6 +58,7 @@ namespace RogueValley.Entities
             {
                 this.speed = speed;
                 this.hp = 100;
+                this.maxhp = 100;
                 this.defence = 5;
                 this.immunityFrames = 0;
                 this.maxImmFrames = 10;

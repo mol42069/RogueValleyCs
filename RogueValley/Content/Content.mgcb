@@ -1484,6 +1484,30 @@
 /processorParam:TextureFormat=Compressed
 /build:Font/gameFont.spritefont
 
+#begin Utility/HealthBar/HBarBg.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Utility/HealthBar/HBarBg.png
+
+#begin Utility/HealthBar/HBarHealth.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Utility/HealthBar/HBarHealth.png
+
 #begin Utility/StartScreen/StartButton.png
 /importer:TextureImporter
 /processor:TextureProcessor

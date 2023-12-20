@@ -32,5 +32,10 @@ namespace RogueValley
             bg = 0,
             sButton = 1,
         }
+        public enum UI 
+        {
+            hBar = 2,
+            hBg = 3,
+        }
     }
 }

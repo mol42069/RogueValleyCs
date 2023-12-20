@@ -36,7 +36,7 @@ namespace RogueValley
 
             _graphics.PreferredBackBufferWidth = 1920;
             _graphics.PreferredBackBufferHeight = 1080;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -272,17 +272,17 @@ namespace RogueValley
                 sprites[(int)enums.Entitiy.Zombie] = zombieSprites;
             }
 
-            // Load the StartScreen Sprites:
+            // Load the UI Sprites:
             {
-                Texture2D[] textures = new Texture2D[2];
+                Texture2D[] textures = new Texture2D[4];
+
                 textures[(int)enums.StartScreen.bg] = Content.Load<Texture2D>("Utility/StartScreen/StartGame");
                 textures[(int)enums.StartScreen.sButton] = Content.Load<Texture2D>("Utility/StartScreen/StartButton");
-                ui.LoadContent(textures);
-            }
+                textures[(int)enums.UI.hBar] = Content.Load<Texture2D>("Utility/HealthBar/HBarHealth");
+                textures[(int)enums.UI.hBg] = Content.Load<Texture2D>("Utility/HealthBar/HBarBg");
+                SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
 
-            // Load the GameOverScreen Sprites:
-            {
-
+                ui.LoadContent(textures, font);
             }
 
             this.mobManager.LoadContent(sprites);
@@ -320,10 +320,12 @@ namespace RogueValley
                 // Delete the Enemies on death:
                 this.mobManager.RmList();
             }
+
             InGameKeyHandler();
+
             this.player.Movement(movement, bgSprite);
             this.player.Update();
-
+            this.ui.InGameUpdate(this.player);
             this.mobManager.Update(this.player);
 
             bgSprite.Update(this.player);
@@ -384,12 +386,11 @@ namespace RogueValley
 
             _spriteBatch.Draw(this.player.playerSprite, new Rectangle(this.player.drawPosition[0], this.player.drawPosition[1], 100, 100), Color.White);
 
-            SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
 
-            _spriteBatch.DrawString(font, player.hp.ToString(), new Vector2(10, 10), Color.Red);
+            this.ui.DrawInGameUI(_spriteBatch, this.player);
         }
         protected void StartScreenDraw() {
-            ui.Draw(_spriteBatch);        
+            ui.DrawStartScreen(_spriteBatch);        
         }
 
         protected void InGameKeyHandler()

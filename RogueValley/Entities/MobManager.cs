@@ -25,22 +25,7 @@ namespace RogueValley.Entities
         public void RmList() {
             this.mobList.Clear();
         }
-        private int GetPosX(int x, Player player) {
-
-            x = rnd.Next(0, 14000);
-            /*if (x < (player.playerPosition[0] + 1000) && x > (player.playerPosition[0] - 1000))
-                x = this.GetPosX(x, player);*/
-            return x;
-        }
-        private int GetPosY(int y, Player player)
-        {
-            y = rnd.Next(0, 7000);
-            /*if (y < (player.playerPosition[1] + 600) && y > (player.playerPosition[1] - 600))
-                y = this.GetPosY(y, player);*/
-            return y;
-
-        }
-
+        
         public void Spawn(int[] ammount, Player player) {
 
             for (int i = 0; i < ammount[(int)enums.Entitiy.Zombie]; i++)
@@ -49,10 +34,10 @@ namespace RogueValley.Entities
                 pos[0] = player.playerPosition[0];
                 pos[1] = player.playerPosition[1];
 
-                while (!(!(pos[1] < (player.playerPosition[1] + 600) && pos[1] > (player.playerPosition[1] - 600)) || !(pos[0] < (player.playerPosition[0] + 1000) && pos[0] > (player.playerPosition[0] - 1000))))
+                while (!(!(pos[1] < (player.playerPosition[1] + 1080) && pos[1] > (player.playerPosition[1] - 1080)) || !(pos[0] < (player.playerPosition[0] + 1920) && pos[0] > (player.playerPosition[0] - 1920))))
                 {
-                    pos[0] = this.GetPosX(0, player);
-                    pos[1] = this.GetPosY(0, player);
+                    pos[0] = rnd.Next(0, 14000);
+                    pos[1] = rnd.Next(0, 7000);
                 }
                 Zombie zombie = new Zombie(pos);
                 zombie.LoadContent(this.sprites[(int)enums.Entitiy.Zombie]);
