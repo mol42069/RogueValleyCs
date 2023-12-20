@@ -12,13 +12,14 @@ namespace RogueValley.Entities
     {
         // PLAYER VARIABLES:
 
-        public int damage, hp, defence, maxhp;
+        public int damage, hp, defence, maxhp, maxtarget;
+        private float piercing;
+        public List<Enemies> target;
 
         // Player Sprites:
 
         public Texture2D playerSprite;
-        private Texture2D[][] playerAniSprites;
-        private Texture2D[][] playerIdleSprites;
+        private Texture2D[][] playerAniSprites, playerIdleSprites, pAttackSprite, sAttackSprite;
 
         // Player Positional Variables:
 
@@ -27,7 +28,12 @@ namespace RogueValley.Entities
 
         // Player Animation Variables:
 
-        private int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames;
+        private int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames, AttackCooldown, pAttackTimer, pAttackTimerMax, sAttackTimer, sAttackTimerMax;
+
+        // OTHER:
+
+        Random rnd;
+        int random, AttackCooldownMax;
 
 
 
@@ -53,6 +59,15 @@ namespace RogueValley.Entities
 
                 this.playerLastDir = 1;         // 0 = right | 1 = left
                 this.playerDirection = 1;       // 0 = right | 1 = left
+
+                this.AttackCooldown = 0;
+                this.AttackCooldownMax = 10;
+
+                this.pAttackTimer = 0;
+                this.pAttackTimerMax = 2;
+
+                this.sAttackTimer = 0;
+                this.sAttackTimerMax = 4;
             }
             // other Player Variables:
             {
@@ -62,15 +77,28 @@ namespace RogueValley.Entities
                 this.defence = 5;
                 this.immunityFrames = 0;
                 this.maxImmFrames = 10;
+                this.piercing = 5.0f;
+                this.damage = 100;
+
+                this.target = new List<Enemies>();
+                this.maxtarget = 10;
+            }
+            // OTHER:
+            {
+                rnd = new Random();
+                this.random = rnd.Next(0, 6);
             }
         }
-        public void LoadContent(Texture2D[][] pas, Texture2D[][] pis)
+        public void LoadContent(Texture2D[][] pas, Texture2D[][] pis, Texture2D[][] pAttack, Texture2D[][] sAttack)
         {
 
             // Player Sprites:
 
             this.playerAniSprites = pas;
             this.playerIdleSprites = pis;
+            this.pAttackSprite = pAttack;
+            this.sAttackSprite = sAttack;
+
             this.playerSprite = pis[0][0];
 
         }
@@ -99,60 +127,173 @@ namespace RogueValley.Entities
             {
                 immunityFrames = 0;
             }
-        }
 
-        protected void Animation()
-        {
-            this.animationTimer++;
-            if (this.animationTimer == this.animationMaxTime)
+            if (this.target.Count != 0 && this.lastMovement[0] == 0 && this.lastMovement[1] == 0)
             {
-                this.animationTimer = 0;
-                this.animationCount++;
-            }
-            if (this.lastMovement[0] != 0 || this.lastMovement[1] != 0)
-            {
-                if (this.animationCount > 5)
+
+                int rCount = 0;
+                int lCount = 0;
+                List<Enemies> tenemies = new List<Enemies>();
+
+                for (int i = 0; i < this.target.Count; i++)
                 {
-                    this.animationCount = 0;
-                }
-                if (this.lastMovement[0] != 0)
-                {
-                    if (this.lastMovement[0] == 1)
+                    if (this.target[i].position[0] < this.playerPosition[0])
                     {
-                        this.playerDirection = 0;
-                        this.playerLastDir = 0;
+                        lCount++;
                     }
                     else
                     {
-                        this.playerDirection = 1;
-                        this.playerLastDir = 1;
+                        rCount++;
+                    }
+                }
+                if (rCount < lCount)
+                {
+                    this.playerDirection = 1;
+                    for (int i = 0; i < this.target.Count; i++)
+                    {
+                        if (this.target[i].position[0] < this.playerPosition[0])
+                        {
+                            tenemies.Add(this.target[i]);
+                        }
+                    }
+                }
+                else if (rCount > lCount)
+                {
+                    this.playerDirection = 0;
+                    for (int i = 0; i < this.target.Count; i++)
+                    {
+                        if (this.target[i].position[0] > this.playerPosition[0])
+                        {
+                            tenemies.Add(this.target[i]);
+                        }
                     }
                 }
                 else
                 {
-                    this.playerDirection = this.playerLastDir;
+                    for (int i = 0; i < this.target.Count; i++)
+                    {
+                        if (this.playerDirection == 0)
+                        {
+                            if (this.target[i].position[0] > this.playerPosition[0])
+                            {
+                                tenemies.Add(this.target[i]);
+                            }
+                        }
+                        else
+                        {
+                            if (this.target[i].position[0] < this.playerPosition[0])
+                            {
+                                tenemies.Add(this.target[i]);
+                            }
+                        }
+                    }
                 }
-                this.playerSprite = this.playerAniSprites[this.playerDirection][this.animationCount];
-            }
-            else
-            {
-                if (this.animationCount > 3)
+                if (this.random == 0)
                 {
-                    this.animationCount = 0;
+                    this.PrimaryAttack(tenemies);
                 }
-                this.playerSprite = this.playerIdleSprites[this.playerDirection][this.animationCount];
+                else
+                {
+                    this.SecondAttack(tenemies);
+                }
+                tenemies.Clear();          
             }
         }
 
-        public void PrimaryAttack(Enemies enemy)
+        protected void Animation()
+        {
+            if (!(this.lastMovement[0] == 0 && this.lastMovement[1] == 0 && this.target.Count != 0 && this.AttackCooldown == 0)) {
+            
+                this.animationTimer++;
+                if(this.animationTimer == this.animationMaxTime)
+                {
+                    this.animationTimer = 0;
+                    this.animationCount++;
+                }
+                if (this.lastMovement[0] != 0 || this.lastMovement[1] != 0)
+                {
+                    if (this.animationCount > 5)
+                    {
+                        this.animationCount = 0;
+                    }
+                    if (this.lastMovement[0] != 0)
+                    {
+                        if (this.lastMovement[0] == 1)
+                        {
+                            this.playerDirection = 0;
+                            this.playerLastDir = 0;
+                        }
+                        else
+                        {
+                            this.playerDirection = 1;
+                            this.playerLastDir = 1;
+                        }
+                    }
+                    else
+                    {
+                        this.playerDirection = this.playerLastDir;
+                    }
+                    this.playerSprite = this.playerAniSprites[this.playerDirection][this.animationCount];
+                }
+                else
+                {
+                    if (this.animationCount > 3)
+                    {
+                        this.animationCount = 0;
+                    }
+                    this.playerSprite = this.playerIdleSprites[this.playerDirection][this.animationCount];
+                }
+            }
+        }
+
+        public void PrimaryAttack(List<Enemies> e)
         {
 
+            if (this.AttackCooldown == 0)
+            {
+                this.pAttackTimer++;
+                if (this.pAttackTimer >= this.pAttackTimerMax * (this.pAttackSprite[this.playerDirection].Length - 1))
+                {
+                    this.pAttackTimer = 0;
+                    for (int i = 0; i < e.Count; i++)
+                    {
+                        e[i].TakeDamage(this.damage, this.piercing);
+                    }
+                    this.random = rnd.Next(0, 6);
+                    this.AttackCooldown = this.AttackCooldownMax;
+                }
+                if (this.pAttackTimer % this.pAttackTimerMax == 0)
+                {
+                    this.playerSprite = this.pAttackSprite[this.playerDirection][(int)(this.pAttackTimer / this.pAttackTimerMax)];
+                }
+                return;
+            }
+            this.AttackCooldown--;
 
         }
 
-        public void SecondAttack(Enemies enemy)
+        public void SecondAttack(List<Enemies> e)
         {
-
+            if (this.AttackCooldown == 0)
+            {
+                this.sAttackTimer++;
+                if (this.sAttackTimer >= this.sAttackTimerMax * (this.sAttackSprite[this.playerDirection].Length - 1))
+                {
+                    this.sAttackTimer = 0;
+                    for (int i = 0; i < e.Count; i++)
+                    {
+                        e[i].TakeDamage(this.damage * 2, this.piercing);
+                    }
+                    this.random = rnd.Next(0, 6);
+                    this.AttackCooldown = this.AttackCooldownMax;
+                }
+                if (this.sAttackTimer % this.sAttackTimerMax == 0)
+                {
+                    this.playerSprite = this.sAttackSprite[this.playerDirection][(int)(this.sAttackTimer / this.sAttackTimerMax)];
+                }
+                return;
+            }
+            this.AttackCooldown--;
 
 
         }

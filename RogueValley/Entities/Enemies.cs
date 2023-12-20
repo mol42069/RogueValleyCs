@@ -15,7 +15,7 @@ namespace RogueValley.Entities
     class Enemies
     {
 
-        protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing;
+        protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing, targetId;
         protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer;
         protected float sAttackMult;
         protected int[] spriteSize, lastMove;
@@ -37,6 +37,7 @@ namespace RogueValley.Entities
             this.spriteSize[0] = 100;
             this.spriteSize[1] = 100;
 
+            this.targetId = -1;
             rnd = new Random();
         }
 
@@ -116,9 +117,9 @@ namespace RogueValley.Entities
             }
         }
 
-        public virtual Player Update(Player player)
+        public virtual int Update(Player player)
         {
-            return player;
+            return 0;
         }
 
         protected virtual Player Ai(Player player)
@@ -128,7 +129,14 @@ namespace RogueValley.Entities
 
         public void TakeDamage(int damage, float piercing)
         {
-
+            if (piercing < this.defence)
+            {
+                this.hp -= (int)((float)damage * ((float)piercing / (float)this.defence));
+            }
+            else
+            {
+                this.hp -= damage;
+            }
         }
         public virtual Player PrimaryAttack(Player player)
         {
@@ -178,14 +186,14 @@ namespace RogueValley.Entities
             this.random = rnd.Next(0, 6);
         }
 
-        public override Player Update(Player player)
+        public override int Update(Player player)
         {
 
             this.Ai(player);
-            Console.WriteLine(this.drawPosition);
+            Console.WriteLine(base.drawPosition);
             Console.WriteLine("\n");
-            Console.WriteLine(this.position);
-            return player;
+            Console.WriteLine(base.position);
+            return base.hp;
         }
 
         protected override Player Ai(Player player)
@@ -219,6 +227,10 @@ namespace RogueValley.Entities
             int n = x + y;
             if (n <= base.reach && n >= -base.reach)
             {
+                //if (player.target.Count < player.maxtarget) {
+                this.targetId = player.target.Count;
+                player.target.Add(this);
+                //}
                 base.lastMove[0] = 0;
                 base.lastMove[1] = 0;
 

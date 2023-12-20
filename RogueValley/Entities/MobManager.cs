@@ -46,9 +46,11 @@ namespace RogueValley.Entities
         }
 
         public void Update(Player player) {
-
+            player.target.Clear();
             for (int i = 0; i < this.mobList.Count; i++) {
-                this.mobList[i].Update(player);
+                if (this.mobList[i].Update(player) <= 0) {
+                    this.mobList.RemoveAt(i);
+                }
             }
         }
 

@@ -69,7 +69,8 @@ namespace RogueValley
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            Texture2D[][] AniSprites;
+            Texture2D[][] AniSprites, pAtckSprites, sAtckSprites;
+
             Texture2D[][] IdleSprites;
             Texture2D[][][][] sprites = new Texture2D[1][][][];
 
@@ -142,7 +143,66 @@ namespace RogueValley
                         }
                     }
                 }
-                player.LoadContent(AniSprites, IdleSprites);
+                pAtckSprites = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    pAtckSprites[i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+
+                            case 0:
+                                name = "Entity/Player/pAttack/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Player/pAttack/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            pAtckSprites[i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                sAtckSprites = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    sAtckSprites[i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Player/sAttack/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Player/sAttack/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            sAtckSprites[i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                player.LoadContent(AniSprites, IdleSprites, pAtckSprites, sAtckSprites);
             }
 
             // Load the Zombie Sprites:
@@ -319,6 +379,7 @@ namespace RogueValley
 
                 // Delete the Enemies on death:
                 this.mobManager.RmList();
+                this.player.target.Clear();
             }
 
             InGameKeyHandler();
