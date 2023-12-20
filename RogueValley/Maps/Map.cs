@@ -67,7 +67,7 @@ namespace RogueValley.Maps
             }            
         }
         public Texture2D get_map() {
-        
+            // return the map sprite
             return mapSprite;
         }
     }
