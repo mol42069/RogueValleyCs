@@ -225,6 +225,7 @@ namespace RogueValley.Entities
             {
                 y = mov[1];
             }
+           
 
             int n = x + y;
 
@@ -256,6 +257,9 @@ namespace RogueValley.Entities
                 }
                 base.pAttackTimer = 0;
                 base.sAttackTimer = 0;
+
+                mov[0] += rnd.Next(-100, 101);
+                mov[1] += rnd.Next(-100, 101);
 
                 base.lastMove[0] = (int)(((float)mov[0] / (float)n) * base.speed);
                 base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
