@@ -89,11 +89,15 @@ namespace RogueValley.Maps
             _spriteBatch.Draw(this.sprites[(int)enums.StartScreen.sButton], this.sButtonRec, Color.White);        
         }
 
-        public void DrawInGameUI(SpriteBatch _spriteBatch, Player player) {
+        public void DrawInGameUI(SpriteBatch _spriteBatch, Player player, MobManager mm) {
             // we draw all ui elements in-game.
+            String s = "WAVE: " + mm.wave.ToString() + " | ENEMIES: " + mm.mobList.Count.ToString();
+
+            _spriteBatch.DrawString(this.font, s, new Microsoft.Xna.Framework.Vector2(10, 10), Color.White);
+
             _spriteBatch.Draw(this.sprites[(int)enums.UI.hBg], new Rectangle(this.hBgPos[0], this.hBgPos[1], this.hBgSize[0], this.hBgSize[1]), Color.White);
             _spriteBatch.Draw(this.sprites[(int)enums.UI.hBar], new Rectangle(this.hBgPos[0] + 5, this.hBgPos[1] + 5, this.hBarSize, this.hBarSizeMax[1]), Color.White);
-            _spriteBatch.DrawString(font, player.hp.ToString(), new Microsoft.Xna.Framework.Vector2(this.hBgPos[0] + (this.hBgSize[0]/2) - 10, this.hBgPos[1] + (this.hBgSize[1] / 2) - 10), Color.White);
+            _spriteBatch.DrawString(this.font, player.hp.ToString(), new Microsoft.Xna.Framework.Vector2(this.hBgPos[0] + (this.hBgSize[0]/2) - 10, this.hBgPos[1] + (this.hBgSize[1] / 2) - 10), Color.White);
         }
 
     }

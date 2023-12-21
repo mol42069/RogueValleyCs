@@ -21,7 +21,7 @@ namespace RogueValley
         private MobManager mobManager;
         private UI ui;
 
-        private int[] movement;
+        private int[] movement, bgSize;
 
         private int fps;
         private System.Diagnostics.Stopwatch watch;
@@ -48,7 +48,7 @@ namespace RogueValley
             movement = new int[2]; // 0=X-Axis | 1=y-Axis
 
             this.gameState = 0;
-
+            this.bgSize = new int[] {7000, 4000};
             ui = new UI();
 
             int[] tempPos = new int[2];
@@ -61,7 +61,7 @@ namespace RogueValley
             this.fps = 60;
             watch = System.Diagnostics.Stopwatch.StartNew();
 
-            mobManager = new MobManager(this.player);
+            mobManager = new MobManager(this.player, this.bgSize);
 
             base.Initialize();
         }
@@ -78,7 +78,7 @@ namespace RogueValley
 
             bg = Content.Load<Texture2D>("Background/grass");
             int[] screenSize = { 1920, 1080 };
-            bgSprite = new Map(player.playerPosition, screenSize, bg, screenSize);
+            bgSprite = new Map(player.playerPosition, screenSize, bg, screenSize, this.bgSize);
 
             // Load the Player Sprites:
             {
@@ -406,13 +406,7 @@ namespace RogueValley
                 this.player.hp = 100;
                 this.player.playerPosition[0] = 500;
                 this.player.playerPosition[1] = 500;
-
-                // Spawn Zombies:
-                int[] a = new int[2];
-                a[(int)enums.Entitiy.Zombie] = 10;
-                mobManager.Spawn(a, player);
             }
-
         }
 
         protected override void Draw(GameTime gameTime)
@@ -455,7 +449,7 @@ namespace RogueValley
             _spriteBatch.Draw(this.player.playerSprite, new Rectangle(this.player.drawPosition[0], this.player.drawPosition[1], 100, 100), Color.White);
 
 
-            this.ui.DrawInGameUI(_spriteBatch, this.player);
+            this.ui.DrawInGameUI(_spriteBatch, this.player, this.mobManager);
         }
         protected void StartScreenDraw() {
             // here is everything we update if we are on the Start Screen.
@@ -496,9 +490,7 @@ namespace RogueValley
             }
             if (state.IsKeyDown(Keys.L))
             {
-                int[] a = new int[2];
-                a[(int)enums.Entitiy.Zombie] = 100;
-                mobManager.Spawn(a, player);
+                mobManager.Spawn(player);
             }
         }
     }

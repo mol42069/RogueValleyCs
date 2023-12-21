@@ -8,10 +8,16 @@ namespace RogueValley
 {
     public class enums
     {
+
+        public enum SpawnRate 
+        {
+            Zombie = 90,
+            Mage = 10,
+        }
         public enum Entitiy
         {
-            Player = 10,
             Zombie = 0,
+            Mage = 1,
         }
         public enum Direction
         {
