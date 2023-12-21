@@ -13,10 +13,8 @@ namespace RogueValley.Maps
         public int[] map_position, mapSize, sSize;
         private Texture2D mapSprite;
 
-        public Map(int[] playerPosition, int[] screenSize, Texture2D mapSprite, int[] sSize) {
-            this.mapSize = new int[2];
-            this.mapSize[0] = 14000;
-            this.mapSize[1] = 7000;
+        public Map(int[] playerPosition, int[] screenSize, Texture2D mapSprite, int[] sSize, int[] bgSize) {
+            this.mapSize = bgSize;
 
             this.sSize = sSize;
 

@@ -317,4 +317,10 @@ namespace RogueValley.Entities
             return player;
         }
     }
+
+    class Mage : Enemies 
+    {
+    
+    
+    }
 }

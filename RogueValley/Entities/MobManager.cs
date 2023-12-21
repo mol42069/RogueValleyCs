@@ -11,11 +11,22 @@ namespace RogueValley.Entities
     class MobManager
     {
         private Texture2D[][][][] sprites;
-        private List<Enemies> mobList;
+        public List<Enemies> mobList;
         private Random rnd;
-        public MobManager(Player player) {
+
+        private int[] spawnRate, bgSize;
+        public int ammount, wave, maxRandom;
+
+        public MobManager(Player player, int[] bgSize) {
             this.mobList = new List<Enemies>();
-            rnd = new Random();
+            this.rnd = new Random();
+
+            this.ammount = 10;
+            this.wave = 0;
+            this.maxRandom = 100;
+
+            this.spawnRate = new int[2];
+            this.bgSize = bgSize;
         }
 
         public void LoadContent(Texture2D[][][][] sprites) {
@@ -25,10 +36,10 @@ namespace RogueValley.Entities
             this.mobList.Clear();
         }
         
-        public void Spawn(int[] ammount, Player player) {
+        public void Spawn(Player player) {
             // we spawn an specific ammount of enemies at random positions that arent ont the screen.
             // And we add them to a list.
-            for (int i = 0; i < ammount[(int)enums.Entitiy.Zombie]; i++)
+            for (int i = 0; i < this.ammount; i++)
             {
                 int[] pos = new int[2];
                 pos[0] = player.playerPosition[0];
@@ -36,12 +47,39 @@ namespace RogueValley.Entities
 
                 while (!(!(pos[1] < (player.playerPosition[1] + 1080) && pos[1] > (player.playerPosition[1] - 1080)) || !(pos[0] < (player.playerPosition[0] + 1920) && pos[0] > (player.playerPosition[0] - 1920))))
                 {
-                    pos[0] = rnd.Next(0, 14000);
-                    pos[1] = rnd.Next(0, 7000);
+                    pos[0] = rnd.Next(0, this.bgSize[0]);
+                    pos[1] = rnd.Next(0, this.bgSize[1]);
                 }
-                Zombie zombie = new Zombie(pos);
-                zombie.LoadContent(this.sprites[(int)enums.Entitiy.Zombie]);
-                this.mobList.Add(zombie);
+
+                int random = rnd.Next(0, 90);
+                switch (this.wave) {
+                    case 1:
+                        
+                        if (random < 90)
+                        {
+                            Zombie zombie = new Zombie(pos);
+                            zombie.LoadContent(this.sprites[(int)enums.Entitiy.Zombie]);
+                            this.mobList.Add(zombie);
+                        }
+                        else if (random >= 90)
+                        {
+                            // here we spawn other stuff for example Mages
+                        }
+                        break;
+
+                    default:
+                        if (random < 90)
+                        {
+                            Zombie zombie = new Zombie(pos);
+                            zombie.LoadContent(this.sprites[(int)enums.Entitiy.Zombie]);
+                            this.mobList.Add(zombie);
+                        }
+                        else if (random >= 90)
+                        {
+                            // here we spawn other stuff for example Mages
+                        }
+                        break;
+                }
             }            
         }
 
@@ -49,10 +87,22 @@ namespace RogueValley.Entities
             // we go through all enemies in our mobList and Update them.
             //if they are dead we remove them from the list so they basicly dont exist anymore.
             player.target.Clear();
-            for (int i = 0; i < this.mobList.Count; i++) {
-                if (this.mobList[i].Update(player) <= 0) {
-                    this.mobList.RemoveAt(i);
+            if (this.mobList.Count != 0)
+            {
+                for (int i = 0; i < this.mobList.Count; i++)
+                {
+                    if (this.mobList[i].Update(player) <= 0)
+                    {
+                        this.mobList.RemoveAt(i);
+                    }
                 }
+            }
+            else 
+            {
+                this.wave++;
+                //this.maxRandom *= this.wave;
+                this.ammount = this.ammount * this.wave;
+                this.Spawn(player);
             }
         }
 
