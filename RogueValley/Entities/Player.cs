@@ -12,8 +12,8 @@ namespace RogueValley.Entities
     {
         // PLAYER VARIABLES:
 
-        public int damage, hp, defence, maxhp, maxtarget;
-        private float piercing;
+        public int damage, hp, defence, maxhp, maxtarget, reach;
+        private float piercing, sAttackMulit;
         public List<Enemies> target;
 
         // Player Sprites:
@@ -64,10 +64,10 @@ namespace RogueValley.Entities
                 this.AttackCooldownMax = 10;
 
                 this.pAttackTimer = 0;
-                this.pAttackTimerMax = 2;
+                this.pAttackTimerMax = 3;
 
                 this.sAttackTimer = 0;
-                this.sAttackTimerMax = 4;
+                this.sAttackTimerMax = 5;
             }
             // other Player Variables:
             {
@@ -79,9 +79,12 @@ namespace RogueValley.Entities
                 this.maxImmFrames = 10;
                 this.piercing = 5.0f;
                 this.damage = 100;
+                this.sAttackMulit = 1.9f;
+
+                this.reach = 200;
 
                 this.target = new List<Enemies>();
-                this.maxtarget = 10;
+                this.maxtarget = 20;
             }
             // OTHER:
             {
@@ -106,6 +109,13 @@ namespace RogueValley.Entities
         {
             this.lastMovement = direction;
 
+            if (!(direction[0] == 0 && direction[1] == 0))
+            {
+                this.pAttackTimer = 0;
+                this.sAttackTimer = 0;
+                this.AttackCooldown = 0;
+            }
+
             if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
             {
                 this.playerPosition[0] += (this.speed / 10) * direction[0];
@@ -127,10 +137,8 @@ namespace RogueValley.Entities
             {
                 immunityFrames = 0;
             }
-
             if (this.target.Count != 0 && this.lastMovement[0] == 0 && this.lastMovement[1] == 0)
             {
-
                 int rCount = 0;
                 int lCount = 0;
                 List<Enemies> tenemies = new List<Enemies>();
@@ -188,13 +196,15 @@ namespace RogueValley.Entities
                         }
                     }
                 }
-                if (this.random == 0)
+                if (this.random != 0)
                 {
-                    this.PrimaryAttack(tenemies);
+                    if(tenemies.Count != 0)
+                        this.PrimaryAttack(tenemies);
                 }
                 else
                 {
-                    this.SecondAttack(tenemies);
+                    if (tenemies.Count != 0)
+                        this.SecondAttack(tenemies);
                 }
                 tenemies.Clear();          
             }
@@ -255,9 +265,18 @@ namespace RogueValley.Entities
                 if (this.pAttackTimer >= this.pAttackTimerMax * (this.pAttackSprite[this.playerDirection].Length - 1))
                 {
                     this.pAttackTimer = 0;
-                    for (int i = 0; i < e.Count; i++)
+                    if (e.Count < this.maxtarget)
                     {
-                        e[i].TakeDamage(this.damage, this.piercing);
+                        for (int i = 0; i < e.Count; i++)
+                        {
+                            e[i].TakeDamage(this.damage, this.piercing);
+                        }
+                    }
+                    else {
+                        for (int i = 0; i < this.maxtarget; i++)
+                        {
+                            e[i].TakeDamage(this.damage, this.piercing);
+                        }
                     }
                     this.random = rnd.Next(0, 6);
                     this.AttackCooldown = this.AttackCooldownMax;
@@ -269,7 +288,6 @@ namespace RogueValley.Entities
                 return;
             }
             this.AttackCooldown--;
-
         }
 
         public void SecondAttack(List<Enemies> e)
@@ -280,9 +298,19 @@ namespace RogueValley.Entities
                 if (this.sAttackTimer >= this.sAttackTimerMax * (this.sAttackSprite[this.playerDirection].Length - 1))
                 {
                     this.sAttackTimer = 0;
-                    for (int i = 0; i < e.Count; i++)
+                    if (e.Count < this.maxtarget)
                     {
-                        e[i].TakeDamage(this.damage * 2, this.piercing);
+                        for (int i = 0; i < e.Count; i++)
+                        {
+                            e[i].TakeDamage((int)((float)this.damage * this.sAttackMulit), this.piercing);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < this.maxtarget; i++)
+                        {
+                            e[i].TakeDamage((int)((float)this.damage * this.sAttackMulit), this.piercing);
+                        }
                     }
                     this.random = rnd.Next(0, 6);
                     this.AttackCooldown = this.AttackCooldownMax;
@@ -304,7 +332,7 @@ namespace RogueValley.Entities
                 this.immunityFrames = this.maxImmFrames;
                 if (piercing < this.defence)
                 {
-                    this.hp -= (int)((float)damage * ((float)piercing/(float)this.defence));
+                    this.hp -= (int)((float)damage * ((float)((float)piercing/(float)this.defence) + 0.2f));
                 }
                 else
                 {

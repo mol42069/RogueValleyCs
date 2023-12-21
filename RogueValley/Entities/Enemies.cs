@@ -176,10 +176,10 @@ namespace RogueValley.Entities
             base.sAttackMult = 1.3f;
 
             base.position = pos;
-            base.defence = 10;
+            base.defence = 1;
             base.reach = 100;
             base.speed = 5;
-            base.piercing = 5;
+            base.piercing = 0;
 
             base.Init();
 
@@ -225,12 +225,15 @@ namespace RogueValley.Entities
             }
 
             int n = x + y;
-            if (n <= base.reach && n >= -base.reach)
+
+            if (n <= player.reach && n >= -player.reach) 
             {
-                //if (player.target.Count < player.maxtarget) {
                 this.targetId = player.target.Count;
                 player.target.Add(this);
-                //}
+            }
+
+            if (n <= base.reach && n >= -base.reach)
+            {
                 base.lastMove[0] = 0;
                 base.lastMove[1] = 0;
 
@@ -245,9 +248,16 @@ namespace RogueValley.Entities
             }
             else
             {
+                if (base.pAttackTimer != 0 || base.sAttackTimer != 0)
+                {
+                    this.random = base.rnd.Next(0, 6);
+                }
                 base.pAttackTimer = 0;
+                base.sAttackTimer = 0;
+
                 base.lastMove[0] = (int)(((float)mov[0] / (float)n) * base.speed);
                 base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
+
                 base.position[0] += base.lastMove[0];
                 base.position[1] += base.lastMove[1];
 
