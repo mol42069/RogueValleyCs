@@ -353,6 +353,8 @@ namespace RogueValley
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
+
             switch (this.gameState) {
                 case 0:
                     StartScreen();
@@ -373,6 +375,7 @@ namespace RogueValley
         }
 
         protected void InGameUpdate() {
+            // here is everything we update if we are in Game.
             if (this.player.hp <= 0)
             {
                 this.gameState = 0;
@@ -392,6 +395,7 @@ namespace RogueValley
             bgSprite.Update(this.player);
         }
         protected void StartScreen() {
+            // here is everything we update if we are on the Start Screen.
             var mouseState = Mouse.GetState();
             if (mouseState.LeftButton == ButtonState.Pressed) {
                 Point mousePos = new Point(mouseState.X, mouseState.Y);
@@ -413,6 +417,8 @@ namespace RogueValley
 
         protected override void Draw(GameTime gameTime)
         {
+            // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
+
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
@@ -439,6 +445,7 @@ namespace RogueValley
         }
 
         protected void InGameDraw() {
+            // here is everything we update if we are in Game.
             _spriteBatch.Draw(this.bgSprite.get_map(), new Rectangle(this.bgSprite.map_position[0], this.bgSprite.map_position[1], this.bgSprite.mapSize[0], this.bgSprite.mapSize[1]), Color.White);
 
             // TODO: Draw Particles
@@ -451,11 +458,13 @@ namespace RogueValley
             this.ui.DrawInGameUI(_spriteBatch, this.player);
         }
         protected void StartScreenDraw() {
+            // here is everything we update if we are on the Start Screen.
             ui.DrawStartScreen(_spriteBatch);        
         }
 
         protected void InGameKeyHandler()
         {
+            // we poll the keyboard.
             KeyboardState state = Keyboard.GetState();
             if (state.IsKeyDown(Keys.Escape))
             {

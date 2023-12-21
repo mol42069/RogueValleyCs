@@ -17,43 +17,49 @@ namespace RogueValley.Entities
 
         protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing, targetId;
         protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer;
+
         protected float sAttackMult;
+
         protected int[] spriteSize, lastMove;
         protected int[] mov;
         public int[] position, drawPosition;
+
         protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite;
         protected Texture2D sprite;
+
         protected Random rnd;
 
         public void Init()
         {
-
             this.drawPosition = new int[2];
 
             this.aniCount = 0;
             this.aniTimer = 0;
             this.aniTimerMax = 5;
+
             this.spriteSize = new int[2];
             this.spriteSize[0] = 100;
             this.spriteSize[1] = 100;
 
             this.targetId = -1;
+
             rnd = new Random();
         }
 
         public void LoadContent(Texture2D[][][] sprites)
         {
-
             this.movSprites = sprites[(int)enums.Movement.MOVE];
             this.idleSprites = sprites[(int)enums.Movement.IDLE];
             this.pAttackSprite = sprites[(int)enums.Movement.PATTACK];
             this.sAttackSprite = sprites[(int)enums.Movement.SATTACK];
-            this.sprite = idleSprites[0][0];
 
+            this.sprite = idleSprites[0][0];
         }
 
         private int[] CalcdrawPos(Map m)
         {
+            // we calculate the enemy based on the player / map position
+
             int[] drawPos = new int[2];
 
             drawPos[0] = this.position[0] + m.map_position[0];
@@ -64,7 +70,7 @@ namespace RogueValley.Entities
 
         public SpriteBatch Draw(SpriteBatch _spriteBatch, Map m)
         {
-
+            // we draw the enemy.
             this.drawPosition = CalcdrawPos(m);
             _spriteBatch.Draw(this.sprite, new Rectangle(this.drawPosition[0], this.drawPosition[1], this.spriteSize[0], this.spriteSize[1]), Color.White);
 
@@ -73,6 +79,7 @@ namespace RogueValley.Entities
 
         protected void Animation()
         {
+            // we do the same as with the player see there
             this.aniTimer++;
 
             if (this.aniTimer == this.aniTimerMax)
@@ -80,14 +87,12 @@ namespace RogueValley.Entities
                 this.aniTimer = 0;
                 this.aniCount++;
             }
-
             if (this.lastMove[0] != 0 || this.lastMove[1] != 0)
             {
                 if (this.aniCount > 5)
                 {
                     this.aniCount = 0;
                 }
-
                 if (this.lastMove[0] != 0)
                 {
                     if (this.lastMove[0] > 0)
@@ -129,6 +134,7 @@ namespace RogueValley.Entities
 
         public void TakeDamage(int damage, float piercing)
         {
+            // same as in the player class check there for explanation.
             if (piercing < this.defence)
             {
                 this.hp -= (int)((float)damage * ((float)piercing / (float)this.defence));
@@ -161,8 +167,6 @@ namespace RogueValley.Entities
 
         public Zombie(int[] pos)
         {
-
-
             base.pAttackTimer = 0;
             base.pAttackTimerMax = 5;
 
@@ -188,17 +192,15 @@ namespace RogueValley.Entities
 
         public override int Update(Player player)
         {
-
+            // we just call the ai func. and return the entity hp.
             this.Ai(player);
-            Console.WriteLine(base.drawPosition);
-            Console.WriteLine("\n");
-            Console.WriteLine(base.position);
             return base.hp;
         }
 
         protected override Player Ai(Player player)
         {
-
+            // we move the entity towards the player until it is in reach. Then we tell the Zombie to attack as well as when this zombie is in reach of
+            // the player we add this to the target list.
             mov = new int[2];
             int x = 0;
             int y = 0;
@@ -271,7 +273,7 @@ namespace RogueValley.Entities
         }
         public override Player PrimaryAttack(Player player)
         {
-
+            // we attack the player every so often. Same as in player basicly but this only attacks the player
             if (base.AttackCooldown == 0)
             {
                 base.pAttackTimer++;
@@ -293,6 +295,7 @@ namespace RogueValley.Entities
         }
 
         public override Player SecondaryAttack(Player player)
+        // we attack the player every so often. Same as in player basicly but this only attacks the player
         {
             if (base.AttackCooldown == 0)
             {

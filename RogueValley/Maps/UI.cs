@@ -65,6 +65,7 @@ namespace RogueValley.Maps
             this.font = font;
         }
         public void InGameUpdate(Player player) {
+            // we make the red bar in the health bar smaller if we take damage.
             this.hBarSize = (int)((float)this.hBarSizeMax[0] * ((float)player.hp / (float)player.maxhp));
             if (this.hBarSize < 0) {
                 this.hBarSize = 0;
@@ -72,7 +73,7 @@ namespace RogueValley.Maps
         }
 
         public int Click(Point mousePos) {
-
+            // we check if the start button on the start-screen is clicked.
             if (this.sButtonRec.Contains(mousePos))
             {
                 return 1;
@@ -83,11 +84,13 @@ namespace RogueValley.Maps
         }
 
         public void DrawStartScreen(SpriteBatch _spriteBatch) {
+            // we draw all ui elements on the start-screen.
             _spriteBatch.Draw(this.sprites[(int)enums.StartScreen.bg], new Rectangle(0, 0, 1920, 1080), Color.White);
             _spriteBatch.Draw(this.sprites[(int)enums.StartScreen.sButton], this.sButtonRec, Color.White);        
         }
 
         public void DrawInGameUI(SpriteBatch _spriteBatch, Player player) {
+            // we draw all ui elements in-game.
             _spriteBatch.Draw(this.sprites[(int)enums.UI.hBg], new Rectangle(this.hBgPos[0], this.hBgPos[1], this.hBgSize[0], this.hBgSize[1]), Color.White);
             _spriteBatch.Draw(this.sprites[(int)enums.UI.hBar], new Rectangle(this.hBgPos[0] + 5, this.hBgPos[1] + 5, this.hBarSize, this.hBarSizeMax[1]), Color.White);
             _spriteBatch.DrawString(font, player.hp.ToString(), new Microsoft.Xna.Framework.Vector2(this.hBgPos[0] + (this.hBgSize[0]/2) - 10, this.hBgPos[1] + (this.hBgSize[1] / 2) - 10), Color.White);

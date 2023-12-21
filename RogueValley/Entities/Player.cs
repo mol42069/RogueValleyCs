@@ -35,12 +35,8 @@ namespace RogueValley.Entities
         Random rnd;
         int random, AttackCooldownMax;
 
-
-
         public Player(int[] pos, int animax = 8, int speed = 20)
         {
-            // PLAYER VARIABLES:
-
             // Player Positional Variables:
             {
                 this.playerPosition = new int[2];
@@ -94,7 +90,6 @@ namespace RogueValley.Entities
         }
         public void LoadContent(Texture2D[][] pas, Texture2D[][] pis, Texture2D[][] pAttack, Texture2D[][] sAttack)
         {
-
             // Player Sprites:
 
             this.playerAniSprites = pas;
@@ -103,7 +98,6 @@ namespace RogueValley.Entities
             this.sAttackSprite = sAttack;
 
             this.playerSprite = pis[0][0];
-
         }
         public void Movement(int[] direction, Map map)
         {
@@ -115,7 +109,6 @@ namespace RogueValley.Entities
                 this.sAttackTimer = 0;
                 this.AttackCooldown = 0;
             }
-
             if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
             {
                 this.playerPosition[0] += (this.speed / 10) * direction[0];
@@ -143,6 +136,8 @@ namespace RogueValley.Entities
                 int lCount = 0;
                 List<Enemies> tenemies = new List<Enemies>();
 
+                // We count where the enemies are:
+
                 for (int i = 0; i < this.target.Count; i++)
                 {
                     if (this.target[i].position[0] < this.playerPosition[0])
@@ -154,6 +149,8 @@ namespace RogueValley.Entities
                         rCount++;
                     }
                 }
+                // then we add the enemies wich are on the side of the player with the most enemies to an List:
+                // if they are equal we just add them on the last direction into the list.
                 if (rCount < lCount)
                 {
                     this.playerDirection = 1;
@@ -196,6 +193,7 @@ namespace RogueValley.Entities
                         }
                     }
                 }
+                // we attack the previous generated List with either primary or secondary wich we choose randomly:
                 if (this.random != 0)
                 {
                     if(tenemies.Count != 0)
@@ -206,6 +204,7 @@ namespace RogueValley.Entities
                     if (tenemies.Count != 0)
                         this.SecondAttack(tenemies);
                 }
+                // after all we clear our list so we dont attack non-existend enemies:
                 tenemies.Clear();          
             }
         }
@@ -265,6 +264,8 @@ namespace RogueValley.Entities
                 if (this.pAttackTimer >= this.pAttackTimerMax * (this.pAttackSprite[this.playerDirection].Length - 1))
                 {
                     this.pAttackTimer = 0;
+                    // we want to attack all enemies in the list e:
+                    // but maximum this.maxtarget ammount.
                     if (e.Count < this.maxtarget)
                     {
                         for (int i = 0; i < e.Count; i++)
@@ -298,6 +299,8 @@ namespace RogueValley.Entities
                 if (this.sAttackTimer >= this.sAttackTimerMax * (this.sAttackSprite[this.playerDirection].Length - 1))
                 {
                     this.sAttackTimer = 0;
+                    // we want to attack all enemies in the list e:
+                    // but maximum this.maxtarget ammount.
                     if (e.Count < this.maxtarget)
                     {
                         for (int i = 0; i < e.Count; i++)
@@ -322,14 +325,16 @@ namespace RogueValley.Entities
                 return;
             }
             this.AttackCooldown--;
-
-
         }
+
         public void TakeDamage(int damage, int piercing)
         {
+            // we need immunity frames so we dont die instantly when a lot of enemies attack the player at once.
             if (this.immunityFrames == 0)
             {
                 this.immunityFrames = this.maxImmFrames;
+                // we calculate if the enemy pierces the players defence if not we calculate the new damage so the
+                // enemy does less damage.
                 if (piercing < this.defence)
                 {
                     this.hp -= (int)((float)damage * ((float)((float)piercing/(float)this.defence) + 0.2f));
