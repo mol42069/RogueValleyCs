@@ -7,6 +7,7 @@ using RogueValley.Maps;
 
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
+using System.Xml.Linq;
 
 namespace RogueValley
 {
@@ -69,16 +70,56 @@ namespace RogueValley
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            Texture2D[][] AniSprites, pAtckSprites, sAtckSprites;
+            Texture2D[][] AniSprites, pAtckSprites, sAtckSprites, deathSprites;
 
             Texture2D[][] IdleSprites;
-            Texture2D[][][][] sprites = new Texture2D[1][][][];
+            Texture2D[][][][] sprites = new Texture2D[3][][][];
 
 
 
             bg = Content.Load<Texture2D>("Background/grass");
             int[] screenSize = { 1920, 1080 };
             bgSprite = new Map(player.playerPosition, screenSize, bg, screenSize, this.bgSize);
+
+            // Load death Sprites:
+
+            {
+                deathSprites = new Texture2D[2][];
+                deathSprites[0] = new Texture2D[6];
+
+                for (int j = 0; j < 6; j++)
+                {
+                    string name = "Entity/Enemies/Dead/DeathAnimation/" + j.ToString();
+
+                    if (name != null)
+                    {
+                        deathSprites[0][j] = Content.Load<Texture2D>(name);
+                    }
+                }
+
+                Texture2D[][][] dead = new Texture2D[1][][];
+                dead[0] = new Texture2D[1][];
+                dead[0][0] = new Texture2D[1];
+                String death = "Entity/Enemies/Dead/DeathSprite/Skull";
+                dead[0][0][0] = Content.Load<Texture2D>(death);
+
+                deathSprites[1] = new Texture2D[7];
+
+                for (int j = 0; j < 7; j++)
+                {
+                    string name = "Entity/Enemies/Dead/DeleteDeadAnimation/" + j.ToString();
+
+                    if (name != null)
+                    {
+                        deathSprites[1][j] = Content.Load<Texture2D>(name);
+                    }
+                }
+                sprites[(int)enums.Entity.Zombie] = new Texture2D[5][][];
+                sprites[(int)enums.Entity.Zombie][(int)enums.Movement.DEAD] = deathSprites;
+                sprites[(int)enums.Entity.Dead] = new Texture2D[3][][];
+                sprites[(int)enums.Entity.Dead] = dead;
+            }
+
 
             // Load the Player Sprites:
             {
@@ -207,7 +248,7 @@ namespace RogueValley
 
             // Load the Zombie Sprites:
             {
-                Texture2D[][][] zombieSprites = new Texture2D[4][][];
+                Texture2D[][][] zombieSprites = new Texture2D[5][][];
 
                 // idleSprites:
                 zombieSprites[(int)enums.Movement.IDLE] = new Texture2D[2][];
@@ -329,7 +370,9 @@ namespace RogueValley
                         }
                     }
                 }
-                sprites[(int)enums.Entitiy.Zombie] = zombieSprites;
+
+                zombieSprites[4] = deathSprites;
+                sprites[(int)enums.Entity.Zombie] = zombieSprites;
             }
 
             // Load the UI Sprites:

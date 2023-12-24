@@ -24,7 +24,7 @@ namespace RogueValley.Entities
         protected int[] mov;
         public int[] position, drawPosition;
 
-        protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite;
+        protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite, deathAnimation;
         protected Texture2D sprite;
 
         protected Random rnd;
@@ -52,6 +52,8 @@ namespace RogueValley.Entities
             this.idleSprites = sprites[(int)enums.Movement.IDLE];
             this.pAttackSprite = sprites[(int)enums.Movement.PATTACK];
             this.sAttackSprite = sprites[(int)enums.Movement.SATTACK];
+            this.deathAnimation = sprites[(int)enums.Movement.DEAD];
+
 
             this.sprite = idleSprites[0][0];
         }
@@ -75,6 +77,25 @@ namespace RogueValley.Entities
             _spriteBatch.Draw(this.sprite, new Rectangle(this.drawPosition[0], this.drawPosition[1], this.spriteSize[0], this.spriteSize[1]), Color.White);
 
             return _spriteBatch;
+        }
+
+        protected void DeathAnimation() {
+            this.aniTimer++;
+
+            if (this.aniTimer == this.aniTimerMax)
+            {
+                this.aniTimer = 0;
+                this.aniCount++;
+            }
+            if (this.aniCount < 6)
+            {
+                this.sprite = this.deathAnimation[0][this.aniCount];
+            }
+        }
+
+        public virtual bool DeleteDead()
+        {
+            return false;
         }
 
         protected void Animation()
@@ -143,6 +164,10 @@ namespace RogueValley.Entities
             {
                 this.hp -= damage;
             }
+            this.aniCount = 0;
+            if (this.hp < 0) {
+                this.hp = 0;
+            }
         }
         public virtual Player PrimaryAttack(Player player)
         {
@@ -193,8 +218,22 @@ namespace RogueValley.Entities
         public override int Update(Player player)
         {
             // we just call the ai func. and return the entity hp.
-            this.Ai(player);
-            return base.hp;
+            if (base.hp == 0)
+            {
+                if (base.aniCount != 6)
+                {
+                    base.DeathAnimation();
+                    return 0;
+                }
+                else {
+                    return -1;
+                }
+            }
+            else
+            {
+                this.Ai(player);
+                return base.hp;
+            }
         }
 
         protected override Player Ai(Player player)
@@ -324,7 +363,199 @@ namespace RogueValley.Entities
 
     class Mage : Enemies 
     {
-    
-    
+        int random;
+
+        public Mage(int[] pos)
+        {
+            base.pAttackTimer = 0;
+            base.pAttackTimerMax = 5;
+
+            base.sAttackTimer = 0;
+            base.sAttackTimerMax = 10;
+
+            base.lastMove = new int[2] { 0, 0 };
+
+            base.hp = 100;
+            base.damage = 20;
+            base.sAttackMult = 1.3f;
+
+            base.position = pos;
+            base.defence = 6;
+            base.reach = 500;
+            base.speed = 5;
+            base.piercing = 0;
+
+            base.Init();
+
+            this.random = rnd.Next(0, 6);
+        }
+
+        public override int Update(Player player)
+        {
+            // we just call the ai func. and return the entity hp.
+            this.Ai(player);
+            return base.hp;
+        }
+
+        protected override Player Ai(Player player)
+        {
+            // we move the entity towards the player until it is in reach. Then we tell the Zombie to attack as well as when this zombie is in reach of
+            // the player we add this to the target list.
+            mov = new int[2];
+            int x = 0;
+            int y = 0;
+
+            mov[0] = (int)(((float)player.playerPosition[0]) - base.position[0]);
+            mov[1] = (int)(((float)player.playerPosition[1]) - base.position[1]);
+
+            if (mov[0] < 0)
+            {
+                x = mov[0] * -1;
+            }
+            else
+            {
+                x = mov[0];
+            }
+
+            if (mov[1] < 0)
+            {
+                y = mov[1] * -1;
+            }
+            else
+            {
+                y = mov[1];
+            }
+
+
+            int n = x + y;
+
+            if (n <= player.reach && n >= -player.reach)
+            {
+                this.targetId = player.target.Count;
+                player.target.Add(this);
+            }
+
+            if (n <= base.reach && n >= -base.reach)
+            {
+                base.lastMove[0] = 0;
+                base.lastMove[1] = 0;
+
+                if (random != 0)
+                {
+                    this.PrimaryAttack(player);
+                }
+                else
+                {
+                    this.SecondaryAttack(player);
+                }
+            }
+            else
+            {
+                if (base.pAttackTimer != 0 || base.sAttackTimer != 0)
+                {
+                    this.random = base.rnd.Next(0, 6);
+                }
+                base.pAttackTimer = 0;
+                base.sAttackTimer = 0;
+
+                mov[0] += rnd.Next(-100, 101);
+                mov[1] += rnd.Next(-100, 101);
+
+                base.lastMove[0] = (int)(((float)mov[0] / (float)n) * base.speed);
+                base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
+
+                base.position[0] += base.lastMove[0];
+                base.position[1] += base.lastMove[1];
+
+                base.Animation();
+            }
+            if (base.pAttackTimer == 0 && base.sAttackTimer == 0)
+            {
+                base.Animation();
+            }
+            return player;
+        }
+        public override Player PrimaryAttack(Player player)
+        {
+            // we attack the player every so often. Same as in player basicly but this only attacks the player
+            if (base.AttackCooldown == 0)
+            {
+                base.pAttackTimer++;
+                if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[base.lastDir].Length - 1))
+                {
+                    base.pAttackTimer = 0;
+                    player.TakeDamage(base.damage, base.piercing);
+                    this.random = rnd.Next(0, 6);
+                    base.AttackCooldown = 20;
+                }
+                if (base.pAttackTimer % base.pAttackTimerMax == 0)
+                {
+                    base.sprite = base.pAttackSprite[base.lastDir][(int)(base.pAttackTimer / base.pAttackTimerMax)];
+                }
+                return player;
+            }
+            base.AttackCooldown--;
+            return player;
+        }
+
+        public override Player SecondaryAttack(Player player)
+        // we attack the player every so often. Same as in player basicly but this only attacks the player
+        {
+            if (base.AttackCooldown == 0)
+            {
+                base.sAttackTimer++;
+                if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[base.lastDir].Length - 1))
+                {
+                    base.sAttackTimer = 0;
+                    player.TakeDamage((int)(base.damage * base.sAttackMult), base.piercing);
+                    this.random = rnd.Next(0, 6);
+                    base.AttackCooldown = 20;
+                }
+                if (base.sAttackTimer % base.sAttackTimerMax == 0)
+                {
+                    base.sprite = base.sAttackSprite[base.lastDir][(int)(base.sAttackTimer / base.sAttackTimerMax)];
+                }
+                return player;
+            }
+            base.AttackCooldown--;
+            return player;
+        }
+    }
+
+    class Dead : Enemies {
+
+
+        public Dead(int[] pos, Texture2D sprite, Texture2D[][]deathAnimation)
+        {
+            base.Init();
+            base.position = pos;
+            base.sprite = sprite;
+            base.deathAnimation = deathAnimation;
+        }
+
+        public override int Update(Player player) {
+            return 0;
+        }
+
+        public override bool DeleteDead() {
+            this.aniTimer++;
+
+            if (this.aniTimer == this.aniTimerMax)
+            {
+                this.aniTimer = 0;
+                this.aniCount++;
+            }
+            if (this.aniCount < 7)
+            {
+                this.sprite = this.deathAnimation[1][this.aniCount];
+            }
+            else {
+                return true;
+            }
+
+
+            return false;
+        }
+
     }
 }

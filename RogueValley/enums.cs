@@ -14,10 +14,12 @@ namespace RogueValley
             Zombie = 90,
             Mage = 10,
         }
-        public enum Entitiy
+        public enum Entity
         {
             Zombie = 0,
             Mage = 1,
+
+            Dead = 2, // lets make this the last.
         }
         public enum Direction
         {
@@ -32,6 +34,7 @@ namespace RogueValley
             MOVE = 1,
             PATTACK = 2,
             SATTACK = 3,
+            DEAD = 4,
         }
         public enum StartScreen 
         {

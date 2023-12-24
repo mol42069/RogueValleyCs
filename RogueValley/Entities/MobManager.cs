@@ -11,7 +11,7 @@ namespace RogueValley.Entities
     class MobManager
     {
         private Texture2D[][][][] sprites;
-        public List<Enemies> mobList;
+        public List<Enemies> mobList, deadList;
         private Random rnd;
 
         private int[] spawnRate, bgSize;
@@ -19,6 +19,7 @@ namespace RogueValley.Entities
 
         public MobManager(Player player, int[] bgSize) {
             this.mobList = new List<Enemies>();
+            this.deadList = new List<Enemies>();
             this.rnd = new Random();
 
             this.ammount = 10;
@@ -34,6 +35,7 @@ namespace RogueValley.Entities
         }
         public void RmList() {
             this.mobList.Clear();
+            this.deadList.Clear();
         }
         
         public void Spawn(Player player) {
@@ -51,14 +53,14 @@ namespace RogueValley.Entities
                     pos[1] = rnd.Next(0, this.bgSize[1]);
                 }
 
-                int random = rnd.Next(0, 90);
+                int random = rnd.Next(0, 50);
                 switch (this.wave) {
                     case 1:
                         
                         if (random < 90)
                         {
                             Zombie zombie = new Zombie(pos);
-                            zombie.LoadContent(this.sprites[(int)enums.Entitiy.Zombie]);
+                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie]);
                             this.mobList.Add(zombie);
                         }
                         else if (random >= 90)
@@ -71,7 +73,7 @@ namespace RogueValley.Entities
                         if (random < 90)
                         {
                             Zombie zombie = new Zombie(pos);
-                            zombie.LoadContent(this.sprites[(int)enums.Entitiy.Zombie]);
+                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie]);
                             this.mobList.Add(zombie);
                         }
                         else if (random >= 90)
@@ -83,6 +85,19 @@ namespace RogueValley.Entities
             }            
         }
 
+        protected bool DeleteDead() {
+
+
+            for (int i = 0; i < this.deadList.Count; i++) {
+                if (this.deadList[i].DeleteDead())
+                    this.deadList.RemoveAt(i);
+            }
+            if (this.deadList.Count == 0)
+                return true;
+            return false;
+
+        }
+
         public void Update(Player player) {
             // we go through all enemies in our mobList and Update them.
             //if they are dead we remove them from the list so they basicly dont exist anymore.
@@ -91,27 +106,42 @@ namespace RogueValley.Entities
             {
                 for (int i = 0; i < this.mobList.Count; i++)
                 {
-                    if (this.mobList[i].Update(player) <= 0)
+                    if (this.mobList[i].Update(player) == -1)
                     {
+                        this.deadList.Add(new Dead(this.mobList[i].position, this.sprites[(int)enums.Entity.Dead][0][0][0], this.sprites[(int)enums.Entity.Zombie][(int)enums.Movement.DEAD]));
                         this.mobList.RemoveAt(i);
                     }
                 }
             }
             else 
             {
-                this.wave++;
-                //this.maxRandom *= this.wave;
-                this.ammount = this.ammount * this.wave;
-                this.Spawn(player);
+
+                if (DeleteDead()) {
+
+                    this.mobList.Clear();
+
+                    this.wave++;
+                    //this.maxRandom *= this.wave;
+                    this.ammount = this.ammount * this.wave;
+
+                    this.deadList.Clear();
+                    this.Spawn(player);                
+                }
+
             }
         }
 
         public void Draw(SpriteBatch _spriteBatch, Map m) {
             // we go through the enemy list and draw them all.
+
+            for (int i = 0; i < this.deadList.Count; i++) {
+                this.deadList[i].Draw(_spriteBatch, m);
+            }
             for (int i = 0; i < this.mobList.Count; i++)
             {
                 this.mobList[i].Draw(_spriteBatch, m);
             }
+           
         }
     }
 }
