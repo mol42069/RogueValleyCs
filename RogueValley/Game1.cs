@@ -374,7 +374,174 @@ namespace RogueValley
                 zombieSprites[4] = deathSprites;
                 sprites[(int)enums.Entity.Zombie] = zombieSprites;
             }
+            // Load Mage Sprites:
+            {
+                Texture2D[][][] MageSprites = new Texture2D[6][][];
+                // idleSprites:
+                MageSprites[(int)enums.Movement.IDLE] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    MageSprites[(int)enums.Movement.IDLE][i] = new Texture2D[6];
 
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Mage/idle/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Mage/idle/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            MageSprites[(int)enums.Movement.IDLE][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                // movSprites
+                MageSprites[(int)enums.Movement.MOVE] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    MageSprites[(int)enums.Movement.MOVE][i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Mage/move/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Mage/move/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            MageSprites[(int)enums.Movement.MOVE][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                // pAttackSprite
+                MageSprites[(int)enums.Movement.PATTACK] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    MageSprites[(int)enums.Movement.PATTACK][i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Mage/pAttack/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Mage/pAttack/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            MageSprites[(int)enums.Movement.PATTACK][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                //sAttackSprite
+                MageSprites[(int)enums.Movement.SATTACK] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    MageSprites[(int)enums.Movement.SATTACK][i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Mage/sAttack/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Mage/sAttack/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            MageSprites[(int)enums.Movement.SATTACK][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                // Projectile:
+                MageSprites[(int)enums.Movement.PROJECTILE] = new Texture2D[5][];
+                for (int i = 0; i < 4; i++)
+                {
+                    MageSprites[(int)enums.Movement.PROJECTILE][i] = new Texture2D[3];
+
+                    for (int j = 0; j < 3; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case (int)enums.Direction.RIGHT:
+                                name = "Entity/Enemies/Mage/Projectile/Right/" + j.ToString();
+                                break;
+                            case (int)enums.Direction.LEFT:
+                                name = "Entity/Enemies/Mage/Projectile/Left/" + j.ToString();
+                                break;
+                            case (int)enums.Direction.UP:
+                                name = "Entity/Enemies/Mage/Projectile/Up/" + j.ToString();
+                                break;
+                            case (int)enums.Direction.DOWN:
+                                name = "Entity/Enemies/Mage/Projectile/Down/" + j.ToString();
+                                break;
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            MageSprites[(int)enums.Movement.PROJECTILE][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                MageSprites[(int)enums.Movement.PROJECTILE][(int)enums.Direction.EXP] = new Texture2D[7];
+                for (int i = 0; i < 7; i++) {
+                    string name = "Entity/Enemies/Mage/Projectile/Final/" + i.ToString();
+
+                    MageSprites[(int)enums.Movement.PROJECTILE][(int) enums.Direction.EXP][i] = Content.Load<Texture2D>(name);
+                }
+
+
+                MageSprites[(int)enums.Movement.DEAD] = deathSprites;
+
+                sprites[(int)enums.Entity.Mage] = MageSprites;
+            }
             // Load the UI Sprites:
             {
                 Texture2D[] textures = new Texture2D[4];
@@ -426,6 +593,8 @@ namespace RogueValley
                 // Delete the Enemies on death:
                 this.mobManager.RmList();
                 this.player.target.Clear();
+                this.mobManager.wave = 0;
+                this.mobManager.ammount = 10;
             }
 
             InGameKeyHandler();

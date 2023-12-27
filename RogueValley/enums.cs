@@ -27,6 +27,7 @@ namespace RogueValley
             LEFT = 1,
             UP = 2,
             DOWN = 3,
+            EXP = 4
         }
         public enum Movement
         {
@@ -35,6 +36,7 @@ namespace RogueValley
             PATTACK = 2,
             SATTACK = 3,
             DEAD = 4,
+            PROJECTILE = 5
         }
         public enum StartScreen 
         {

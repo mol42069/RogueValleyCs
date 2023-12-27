@@ -53,7 +53,7 @@ namespace RogueValley.Entities
                     pos[1] = rnd.Next(0, this.bgSize[1]);
                 }
 
-                int random = rnd.Next(0, 50);
+                int random = rnd.Next(0, 190);
                 switch (this.wave) {
                     case 1:
                         
@@ -66,6 +66,10 @@ namespace RogueValley.Entities
                         else if (random >= 90)
                         {
                             // here we spawn other stuff for example Mages
+                            Mage mage = new Mage(pos);
+                            mage.LoadContent(this.sprites[(int)enums.Entity.Mage]);
+                            mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
+                            this.mobList.Add(mage);
                         }
                         break;
 
@@ -79,6 +83,10 @@ namespace RogueValley.Entities
                         else if (random >= 90)
                         {
                             // here we spawn other stuff for example Mages
+                            Mage mage = new Mage(pos);
+                            mage.LoadContent(this.sprites[(int)enums.Entity.Mage]);
+                            mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
+                            this.mobList.Add(mage);
                         }
                         break;
                 }
@@ -86,8 +94,6 @@ namespace RogueValley.Entities
         }
 
         protected bool DeleteDead() {
-
-
             for (int i = 0; i < this.deadList.Count; i++) {
                 if (this.deadList[i].DeleteDead())
                     this.deadList.RemoveAt(i);
@@ -95,7 +101,6 @@ namespace RogueValley.Entities
             if (this.deadList.Count == 0)
                 return true;
             return false;
-
         }
 
         public void Update(Player player) {
@@ -113,10 +118,10 @@ namespace RogueValley.Entities
                     }
                 }
             }
-            else 
+            else
             {
-
-                if (DeleteDead()) {
+                if (DeleteDead())
+                {
 
                     this.mobList.Clear();
 
@@ -125,9 +130,8 @@ namespace RogueValley.Entities
                     this.ammount = this.ammount * this.wave;
 
                     this.deadList.Clear();
-                    this.Spawn(player);                
+                    this.Spawn(player);
                 }
-
             }
         }
 

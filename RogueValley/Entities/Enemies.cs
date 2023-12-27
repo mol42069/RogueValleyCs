@@ -23,6 +23,7 @@ namespace RogueValley.Entities
         protected int[] spriteSize, lastMove;
         protected int[] mov;
         public int[] position, drawPosition;
+        protected List<Projectiles> projectilesList;
 
         protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite, deathAnimation;
         protected Texture2D sprite;
@@ -75,6 +76,14 @@ namespace RogueValley.Entities
             // we draw the enemy.
             this.drawPosition = CalcdrawPos(m);
             _spriteBatch.Draw(this.sprite, new Rectangle(this.drawPosition[0], this.drawPosition[1], this.spriteSize[0], this.spriteSize[1]), Color.White);
+
+            if (this.projectilesList != null)
+            {
+                for (int i = 0; i < this.projectilesList.Count; i++)
+                {
+                    this.projectilesList[i].Draw(_spriteBatch, m);
+                }
+            }
 
             return _spriteBatch;
         }
@@ -207,7 +216,7 @@ namespace RogueValley.Entities
             base.position = pos;
             base.defence = 1;
             base.reach = 100;
-            base.speed = 5;
+            base.speed = 7;
             base.piercing = 0;
 
             base.Init();
@@ -364,6 +373,8 @@ namespace RogueValley.Entities
     class Mage : Enemies 
     {
         int random;
+        Texture2D[][] projectiles;
+        
 
         public Mage(int[] pos)
         {
@@ -376,25 +387,53 @@ namespace RogueValley.Entities
             base.lastMove = new int[2] { 0, 0 };
 
             base.hp = 100;
-            base.damage = 20;
-            base.sAttackMult = 1.3f;
+            base.damage = 15;
+            base.sAttackMult = 1.5f;
 
             base.position = pos;
             base.defence = 6;
             base.reach = 500;
             base.speed = 5;
-            base.piercing = 0;
+            base.piercing = 8;
+            base.AttackCooldown = 30;
 
             base.Init();
 
+            base.projectilesList = new List<Projectiles>();
+
             this.random = rnd.Next(0, 6);
+        }
+
+        public void LoadProjectile(Texture2D[][] projectiles) {
+            this.projectiles = projectiles;
         }
 
         public override int Update(Player player)
         {
             // we just call the ai func. and return the entity hp.
-            this.Ai(player);
-            return base.hp;
+
+            for (int i = 0; i < base.projectilesList.Count; i++) {
+                if (base.projectilesList[i].Update(player)) {
+                    base.projectilesList.RemoveAt(i);
+                }
+            }
+            if (base.hp == 0)
+            {
+                if (base.aniCount != 6)
+                {
+                    base.DeathAnimation();
+                    return 0;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else
+            {
+                this.Ai(player);
+                return base.hp;
+            }
         }
 
         protected override Player Ai(Player player)
@@ -440,14 +479,16 @@ namespace RogueValley.Entities
                 base.lastMove[0] = 0;
                 base.lastMove[1] = 0;
 
-                if (random != 0)
+                this.PrimaryAttack(player);
+
+                /*if (random != 0)
                 {
                     this.PrimaryAttack(player);
                 }
                 else
                 {
                     this.SecondaryAttack(player);
-                }
+                }*/
             }
             else
             {
@@ -484,7 +525,9 @@ namespace RogueValley.Entities
                 if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[base.lastDir].Length - 1))
                 {
                     base.pAttackTimer = 0;
-                    player.TakeDamage(base.damage, base.piercing);
+                    int[] tempPos = (int[])player.playerPosition.Clone(); 
+
+                    projectilesList.Add(new FlameBall(this.projectiles, (int[])base.position.Clone(), tempPos, base.damage, base.piercing));
                     this.random = rnd.Next(0, 6);
                     base.AttackCooldown = 20;
                 }
