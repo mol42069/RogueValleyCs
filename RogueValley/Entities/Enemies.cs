@@ -395,7 +395,7 @@ namespace RogueValley.Entities
             base.reach = 500;
             base.speed = 5;
             base.piercing = 8;
-            base.AttackCooldown = 30;
+            base.AttackCooldown = 50;
 
             base.Init();
 
@@ -529,7 +529,7 @@ namespace RogueValley.Entities
 
                     projectilesList.Add(new FlameBall(this.projectiles, (int[])base.position.Clone(), tempPos, base.damage, base.piercing));
                     this.random = rnd.Next(0, 6);
-                    base.AttackCooldown = 20;
+                    base.AttackCooldown = 50;
                 }
                 if (base.pAttackTimer % base.pAttackTimerMax == 0)
                 {

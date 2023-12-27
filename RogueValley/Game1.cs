@@ -704,6 +704,11 @@ namespace RogueValley
             {
                 mobManager.Spawn(player);
             }
+
+            if (state.IsKeyDown(Keys.Space))
+                this.player.sAttackTrigger = true;
+            else 
+                this.player.sAttackTrigger = false;
         }
     }
 }

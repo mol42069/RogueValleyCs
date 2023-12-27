@@ -25,6 +25,7 @@ namespace RogueValley.Entities
 
         private int playerDirection, playerLastDir, speed;
         public int[] playerPosition, drawPosition, lastMovement;
+        public bool sAttackTrigger;
 
         // Player Animation Variables:
 
@@ -72,10 +73,11 @@ namespace RogueValley.Entities
                 this.maxhp = 100;
                 this.defence = 5;
                 this.immunityFrames = 0;
-                this.maxImmFrames = 10;
+                this.maxImmFrames = 20;
                 this.piercing = 5.0f;
                 this.damage = 100;
-                this.sAttackMulit = 1.9f;
+                this.sAttackMulit = 2.5f;
+                this.sAttackTrigger = false;
 
                 this.reach = 200;
 
@@ -194,7 +196,7 @@ namespace RogueValley.Entities
                     }
                 }
                 // we attack the previous generated List with either primary or secondary wich we choose randomly:
-                if (this.random != 0)
+                if (!this.sAttackTrigger)
                 {
                     if(tenemies.Count != 0)
                         this.PrimaryAttack(tenemies);
