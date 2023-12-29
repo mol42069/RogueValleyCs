@@ -251,7 +251,7 @@ namespace RogueValley
                     player.projectiles.Add(new PlayerExplodingBall(this.projectiles[(int)enums.Projectile.EplodingBall], tempPos , (int[])targetPos.Clone(), base.damage, (int)base.piercing));
 
                     player.sAttackTrigger = false;
-
+                    player.targetPos = null;
                     base.AttackCooldown = 30;
                 }
                 if (base.sAttackTimer % base.sAttackTimerMax == 0)

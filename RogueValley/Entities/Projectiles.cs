@@ -353,6 +353,8 @@ namespace RogueValley.Entities
 
     class PlayerExplodingBall : Projectiles
     {
+
+        protected int[] finalExpPos;
         public PlayerExplodingBall(Texture2D[][] sprites, int[] pos, int[] finalPos, int damage, int piercing)
         {
             base.sprites = sprites;
@@ -367,6 +369,10 @@ namespace RogueValley.Entities
 
             base.position = pos;
             base.finalPos = finalPos;
+
+            this.finalExpPos = new int[2];
+            this.finalExpPos[0] = finalPos[0] - (base.finalSize[0] / 2);
+            this.finalExpPos[1] = finalPos[1] - (base.finalSize[1] / 2);
 
             base.speed = 15;
             base.reach = 250;
@@ -401,7 +407,10 @@ namespace RogueValley.Entities
             {
 
                 base.spriteSize = base.finalSize;
-
+                /*
+                base.position[0] = base.position[0] - (base.finalSize[0] / 2);
+                base.position[1] = base.position[1] - (base.finalSize[1] / 2);
+                */
                 if (this.ExploAnimation())
                 {
                     return true;

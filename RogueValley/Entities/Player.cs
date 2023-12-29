@@ -33,7 +33,7 @@ namespace RogueValley.Entities
         // Player Positional Variables:
 
         public int playerDirection, playerLastDir, speed;
-        public int[] playerPosition, drawPosition, lastMovement;
+        public int[] playerPosition, drawPosition, lastMovement, targetPos;
         public bool sAttackTrigger;
 
         // Player Animation Variables:
@@ -343,11 +343,14 @@ namespace RogueValley.Entities
         {
             if (weapon is Staff)
             {
-                int[] targetPos = new int[2];
-                var mouseState = Mouse.GetState();
-                Point mousePos = new Point(mouseState.X, mouseState.Y);
-                targetPos[0] = mousePos.X - map.map_position[0];
-                targetPos[1] = mousePos.Y - map.map_position[1];
+                if (this.targetPos is null)
+                {
+                    this.targetPos = new int[2];
+                    var mouseState = Mouse.GetState();
+                    Point mousePos = new Point(mouseState.X, mouseState.Y);
+                    targetPos[0] = mousePos.X - map.map_position[0];
+                    targetPos[1] = mousePos.Y - map.map_position[1];
+                }
                 weapon.SecondaryAttackPlayer(e, this, targetPos);
                 
             }
