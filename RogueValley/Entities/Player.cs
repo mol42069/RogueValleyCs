@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using RogueValley.Entities;
 using RogueValley.Maps;
+using static RogueValley.enums;
+using RogueValley;
+
 namespace RogueValley.Entities
 {
     class Player
@@ -13,23 +16,25 @@ namespace RogueValley.Entities
         // PLAYER VARIABLES:
 
         public int damage, hp, defence, maxhp, maxtarget, reach;
-        private float piercing, sAttackMulit;
+        public float piercing, sAttackMulit;
         public List<Enemies> target;
+
+        protected Weapon weapon;
 
         // Player Sprites:
 
         public Texture2D playerSprite;
-        private Texture2D[][] playerAniSprites, playerIdleSprites, pAttackSprite, sAttackSprite;
+        public Texture2D[][] playerAniSprites, playerIdleSprites, pAttackSprite, sAttackSprite;
 
         // Player Positional Variables:
 
-        private int playerDirection, playerLastDir, speed;
+        public int playerDirection, playerLastDir, speed;
         public int[] playerPosition, drawPosition, lastMovement;
         public bool sAttackTrigger;
 
         // Player Animation Variables:
 
-        private int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames, AttackCooldown, pAttackTimer, pAttackTimerMax, sAttackTimer, sAttackTimerMax;
+        public int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames, AttackCooldown, pAttackTimer, pAttackTimerMax, sAttackTimer, sAttackTimerMax;
 
         // OTHER:
 
@@ -88,6 +93,8 @@ namespace RogueValley.Entities
             {
                 rnd = new Random();
                 this.random = rnd.Next(0, 6);
+                weapon = new StandartSword();
+
             }
         }
         public void LoadContent(Texture2D[][] pas, Texture2D[][] pis, Texture2D[][] pAttack, Texture2D[][] sAttack)
@@ -100,6 +107,8 @@ namespace RogueValley.Entities
             this.sAttackSprite = sAttack;
 
             this.playerSprite = pis[0][0];
+
+            weapon.LoadContent(this.pAttackSprite, this.sAttackSprite);
         }
         public void Movement(int[] direction, Map map)
         {
@@ -107,9 +116,11 @@ namespace RogueValley.Entities
 
             if (!(direction[0] == 0 && direction[1] == 0))
             {
+                weapon.ResetAnimation();
+                /*
                 this.pAttackTimer = 0;
                 this.sAttackTimer = 0;
-                this.AttackCooldown = 0;
+                this.AttackCooldown = 0;*/
             }
             if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
             {
@@ -123,6 +134,10 @@ namespace RogueValley.Entities
 
         public void Update()
         {
+            if (weapon.AttackCooldown > 0) {
+                weapon.AttackCooldown--;
+            }
+
             this.Animation();
             if (immunityFrames > 0)
             {
@@ -259,7 +274,9 @@ namespace RogueValley.Entities
 
         public void PrimaryAttack(List<Enemies> e)
         {
+            weapon.PrimaryAttack(e, this);
 
+            /*
             if (this.AttackCooldown == 0)
             {
                 this.pAttackTimer++;
@@ -291,10 +308,15 @@ namespace RogueValley.Entities
                 return;
             }
             this.AttackCooldown--;
+            */
         }
 
         public void SecondAttack(List<Enemies> e)
         {
+            weapon.SecondaryAttack(e, this);
+
+
+            /*
             if (this.AttackCooldown == 0)
             {
                 this.sAttackTimer++;
@@ -327,6 +349,7 @@ namespace RogueValley.Entities
                 return;
             }
             this.AttackCooldown--;
+            */
         }
 
         public void TakeDamage(int damage, int piercing)

@@ -48,5 +48,10 @@ namespace RogueValley
             hBar = 2,
             hBg = 3,
         }
+        public enum Weapon
+        {
+            StandartSword,
+            Staff,
+        }
     }
 }
