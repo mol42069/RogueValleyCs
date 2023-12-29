@@ -29,6 +29,8 @@ namespace RogueValley
 
         public int gameState;
 
+        private UpgradeManager upgradeManager;
+
 
 
         public Game1()
@@ -64,13 +66,16 @@ namespace RogueValley
 
             mobManager = new MobManager(this.player, this.bgSize);
 
+            upgradeManager = new WeaponSelecScreen();
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            Texture2D[][] AniSprites, pAtckSprites, sAtckSprites, deathSprites;
+            Texture2D[][] AniSprites, deathSprites;
+            Texture2D[][][] pAtckSprites, sAtckSprites;
 
             Texture2D[][] IdleSprites;
             Texture2D[][][][] sprites = new Texture2D[3][][][];
@@ -184,10 +189,11 @@ namespace RogueValley
                         }
                     }
                 }
-                pAtckSprites = new Texture2D[2][];
+                pAtckSprites = new Texture2D[2][][];
+                pAtckSprites[0] = new Texture2D[2][];
                 for (int i = 0; i < 2; i++)
                 {
-                    pAtckSprites[i] = new Texture2D[6];
+                    pAtckSprites[0][i] = new Texture2D[6];
 
                     for (int j = 0; j < 6; j++)
                     {
@@ -210,14 +216,17 @@ namespace RogueValley
                         if (name != null)
                         {
                             Console.WriteLine(name);
-                            pAtckSprites[i][j] = Content.Load<Texture2D>(name);
+                            pAtckSprites[0][i][j] = Content.Load<Texture2D>(name);
                         }
                     }
                 }
-                sAtckSprites = new Texture2D[2][];
+                pAtckSprites[1] = pAtckSprites[0];
+
+                sAtckSprites = new Texture2D[2][][];
+                sAtckSprites[0] = new Texture2D[2][];
                 for (int i = 0; i < 2; i++)
                 {
-                    sAtckSprites[i] = new Texture2D[6];
+                    sAtckSprites[0][i] = new Texture2D[6];
 
                     for (int j = 0; j < 6; j++)
                     {
@@ -239,10 +248,11 @@ namespace RogueValley
                         if (name != null)
                         {
                             Console.WriteLine(name);
-                            sAtckSprites[i][j] = Content.Load<Texture2D>(name);
+                            sAtckSprites[0][i][j] = Content.Load<Texture2D>(name);
                         }
                     }
                 }
+                sAtckSprites[1] = sAtckSprites[0];
                 player.LoadContent(AniSprites, IdleSprites, pAtckSprites, sAtckSprites);
             }
 
@@ -550,6 +560,15 @@ namespace RogueValley
                 textures[(int)enums.StartScreen.sButton] = Content.Load<Texture2D>("Utility/StartScreen/StartButton");
                 textures[(int)enums.UI.hBar] = Content.Load<Texture2D>("Utility/HealthBar/HBarHealth");
                 textures[(int)enums.UI.hBg] = Content.Load<Texture2D>("Utility/HealthBar/HBarBg");
+
+                Texture2D[][] upgradeSprites = new Texture2D[1][];
+                upgradeSprites[(int)enums.UpgradeManager.WeaponSelect] = new Texture2D[3];
+                upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][0] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/WeaponChoiceBg");
+                upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][1] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseSword");
+                upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][2] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseStaff");
+
+                upgradeManager.LoadContent(upgradeSprites);
+
                 SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
 
                 ui.LoadContent(textures, font);
@@ -560,7 +579,7 @@ namespace RogueValley
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Enter))
                 Exit();
 
             // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
@@ -572,6 +591,12 @@ namespace RogueValley
 
                 case 1:
                     InGameUpdate();
+                    break;
+
+                case 2:
+                    this.player = this.upgradeManager.Update(this.player);
+                    if (this.player.weapon != null)
+                        this.gameState = 1;
                     break;
 
                 default:
@@ -595,6 +620,7 @@ namespace RogueValley
                 this.player.target.Clear();
                 this.mobManager.wave = 0;
                 this.mobManager.ammount = 10;
+                this.player.weapon = null;
             }
 
             InGameKeyHandler();
@@ -614,6 +640,12 @@ namespace RogueValley
                 this.gameState = ui.Click(mousePos);
 
                 // Reset Player:
+
+                this.mobManager.ammount = 10;
+                this.mobManager.wave = 0;
+                this.mobManager.RmList();
+
+                this.player.weapon = null;
 
                 this.player.hp = 100;
                 this.player.playerPosition[0] = 500;
@@ -636,6 +668,10 @@ namespace RogueValley
 
                 case 1:
                     InGameDraw();
+                    break;
+
+                case 2:
+                    _spriteBatch = upgradeManager.Draw(_spriteBatch);
                     break;
 
                 default:
@@ -674,7 +710,7 @@ namespace RogueValley
             KeyboardState state = Keyboard.GetState();
             if (state.IsKeyDown(Keys.Escape))
             {
-                Exit();
+                this.gameState = 0;
             }
             if (state.IsKeyDown(Keys.A) && !(state.IsKeyDown(Keys.D)))
             {

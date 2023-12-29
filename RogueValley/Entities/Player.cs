@@ -19,12 +19,13 @@ namespace RogueValley.Entities
         public float piercing, sAttackMulit;
         public List<Enemies> target;
 
-        protected Weapon weapon;
+        public Weapon weapon;
 
         // Player Sprites:
 
         public Texture2D playerSprite;
-        public Texture2D[][] playerAniSprites, playerIdleSprites, pAttackSprite, sAttackSprite;
+        public Texture2D[][] playerAniSprites, playerIdleSprites;
+        public Texture2D[][][] pAttackSprite, sAttackSprite;
 
         // Player Positional Variables:
 
@@ -93,22 +94,18 @@ namespace RogueValley.Entities
             {
                 rnd = new Random();
                 this.random = rnd.Next(0, 6);
-                weapon = new StandartSword();
-
             }
         }
-        public void LoadContent(Texture2D[][] pas, Texture2D[][] pis, Texture2D[][] pAttack, Texture2D[][] sAttack)
+        public void LoadContent(Texture2D[][] pas, Texture2D[][] pis, Texture2D[][][] pAttack, Texture2D[][][] sAttack)
         {
             // Player Sprites:
 
             this.playerAniSprites = pas;
             this.playerIdleSprites = pis;
-            this.pAttackSprite = pAttack;
-            this.sAttackSprite = sAttack;
 
             this.playerSprite = pis[0][0];
-
-            weapon.LoadContent(this.pAttackSprite, this.sAttackSprite);
+            this.pAttackSprite = pAttack;
+            this.sAttackSprite = sAttack;
         }
         public void Movement(int[] direction, Map map)
         {

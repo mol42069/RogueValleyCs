@@ -50,8 +50,14 @@ namespace RogueValley
         }
         public enum Weapon
         {
-            StandartSword,
-            Staff,
+            StandartSword = 0,
+            Staff = 1,
         }
+
+        public enum UpgradeManager {
+            WeaponSelect = 0,
+
+        }
+
     }
 }

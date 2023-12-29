@@ -53,7 +53,7 @@ namespace RogueValley.Entities
                     pos[1] = rnd.Next(0, this.bgSize[1]);
                 }
 
-                int random = rnd.Next(0, 190);
+                int random = rnd.Next(0, 100);
                 switch (this.wave) {
                     case 1:
                         

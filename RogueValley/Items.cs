@@ -23,13 +23,13 @@ namespace RogueValley
         protected int animationCount, animationTimer, animationTimerMax, AttackCooldownMax, sAttackTimerMax;
         protected float secondaryMulti, piercing;
 
-        protected Texture2D[][] pAttackSprite, sAttackSprite;
+        protected Texture2D[][][] pAttackSprite, sAttackSprite;
 
 
         public Weapon() {
         }
 
-        public void LoadContent(Texture2D[][] pAttackSprite, Texture2D[][] sAttackSprite) {
+        public void LoadContent(Texture2D[][][] pAttackSprite, Texture2D[][][] sAttackSprite) {
             this.pAttackSprite = pAttackSprite;
             this.sAttackSprite = sAttackSprite;
         }
@@ -87,7 +87,7 @@ namespace RogueValley
             if (base.AttackCooldown == 0)
             {
                 base.pAttackTimer++;
-                if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[player.playerDirection].Length - 1))
+                if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[(int)enums.Weapon.StandartSword][player.playerDirection].Length - 1))
                 {
                     base.pAttackTimer = 0;
                     // we want to attack all enemies in the list e:
@@ -110,7 +110,7 @@ namespace RogueValley
                 }
                 if (base.pAttackTimer % base.pAttackTimerMax == 0)
                 {
-                    player.playerSprite = base.pAttackSprite[player.playerDirection][(int)(base.pAttackTimer / base.pAttackTimerMax)];
+                    player.playerSprite = base.pAttackSprite[(int)enums.Weapon.StandartSword][player.playerDirection][(int)(base.pAttackTimer / base.pAttackTimerMax)];
                 }
                 return;
             }
@@ -122,7 +122,7 @@ namespace RogueValley
             if (base.AttackCooldown == 0)
             {
                 base.sAttackTimer++;
-                if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[player.playerDirection].Length - 1))
+                if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[(int)enums.Weapon.StandartSword][player.playerDirection].Length - 1))
                 {
                     base.sAttackTimer = 0;
                     // we want to attack all enemies in the list e:
@@ -145,7 +145,7 @@ namespace RogueValley
                 }
                 if (base.sAttackTimer % base.sAttackTimerMax == 0)
                 {
-                    player.playerSprite = base.sAttackSprite[player.playerDirection][(int)(base.sAttackTimer / base.sAttackTimerMax)];
+                    player.playerSprite = base.sAttackSprite[(int)enums.Weapon.StandartSword][player.playerDirection][(int)(base.sAttackTimer / base.sAttackTimerMax)];
                 }
                 return;
             }
@@ -156,7 +156,6 @@ namespace RogueValley
     {
         public Staff()
         {
-
             base.damage = 100;
             base.piercing = 5.0f;
             base.reach = 200;
@@ -170,15 +169,13 @@ namespace RogueValley
             base.animationTimerMax = 5;
 
             base.AttackCooldown = 0;
-            base.AttackCooldownMax = 10;
+            base.AttackCooldownMax = 20;
 
             base.pAttackTimer = 0;
             base.pAttackTimerMax = 3;
 
             base.sAttackTimer = 0;
-            base.sAttackTimerMax = 5;
-
-
+            base.sAttackTimerMax = 10;
 
         }
 
@@ -189,7 +186,7 @@ namespace RogueValley
             if (base.AttackCooldown == 0)
             {
                 base.pAttackTimer++;
-                if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[player.playerDirection].Length - 1))
+                if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[(int)enums.Weapon.Staff][player.playerDirection].Length - 1))
                 {
                     base.pAttackTimer = 0;
                     // we want to attack all enemies in the list e:
@@ -212,7 +209,7 @@ namespace RogueValley
                 }
                 if (base.pAttackTimer % base.pAttackTimerMax == 0)
                 {
-                    player.playerSprite = base.pAttackSprite[player.playerDirection][(int)(base.pAttackTimer / base.pAttackTimerMax)];
+                    player.playerSprite = base.pAttackSprite[(int)enums.Weapon.Staff][player.playerDirection][(int)(base.pAttackTimer / base.pAttackTimerMax)];
                 }
                 return;
             }
@@ -224,7 +221,7 @@ namespace RogueValley
             if (base.AttackCooldown == 0)
             {
                 base.sAttackTimer++;
-                if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[player.playerDirection].Length - 1))
+                if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[(int)enums.Weapon.Staff][player.playerDirection].Length - 1))
                 {
                     base.sAttackTimer = 0;
                     // we want to attack all enemies in the list e:
@@ -247,7 +244,7 @@ namespace RogueValley
                 }
                 if (base.sAttackTimer % base.sAttackTimerMax == 0)
                 {
-                    player.playerSprite = base.sAttackSprite[player.playerDirection][(int)(base.sAttackTimer / base.sAttackTimerMax)];
+                    player.playerSprite = base.sAttackSprite[(int)enums.Weapon.Staff][player.playerDirection][(int)(base.sAttackTimer / base.sAttackTimerMax)];
                 }
                 return;
             }

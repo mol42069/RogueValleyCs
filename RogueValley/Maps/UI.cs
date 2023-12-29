@@ -76,7 +76,7 @@ namespace RogueValley.Maps
             // we check if the start button on the start-screen is clicked.
             if (this.sButtonRec.Contains(mousePos))
             {
-                return 1;
+                return 2;
             }
             else {
                 return 0;

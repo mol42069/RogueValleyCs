@@ -480,15 +480,6 @@ namespace RogueValley.Entities
                 base.lastMove[1] = 0;
 
                 this.PrimaryAttack(player);
-
-                /*if (random != 0)
-                {
-                    this.PrimaryAttack(player);
-                }
-                else
-                {
-                    this.SecondaryAttack(player);
-                }*/
             }
             else
             {
