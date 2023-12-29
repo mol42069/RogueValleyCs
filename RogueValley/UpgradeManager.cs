@@ -18,13 +18,15 @@ namespace RogueValley
     {
 
         protected Texture2D[][] sprites;
+        protected Texture2D[][][] projectiles;
 
         public UpgradeManager() {
         
 
         }
-        public void LoadContent(Texture2D[][] sprites) {
+        public void LoadContent(Texture2D[][] sprites, Texture2D[][][] projectiles) {
             this.sprites = sprites;
+            this.projectiles = projectiles;
         }
 
         public virtual SpriteBatch Draw(SpriteBatch _spriteBatch)
@@ -71,8 +73,9 @@ namespace RogueValley
                     player.weapon.LoadContent(player.pAttackSprite, player.sAttackSprite);
                 }
                 else if (this.choices[(int)enums.Weapon.Staff].Contains(mousePos)) {
-                    player.weapon = new Staff();
+                    player.weapon = new Staff(player);
                     player.weapon.LoadContent(player.pAttackSprite, player.sAttackSprite);
+                    player.weapon.LoadStaffProjs(base.projectiles);
                 }
             }
             return player;

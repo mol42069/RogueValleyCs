@@ -8,6 +8,8 @@ using RogueValley.Entities;
 using RogueValley.Maps;
 using static RogueValley.enums;
 using RogueValley;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
 
 namespace RogueValley.Entities
 {
@@ -17,7 +19,8 @@ namespace RogueValley.Entities
 
         public int damage, hp, defence, maxhp, maxtarget, reach;
         public float piercing, sAttackMulit;
-        public List<Enemies> target;
+        public List<Enemies> target, mobList;
+        public List<Projectiles> projectiles;
 
         public Weapon weapon;
 
@@ -89,6 +92,8 @@ namespace RogueValley.Entities
 
                 this.target = new List<Enemies>();
                 this.maxtarget = 20;
+
+                this.projectiles = new List<Projectiles>();
             }
             // OTHER:
             {
@@ -129,8 +134,16 @@ namespace RogueValley.Entities
             }
         }
 
-        public void Update()
+        public void Update(Map map)
         {
+            if (projectiles.Count > 0) {
+                for (int i = 0; i < projectiles.Count; i++) {
+                    if (projectiles[i].UpdatePlayer(this, this.target)) {
+                        projectiles.RemoveAt(i);
+                    }
+                }
+            }
+
             if (weapon.AttackCooldown > 0) {
                 weapon.AttackCooldown--;
             }
@@ -210,16 +223,18 @@ namespace RogueValley.Entities
                 // we attack the previous generated List with either primary or secondary wich we choose randomly:
                 if (!this.sAttackTrigger)
                 {
-                    if(tenemies.Count != 0)
+                    if (tenemies.Count != 0)
                         this.PrimaryAttack(tenemies);
                 }
-                else
-                {
+                else if(this.weapon is not Staff) {
                     if (tenemies.Count != 0)
-                        this.SecondAttack(tenemies);
+                        this.SecondAttack(tenemies, map);
                 }
                 // after all we clear our list so we dont attack non-existend enemies:
                 tenemies.Clear();          
+            }
+            if (this.sAttackTrigger && this.lastMovement[0] == 0 && this.lastMovement[1] == 0 && this.weapon is Staff) {
+                this.SecondAttack(this.mobList, map);
             }
         }
 
@@ -269,9 +284,25 @@ namespace RogueValley.Entities
             }
         }
 
+        protected int[] getTargetPos() {
+            int[] targetPos = new int[2];
+
+            targetPos = this.target[rnd.Next(0, this.target.Count)].position;
+
+            return targetPos;
+        }
+
         public void PrimaryAttack(List<Enemies> e)
         {
-            weapon.PrimaryAttack(e, this);
+
+            if (weapon is Staff) {
+                int[] targetPos = new int[2];
+                targetPos = this.getTargetPos();
+                weapon.PrimaryAttackPlayer(e, this, targetPos);
+            }
+            else if (weapon is StandartSword){
+                weapon.PrimaryAttack(e, this);
+            }
 
             /*
             if (this.AttackCooldown == 0)
@@ -308,9 +339,22 @@ namespace RogueValley.Entities
             */
         }
 
-        public void SecondAttack(List<Enemies> e)
+        public void SecondAttack(List<Enemies> e, Map map)
         {
-            weapon.SecondaryAttack(e, this);
+            if (weapon is Staff)
+            {
+                int[] targetPos = new int[2];
+                var mouseState = Mouse.GetState();
+                Point mousePos = new Point(mouseState.X, mouseState.Y);
+                targetPos[0] = mousePos.X - map.map_position[0];
+                targetPos[1] = mousePos.Y - map.map_position[1];
+                weapon.SecondaryAttackPlayer(e, this, targetPos);
+                
+            }
+            else if (weapon is StandartSword)
+            {
+                weapon.SecondaryAttack(e, this);
+            }
 
 
             /*

@@ -58,6 +58,10 @@ namespace RogueValley
             WeaponSelect = 0,
 
         }
+        public enum Projectile {
+            FireBall = 0,
+            EplodingBall = 1,        
+        }
 
     }
 }

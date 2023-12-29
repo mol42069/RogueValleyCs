@@ -133,6 +133,7 @@ namespace RogueValley.Entities
                     this.Spawn(player);
                 }
             }
+            player.mobList = this.mobList;
         }
 
         public void Draw(SpriteBatch _spriteBatch, Map m) {

@@ -8,6 +8,8 @@ using RogueValley.Maps;
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
+using static RogueValley.enums;
+using UI = RogueValley.Maps.UI;
 
 namespace RogueValley
 {
@@ -552,8 +554,67 @@ namespace RogueValley
 
                 sprites[(int)enums.Entity.Mage] = MageSprites;
             }
-            // Load the UI Sprites:
+            // Staff Projectiles:
+
             {
+                Texture2D[][][] StaffProjSprites = new Texture2D[2][][];
+                StaffProjSprites[(int)enums.Projectile.FireBall] = new Texture2D[5][];
+                for (int i = 0; i < 4; i++)
+                {
+                    StaffProjSprites[(int)enums.Projectile.FireBall][i] = new Texture2D[3];
+
+                    for (int j = 0; j < 3; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case (int)enums.Direction.RIGHT:
+                                name = "Entity/Player/Projectiles/FireBall/Animation/RIGHT/" + j.ToString();
+                                break;
+                            case (int)enums.Direction.LEFT:
+                                name = "Entity/Player/Projectiles/FireBall/Animation/Left/" + j.ToString();
+                                break;
+                            case (int)enums.Direction.UP:
+                                name = "Entity/Player/Projectiles/FireBall/Animation/Up/" + j.ToString();
+                                break;
+                            case (int)enums.Direction.DOWN:
+                                name = "Entity/Player/Projectiles/FireBall/Animation/Down/" + j.ToString();
+                                break;
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            StaffProjSprites[(int)enums.Projectile.FireBall][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                StaffProjSprites[(int)enums.Projectile.FireBall][(int)enums.Direction.EXP] = new Texture2D[7];
+                for (int i = 0; i < 7; i++)
+                {
+                    string name = "Entity/Player/Projectiles/FireBall/Finale/" + i.ToString();
+
+                    StaffProjSprites[(int)enums.Projectile.FireBall][(int)enums.Direction.EXP][i] = Content.Load<Texture2D>(name);
+                }
+                StaffProjSprites[(int)enums.Projectile.EplodingBall] = new Texture2D[2][];
+                StaffProjSprites[(int)enums.Projectile.EplodingBall][0] = new Texture2D[1];
+                StaffProjSprites[(int)enums.Projectile.EplodingBall][0][0] = Content.Load<Texture2D>("Entity/Player/Projectiles/ExplodingBall/Animation/0");
+
+                StaffProjSprites[(int)enums.Projectile.EplodingBall][1] = new Texture2D[7];
+                for (int i = 0; i < 7; i++)
+                {
+                    string name = "Entity/Player/Projectiles/ExplodingBall/Finale/" + i.ToString();
+
+                    StaffProjSprites[(int)enums.Projectile.EplodingBall][1][i] = Content.Load<Texture2D>(name);
+                }
+                
+
+
+            
+
+            // Load the UI Sprites:
+            
                 Texture2D[] textures = new Texture2D[4];
 
                 textures[(int)enums.StartScreen.bg] = Content.Load<Texture2D>("Utility/StartScreen/StartGame");
@@ -567,7 +628,7 @@ namespace RogueValley
                 upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][1] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseSword");
                 upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][2] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseStaff");
 
-                upgradeManager.LoadContent(upgradeSprites);
+                upgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
 
                 SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
 
@@ -626,7 +687,7 @@ namespace RogueValley
             InGameKeyHandler();
 
             this.player.Movement(movement, bgSprite);
-            this.player.Update();
+            this.player.Update(this.bgSprite);
             this.ui.InGameUpdate(this.player);
             this.mobManager.Update(this.player);
 
@@ -693,6 +754,13 @@ namespace RogueValley
             // TODO: Draw Particles
             // TODO: Draw Enemies
             this.mobManager.Draw(_spriteBatch, this.bgSprite);
+            if (this.player.projectiles.Count > 0)
+            {
+                for (int i = 0; i < this.player.projectiles.Count; i++)
+                {
+                    this.player.projectiles[i].Draw(_spriteBatch, this.bgSprite);
+                }
+            }
 
             _spriteBatch.Draw(this.player.playerSprite, new Rectangle(this.player.drawPosition[0], this.player.drawPosition[1], 100, 100), Color.White);
 
@@ -741,10 +809,9 @@ namespace RogueValley
                 mobManager.Spawn(player);
             }
 
-            if (state.IsKeyDown(Keys.Space))
+            var mouseState = Mouse.GetState();
+            if (mouseState.LeftButton == ButtonState.Pressed)            
                 this.player.sAttackTrigger = true;
-            else 
-                this.player.sAttackTrigger = false;
         }
     }
 }
