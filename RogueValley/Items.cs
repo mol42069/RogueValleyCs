@@ -37,18 +37,20 @@ namespace RogueValley
         public void Animation() { 
 
         }
+        public virtual void PrimaryAttack(List<Enemies> ene, Player player, int[] targetPos)
+        {
+
+        }
         public virtual void PrimaryAttack(List<Enemies> ene, Player player)
         {
 
         }
-        public virtual void SecondaryAttack(List<Enemies> ene, Player player) {
+        public virtual void SecondaryAttack(List<Enemies> ene, Player player, int[] targetPos) {
         
         }
-        public virtual void PrimaryAttackPlayer(List<Enemies> ene, Player player, int[] targetPos) {
-        
-        }
-        public virtual void SecondaryAttackPlayer(List<Enemies> e, Player player, int[] targetPos) {
-        
+        public virtual void SecondaryAttack(List<Enemies> ene, Player player)
+        {
+
         }
 
         public virtual void LoadStaffProjs(Texture2D[][][] projectiles)
@@ -68,7 +70,7 @@ namespace RogueValley
 
     }
     class StandartSword:Weapon {
-        public StandartSword() {
+        public StandartSword(Player player) {
             
             base.damage = 100;
             base.piercing = 5.0f;
@@ -90,6 +92,8 @@ namespace RogueValley
 
             base.sAttackTimer = 0;
             base.sAttackTimerMax = 5;
+
+            player.reach = base.reach;
 
 
 
@@ -138,6 +142,9 @@ namespace RogueValley
                 if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[(int)enums.Weapon.StandartSword][player.playerDirection].Length - 1))
                 {
                     base.sAttackTimer = 0;
+
+                    player.sAttackTrigger = false;
+
                     // we want to attack all enemies in the list e:
                     // but maximum this.maxtarget ammount.
                     if (e.Count < base.maxTarget)
@@ -167,7 +174,6 @@ namespace RogueValley
 
     class Staff : Weapon
     {
-        List<Projectiles> projectilesList;
         Texture2D[][][] projectiles;
         public Staff(Player player)
         {
@@ -192,21 +198,18 @@ namespace RogueValley
             base.sAttackTimer = 0;
             base.sAttackTimerMax = 10;
 
-            projectilesList = new List<Projectiles>();
-
             player.reach = base.reach;
 
         }
 
         public override void LoadStaffProjs(Texture2D[][][] projectiles) {
             this.projectiles = projectiles;
-        
         }
 
         // INSTEAD OF THESE ATTACKS WE DO THE SAME AS WITH MAGES BUT ON SECONDARY ATTACK WE SEND AN EXPLOSTION TO THE CURSOR OTHERWISE WE CAST FLAME-
         // BALLS TO A RANDOM ENEMY
 
-        public override void PrimaryAttackPlayer(List<Enemies> ene, Player player, int[] targetPos)
+        public override void PrimaryAttack(List<Enemies> ene, Player player, int[] targetPos)
         {
             if (base.AttackCooldown == 0)
             {
@@ -230,7 +233,7 @@ namespace RogueValley
             return;
         }
 
-        public override void SecondaryAttackPlayer(List<Enemies> e, Player player, int[] targetPos)
+        public override void SecondaryAttack(List<Enemies> e, Player player, int[] targetPos)
         {
             if (base.AttackCooldown == 0)
             {

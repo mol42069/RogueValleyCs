@@ -10,6 +10,7 @@ using static RogueValley.enums;
 using RogueValley;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
+using System.Numerics;
 
 namespace RogueValley.Entities
 {
@@ -148,7 +149,6 @@ namespace RogueValley.Entities
                 weapon.AttackCooldown--;
             }
 
-            this.Animation();
             if (immunityFrames > 0)
             {
                 immunityFrames--;
@@ -157,7 +157,8 @@ namespace RogueValley.Entities
             {
                 immunityFrames = 0;
             }
-            if (this.target.Count != 0 && this.lastMovement[0] == 0 && this.lastMovement[1] == 0)
+
+            if (this.lastMovement[0] == 0 && this.lastMovement[1] == 0)
             {
                 int rCount = 0;
                 int lCount = 0;
@@ -226,15 +227,27 @@ namespace RogueValley.Entities
                     if (tenemies.Count != 0)
                         this.PrimaryAttack(tenemies);
                 }
-                else if(this.weapon is not Staff) {
-                    if (tenemies.Count != 0)
-                        this.SecondAttack(tenemies, map);
+                else
+                {
+                    if (this.weapon is not Staff)
+                    {
+                        if (tenemies.Count != 0)
+                            this.SecondAttack(tenemies, map);
+                    }
+                    else {
+                        this.SecondAttack(this.mobList, map);
+                    }
                 }
                 // after all we clear our list so we dont attack non-existend enemies:
-                tenemies.Clear();          
+                tenemies.Clear();
             }
-            if (this.sAttackTrigger && this.lastMovement[0] == 0 && this.lastMovement[1] == 0 && this.weapon is Staff) {
-                this.SecondAttack(this.mobList, map);
+            else 
+            {
+                this.Animation();
+                this.targetPos = null;
+            }
+            if (this.target.Count == 0 && (!this.sAttackTrigger && this.weapon is not Staff) || (this.weapon is Staff && this.targetPos is null)) {
+                this.Animation();
             }
         }
 
@@ -298,45 +311,11 @@ namespace RogueValley.Entities
             if (weapon is Staff) {
                 int[] targetPos = new int[2];
                 targetPos = this.getTargetPos();
-                weapon.PrimaryAttackPlayer(e, this, targetPos);
+                weapon.PrimaryAttack(e, this, targetPos);
             }
             else if (weapon is StandartSword){
                 weapon.PrimaryAttack(e, this);
             }
-
-            /*
-            if (this.AttackCooldown == 0)
-            {
-                this.pAttackTimer++;
-                if (this.pAttackTimer >= this.pAttackTimerMax * (this.pAttackSprite[this.playerDirection].Length - 1))
-                {
-                    this.pAttackTimer = 0;
-                    // we want to attack all enemies in the list e:
-                    // but maximum this.maxtarget ammount.
-                    if (e.Count < this.maxtarget)
-                    {
-                        for (int i = 0; i < e.Count; i++)
-                        {
-                            e[i].TakeDamage(this.damage, this.piercing);
-                        }
-                    }
-                    else {
-                        for (int i = 0; i < this.maxtarget; i++)
-                        {
-                            e[i].TakeDamage(this.damage, this.piercing);
-                        }
-                    }
-                    this.random = rnd.Next(0, 6);
-                    this.AttackCooldown = this.AttackCooldownMax;
-                }
-                if (this.pAttackTimer % this.pAttackTimerMax == 0)
-                {
-                    this.playerSprite = this.pAttackSprite[this.playerDirection][(int)(this.pAttackTimer / this.pAttackTimerMax)];
-                }
-                return;
-            }
-            this.AttackCooldown--;
-            */
         }
 
         public void SecondAttack(List<Enemies> e, Map map)
@@ -348,52 +327,16 @@ namespace RogueValley.Entities
                     this.targetPos = new int[2];
                     var mouseState = Mouse.GetState();
                     Point mousePos = new Point(mouseState.X, mouseState.Y);
-                    targetPos[0] = mousePos.X - map.map_position[0];
-                    targetPos[1] = mousePos.Y - map.map_position[1];
+                    this.targetPos[0] = mousePos.X - map.map_position[0];
+                    this.targetPos[1] = mousePos.Y - map.map_position[1];
                 }
-                weapon.SecondaryAttackPlayer(e, this, targetPos);
+                weapon.SecondaryAttack(e, this, targetPos);
                 
             }
             else if (weapon is StandartSword)
             {
                 weapon.SecondaryAttack(e, this);
             }
-
-
-            /*
-            if (this.AttackCooldown == 0)
-            {
-                this.sAttackTimer++;
-                if (this.sAttackTimer >= this.sAttackTimerMax * (this.sAttackSprite[this.playerDirection].Length - 1))
-                {
-                    this.sAttackTimer = 0;
-                    // we want to attack all enemies in the list e:
-                    // but maximum this.maxtarget ammount.
-                    if (e.Count < this.maxtarget)
-                    {
-                        for (int i = 0; i < e.Count; i++)
-                        {
-                            e[i].TakeDamage((int)((float)this.damage * this.sAttackMulit), this.piercing);
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < this.maxtarget; i++)
-                        {
-                            e[i].TakeDamage((int)((float)this.damage * this.sAttackMulit), this.piercing);
-                        }
-                    }
-                    this.random = rnd.Next(0, 6);
-                    this.AttackCooldown = this.AttackCooldownMax;
-                }
-                if (this.sAttackTimer % this.sAttackTimerMax == 0)
-                {
-                    this.playerSprite = this.sAttackSprite[this.playerDirection][(int)(this.sAttackTimer / this.sAttackTimerMax)];
-                }
-                return;
-            }
-            this.AttackCooldown--;
-            */
         }
 
         public void TakeDamage(int damage, int piercing)

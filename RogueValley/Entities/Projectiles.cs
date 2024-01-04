@@ -231,125 +231,123 @@ namespace RogueValley.Entities
                 base.speed = 15;
                 base.reach = 50;
             
-
                 base.piercing = piercing;
                 base.damage = damage;
 
                 base.aniTimerMax = 5;
             }
 
-
-
-
-
-            public override bool UpdatePlayer(Player player, List<Enemies> enemy)
+        public override bool UpdatePlayer(Player player, List<Enemies> enemy)
+        {
+            if ((base.finalPos[0] + base.reach > base.position[0] && base.finalPos[0] - base.reach < base.position[0] && base.finalPos[1] + base.reach > base.position[1] && base.finalPos[1] - base.reach < base.position[1]) || base.aniHitCount != 0)
             {
-                if ((base.finalPos[0] + base.reach > base.position[0] && base.finalPos[0] - base.reach < base.position[0] && base.finalPos[1] + base.reach > base.position[1] && base.finalPos[1] - base.reach < base.position[1]) || base.aniHitCount != 0)
+                base.spriteSize = base.finalSize;
+
+                if (base.ExplosionAnimation())
+                {
+                    return true;
+                }
+
+                for (int i = 0; i < enemy.Count; i++)
                 {
 
-                    base.spriteSize = base.finalSize;
+                    if ((enemy[i].position[0] + base.reach > base.position[0] && enemy[i].position[0] - base.reach < base.position[0] && enemy[i].position[1] + base.reach > base.position[1] && enemy[i].position[1] - base.reach < base.position[1]))
+                        enemy[i].TakeDamage(base.damage, base.piercing);
+                }
+                return false;
+            }
+            else
+            {
+                int[] mov = new int[2];
+                int x = 0;
+                int y = 0;
 
-                    if (base.ExplosionAnimation())
-                    {
-                        return true;
-                    }
+                mov[0] = (int)(((float)base.finalPos[0]) - base.position[0]);
+                mov[1] = (int)(((float)base.finalPos[1]) - base.position[1]);
 
-                    for (int i = 0; i < enemy.Count; i++)
-                    {
-
-                        if ((enemy[i].position[0] + base.reach > base.position[0] && enemy[i].position[0] - base.reach < base.position[0] && enemy[i].position[1] + base.reach > base.position[1] && enemy[i].position[1] - base.reach < base.position[1]))
-                            enemy[i].TakeDamage(base.damage, base.piercing);
-                    }
-                    return false;
+                if (mov[0] < 0)
+                {
+                    x = mov[0] * -1;
                 }
                 else
                 {
-                    int[] mov = new int[2];
-                    int x = 0;
-                    int y = 0;
-
-                    mov[0] = (int)(((float)base.finalPos[0]) - base.position[0]);
-                    mov[1] = (int)(((float)base.finalPos[1]) - base.position[1]);
-
-                    if (mov[0] < 0)
-                    {
-                        x = mov[0] * -1;
-                    }
-                    else
-                    {
-                        x = mov[0];
-                    }
-
-                    if (mov[1] < 0)
-                    {
-                        y = mov[1] * -1;
-                    }
-                    else
-                    {
-                        y = mov[1];
-                    }
-
-                    if (x < 0)
-                    {
-                        if (y < 0)
-                        {
-                            if (x < y)
-                            {
-                                base.direction = (int)enums.Direction.LEFT;
-                            }
-                            else
-                            {
-                                base.direction = (int)enums.Direction.UP;
-                            }
-                        }
-                        else
-                        {
-                            if (x < -y)
-                            {
-                                base.direction = (int)enums.Direction.LEFT;
-                            }
-                            else
-                            {
-                                base.direction = (int)enums.Direction.DOWN;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (y < 0)
-                        {
-                            if (-x < y)
-                            {
-                                base.direction = (int)enums.Direction.RIGHT;
-                            }
-                            else
-                            {
-                                base.direction = (int)enums.Direction.UP;
-                            }
-                        }
-                        else
-                        {
-                            if (-x < -y)
-                            {
-                                base.direction = (int)enums.Direction.RIGHT;
-                            }
-                            else
-                            {
-                                base.direction = (int)enums.Direction.DOWN;
-                            }
-                        }
-                    }
-
-                    int n = x + y;
-
-                    base.position[0] += (int)(((float)mov[0] / (float)n) * base.speed);
-                    base.position[1] += (int)(((float)mov[1] / (float)n) * base.speed);
-
-                    base.Animation();
-                    return false;
+                    x = mov[0];
                 }
+
+                if (mov[1] < 0)
+                {
+                    y = mov[1] * -1;
+                }
+                else
+                {
+                    y = mov[1];
+                }
+
+                if (x < 0)
+                {
+                    if (y < 0)
+                    {
+                        if (x < y)
+                        {
+                            base.direction = (int)enums.Direction.LEFT;
+                        }
+                        else
+                        {
+                            base.direction = (int)enums.Direction.UP;
+                        }
+                    }
+                    else
+                    {
+                        if (x < -y)
+                        {
+                            base.direction = (int)enums.Direction.LEFT;
+                        }
+                        else
+                        {
+                            base.direction = (int)enums.Direction.DOWN;
+                        }
+                    }
+                }
+                else
+                {
+                    if (y < 0)
+                    {
+                        if (-x < y)
+                        {
+                            base.direction = (int)enums.Direction.RIGHT;
+                        }
+                        else
+                        {
+                            base.direction = (int)enums.Direction.UP;
+                        }
+                    }
+                    else
+                    {
+                        if (-x < -y)
+                        {
+                            base.direction = (int)enums.Direction.RIGHT;
+                        }
+                        else
+                        {
+                            base.direction = (int)enums.Direction.DOWN;
+                        }
+                    }
+                }
+                int n = x + y;
+
+                base.position[0] += (int)(((float)mov[0] / (float)n) * base.speed);
+                base.position[1] += (int)(((float)mov[1] / (float)n) * base.speed);
+
+                base.Animation();
             }
+            for (int i = 0; i < enemy.Count; i++)
+            {
+                if ((enemy[i].position[0] + base.reach > base.position[0] && enemy[i].position[0] - base.reach < base.position[0] && enemy[i].position[1] + base.reach > base.position[1] && enemy[i].position[1] - base.reach < base.position[1]))
+                    enemy[i].TakeDamage(base.damage, base.piercing);
+            }
+            return false;
         }
+    }
 
     class PlayerExplodingBall : Projectiles
     {
@@ -382,6 +380,7 @@ namespace RogueValley.Entities
             base.damage = damage;
 
             base.aniTimerMax = 5;
+            base.aniTimer = 0;
         }
         protected bool ExploAnimation()
         {
@@ -403,14 +402,15 @@ namespace RogueValley.Entities
 
         public override bool UpdatePlayer(Player player, List<Enemies> enemy)
         {
-            if ((base.finalPos[0] + base.reach > base.position[0] && base.finalPos[0] - base.reach < base.position[0] && base.finalPos[1] + base.reach > base.position[1] && base.finalPos[1] - base.reach < base.position[1]) || base.aniHitCount != 0)
+            if (base.finalPos[0] + base.speed > base.position[0] && base.finalPos[0] - base.speed < base.position[0] && base.finalPos[1] + base.speed > base.position[1] && base.finalPos[1] - base.speed < base.position[1] || base.aniTimer != 0 || base.aniHitCount != 0)
             {
+                if (base.aniTimer == 0 && base.aniHitCount == 0)
+                {
+                    base.spriteSize = base.finalSize;
+                    base.position[0] = base.position[0] - (base.finalSize[0] / 2);
+                    base.position[1] = base.position[1] - (base.finalSize[1] / 2);
+                }
 
-                base.spriteSize = base.finalSize;
-                /*
-                base.position[0] = base.position[0] - (base.finalSize[0] / 2);
-                base.position[1] = base.position[1] - (base.finalSize[1] / 2);
-                */
                 if (this.ExploAnimation())
                 {
                     return true;
@@ -501,7 +501,6 @@ namespace RogueValley.Entities
                         }
                     }
                 }
-
                 int n = x + y;
 
                 base.position[0] += (int)(((float)mov[0] / (float)n) * base.speed);

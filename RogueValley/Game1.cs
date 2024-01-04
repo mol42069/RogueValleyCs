@@ -29,6 +29,8 @@ namespace RogueValley
         private int fps;
         private System.Diagnostics.Stopwatch watch;
 
+        public bool clicked, past_clicked;
+
         public int gameState;
 
         private UpgradeManager upgradeManager;
@@ -67,6 +69,9 @@ namespace RogueValley
             watch = System.Diagnostics.Stopwatch.StartNew();
 
             mobManager = new MobManager(this.player, this.bgSize);
+
+            this.past_clicked = false;
+            this.clicked = false;
 
             upgradeManager = new WeaponSelecScreen();
 
@@ -643,6 +648,25 @@ namespace RogueValley
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Enter))
                 Exit();
 
+            // here we catch a mouseclick:
+
+            var mouseState = Mouse.GetState();
+            if (mouseState.LeftButton == ButtonState.Released && this.past_clicked)
+            {
+                this.clicked = true;
+                this.past_clicked = false;
+            }
+            else {
+                this.clicked = false;
+            }
+            if (mouseState.LeftButton == ButtonState.Pressed){
+
+                this.past_clicked = true;
+
+            }
+
+
+
             // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
 
             switch (this.gameState) {
@@ -655,15 +679,17 @@ namespace RogueValley
                     break;
 
                 case 2:
-                    this.player = this.upgradeManager.Update(this.player);
+                    this.player = this.upgradeManager.Update(this.player, this.clicked);
                     if (this.player.weapon != null)
                         this.gameState = 1;
+
+                    if (this.player.weapon is Staff){
+                        this.player.reach = 200;
+                    }
                     break;
 
                 default:
                     break;
-
-
             }
 
             base.Update(gameTime);
@@ -696,7 +722,9 @@ namespace RogueValley
         protected void StartScreen() {
             // here is everything we update if we are on the Start Screen.
             var mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Pressed) {
+            if (this.clicked) {
+
+
                 Point mousePos = new Point(mouseState.X, mouseState.Y);
                 this.gameState = ui.Click(mousePos);
 
@@ -737,7 +765,6 @@ namespace RogueValley
 
                 default:
                     break;
-
             }
 
 
@@ -810,7 +837,7 @@ namespace RogueValley
             }
 
             var mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Pressed)            
+            if (this.clicked)            
                 this.player.sAttackTrigger = true;
         }
     }

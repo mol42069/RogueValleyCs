@@ -145,8 +145,7 @@ namespace RogueValley.Entities
             for (int i = 0; i < this.mobList.Count; i++)
             {
                 this.mobList[i].Draw(_spriteBatch, m);
-            }
-           
+            }           
         }
     }
 }

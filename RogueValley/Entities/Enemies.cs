@@ -277,7 +277,7 @@ namespace RogueValley.Entities
 
             int n = x + y;
 
-            if (n <= player.reach && n >= -player.reach) 
+            if (n <= player.weapon.reach && n >= -player.weapon.reach) 
             {
                 this.targetId = player.target.Count;
                 player.target.Add(this);
@@ -468,7 +468,7 @@ namespace RogueValley.Entities
 
             int n = x + y;
 
-            if (n <= player.reach && n >= -player.reach)
+            if (n <= player.weapon.reach && n >= -player.weapon.reach)
             {
                 this.targetId = player.target.Count;
                 player.target.Add(this);

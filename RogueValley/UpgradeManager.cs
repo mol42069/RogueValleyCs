@@ -36,7 +36,7 @@ namespace RogueValley
 
             return _spriteBatch;
         }
-        public virtual Player Update(Player player)
+        public virtual Player Update(Player player, bool clicked)
         {
 
 
@@ -60,16 +60,16 @@ namespace RogueValley
 
             return _spriteBatch;
         }
-        public override Player Update(Player player)
+        public override Player Update(Player player, bool clicked)
         {
             var mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Pressed)
+            if (clicked)
             {
                 Point mousePos = new Point(mouseState.X, mouseState.Y);
 
                 if (this.choices[(int)enums.Weapon.StandartSword].Contains(mousePos))
                 {
-                    player.weapon = new StandartSword();
+                    player.weapon = new StandartSword(player);
                     player.weapon.LoadContent(player.pAttackSprite, player.sAttackSprite);
                 }
                 else if (this.choices[(int)enums.Weapon.Staff].Contains(mousePos)) {
