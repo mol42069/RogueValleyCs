@@ -177,11 +177,11 @@ namespace RogueValley
         Texture2D[][][] projectiles;
         public Staff(Player player)
         {
-            base.damage = 100;
+            base.damage = 50;
             base.piercing = 10.0f;
             base.reach = 800;
             base.maxTarget = 5;
-            base.secondaryMulti = 2.5f;
+            base.secondaryMulti = 10f;
 
             // Animation Variables
 

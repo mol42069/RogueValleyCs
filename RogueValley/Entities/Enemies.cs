@@ -376,8 +376,8 @@ namespace RogueValley.Entities
 
             base.lastMove = new int[2] { 0, 0 };
 
-            base.hp = 100;
-            base.maxhp = 100;
+            base.hp = 50;
+            base.maxhp = 50;
             base.damage = 10;
             base.sAttackMult = 1.3f;
             base.AttackCooldownMax = 20;

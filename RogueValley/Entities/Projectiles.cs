@@ -364,7 +364,7 @@ namespace RogueValley.Entities
             this.finalExpPos[1] = finalPos[1] - (base.finalSize[1] / 2);
 
             base.speed = 15;
-            base.reach = 150;
+            base.reach = 300;
 
 
             base.piercing = piercing;
@@ -401,18 +401,24 @@ namespace RogueValley.Entities
                     base.position[0] = base.position[0] - (base.finalSize[0] / 2);
                     base.position[1] = base.position[1] - (base.finalSize[1] / 2);
                 }
+                if (base.aniTimer == 0 && base.aniHitCount == 1) {
+
+                    int[] tempPos = new int[2] { (base.position[0] + base.spriteSize[0] / 2) -(base.reach - base.spriteSize[0])/2, (base.position[1] + base.spriteSize[1] / 2) - (base.reach - base.spriteSize[1])/2};
+
+                    for (int i = 0; i < enemy.Count; i++)
+                    {
+
+                        if ((enemy[i].position[0] + base.reach > tempPos[0] && enemy[i].position[0] - base.reach < tempPos[0] && enemy[i].position[1] + base.reach > tempPos[1] && enemy[i].position[1] - base.reach < tempPos[1]))
+                            enemy[i].TakeDamage(base.damage, base.piercing);
+                    }
+                }
 
                 if (this.ExploAnimation())
                 {
                     return true;
                 }
 
-                for (int i = 0; i < enemy.Count; i++)
-                {
-
-                    if ((enemy[i].position[0] + base.reach > base.position[0] && enemy[i].position[0] - base.reach < base.position[0] && enemy[i].position[1] + base.reach > base.position[1] && enemy[i].position[1] - base.reach < base.position[1]))
-                        enemy[i].TakeDamage(base.damage, base.piercing);
-                }
+                
                 return false;
             }
             else
