@@ -129,7 +129,7 @@ namespace RogueValley.Entities
             return false;
         }
 
-        public void Update(Player player) {
+        public void Update(Player player, Game1 g1) {
             // we go through all enemies in our mobList and Update them.
             //if they are dead we remove them from the list so they basicly dont exist anymore.
             player.target.Clear();
@@ -140,6 +140,21 @@ namespace RogueValley.Entities
                     if (this.mobList[i].Update(player) == -1)
                     {
                         this.deadList.Add(new Dead(this.mobList[i].position, this.sprites[(int)enums.Entity.Dead][0][0][0], this.sprites[(int)enums.Entity.Zombie][(int)enums.Movement.DEAD], this.mobList[i].spriteSize));
+                        switch (this.mobList[i]) {
+
+                            case Ogre:
+                                g1.score += 10;
+                                break;
+
+                            case Mage:
+                                g1.score += 5;
+                                break;
+
+                            case Zombie:
+                                g1.score += 1;
+                                break;
+
+                        }
                         this.mobList.RemoveAt(i);
                     }
                 }
@@ -153,7 +168,7 @@ namespace RogueValley.Entities
 
                     this.wave++;
                     //this.maxRandom *= this.wave;
-                    this.ammount = this.ammount * this.wave;
+                    this.ammount = 10 * this.wave;
 
                     this.deadList.Clear();
                     this.Spawn(player);

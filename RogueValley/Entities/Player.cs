@@ -301,7 +301,25 @@ namespace RogueValley.Entities
         protected int[] getTargetPos() {
             int[] targetPos = new int[2];
 
-            targetPos = this.target[rnd.Next(0, this.target.Count)].targetPosition;
+            int distance = 1000;
+            int finalIdx = 0;
+            for (int i = 0; i < this.target.Count; i++) {
+
+                int x = this.target[i].position[0] - this.playerPosition[0];
+                if (x < 0) x = -x;
+                
+                int y = this.target[i].position[1] - this.playerPosition[1];
+                if (y < 0) y = -y;
+
+                if (x + y < distance) { 
+                    distance = x + y;
+                    finalIdx = i;
+                }
+
+            }
+
+
+            targetPos = this.target[finalIdx].targetPosition;
 
             return targetPos;
         }

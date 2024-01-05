@@ -31,7 +31,7 @@ namespace RogueValley
 
         public bool clicked, past_clicked;
 
-        public int gameState;
+        public int gameState, score;
 
         private UpgradeManager upgradeManager;
 
@@ -847,7 +847,7 @@ namespace RogueValley
             this.player.Movement(movement, bgSprite);
             this.player.Update(this.bgSprite);
             this.ui.InGameUpdate(this.player);
-            this.mobManager.Update(this.player);
+            this.mobManager.Update(this.player, this);
 
             bgSprite.Update(this.player);
         }
@@ -924,7 +924,7 @@ namespace RogueValley
             _spriteBatch.Draw(this.player.playerSprite, new Rectangle(this.player.drawPosition[0], this.player.drawPosition[1], 100, 100), Color.White);
 
 
-            this.ui.DrawInGameUI(_spriteBatch, this.player, this.mobManager);
+            this.ui.DrawInGameUI(_spriteBatch, this.player, this.mobManager, this.score);
         }
         protected void StartScreenDraw() {
             // here is everything we update if we are on the Start Screen.
