@@ -178,7 +178,7 @@ namespace RogueValley
         public Staff(Player player)
         {
             base.damage = 100;
-            base.piercing = 5.0f;
+            base.piercing = 10.0f;
             base.reach = 800;
             base.maxTarget = 5;
             base.secondaryMulti = 2.5f;
@@ -251,7 +251,7 @@ namespace RogueValley
                     base.sAttackTimer = 0;
                     int[] tempPos = (int[])player.playerPosition.Clone();
 
-                    player.projectiles.Add(new PlayerExplodingBall(this.projectiles[(int)enums.Projectile.EplodingBall], tempPos , (int[])targetPos.Clone(), base.damage, (int)base.piercing));
+                    player.projectiles.Add(new PlayerExplodingBall(this.projectiles[(int)enums.Projectile.EplodingBall], tempPos , (int[])targetPos.Clone(), (int)(base.damage * base.secondaryMulti), (int)base.piercing));
 
                     player.sAttackTrigger = false;
                     player.targetPos = null;

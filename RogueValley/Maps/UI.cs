@@ -16,13 +16,13 @@ namespace RogueValley.Maps
 {
     class UI
     {
-        private Texture2D[] sprites;
+        public Texture2D[] sprites;
 
         private Rectangle sButtonRec;
         private SpriteFont font;
 
         private int[] bgPos, startBPos, startBSize, hBarSizeMax, hBgSize, hBgPos;
-        private int hBarSize;
+        private int hBarSize, enemyHBarSize;
         public UI() {
             // StartScreen Size and Position Variables
             {
@@ -53,6 +53,8 @@ namespace RogueValley.Maps
                 this.hBgPos = new int[2];
                 this.hBgPos[0] = 10;
                 this.hBgPos[1] = 980;
+
+
             }
             // Rectangles for Buttons:
             {
@@ -99,5 +101,37 @@ namespace RogueValley.Maps
             _spriteBatch.Draw(this.sprites[(int)enums.UI.hBar], new Rectangle(this.hBgPos[0] + 5, this.hBgPos[1] + 5, this.hBarSize, this.hBarSizeMax[1]), Color.White);
             _spriteBatch.DrawString(this.font, player.hp.ToString(), new Microsoft.Xna.Framework.Vector2(this.hBgPos[0] + (this.hBgSize[0]/2) - 10, this.hBgPos[1] + (this.hBgSize[1] / 2) - 10), Color.White);
         }
+
+       
+
+    }
+
+    class EnemyUI {
+
+        protected int enemyHBarSize;
+        protected Texture2D[] sprites;
+        public EnemyUI() {
+        }
+        public void LoadContent(Texture2D[] sprites)
+        {
+            this.sprites = sprites;
+        }
+
+        public void EnemyHealthbarUpdate(Enemies enemy)
+        {
+            this.enemyHBarSize = (int)((float)(enemy.spriteSize[0] - 4) * ((float)enemy.hp / (float)enemy.maxhp));
+        }
+
+
+        public SpriteBatch EnemyHealthBarDraw(SpriteBatch _spriteBatch, Map m, Enemies enemy)
+        {
+
+            _spriteBatch.Draw(this.sprites[(int)enums.UI.hBg], new Rectangle(enemy.drawPosition[0], enemy.drawPosition[1] - 13, enemy.spriteSize[0], 10), Color.White);
+            _spriteBatch.Draw(this.sprites[(int)enums.UI.hBar], new Rectangle(enemy.drawPosition[0] + 2, enemy.drawPosition[1] - 12, this.enemyHBarSize, 8), Color.White);
+
+            return _spriteBatch;
+        }
+
+
     }
 }

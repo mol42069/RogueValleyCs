@@ -14,7 +14,7 @@ namespace RogueValley.Entities
     {
         protected Texture2D[][] sprites;
         protected Texture2D sprite;
-        protected int aniCount, aniTimer, aniTimerMax, speed, direction, reach, playerReach, aniHitCount, damage, piercing;
+        protected int aniCount, aniTimer, aniTimerMax, speed, direction, reach, aniHitCount, damage, piercing;
         protected int[] position, drawPosition, spriteSize, finalPos, finalSize;
 
         public Projectiles() {
@@ -77,7 +77,6 @@ namespace RogueValley.Entities
 
             return false;
         }
-
     }
 
     class FlameBall : Projectiles {
@@ -119,7 +118,6 @@ namespace RogueValley.Entities
                 if ((player.playerPosition[0] + base.reach > base.position[0] && player.playerPosition[0] - base.reach < base.position[0] && player.playerPosition[1] + base.reach > base.position[1] && player.playerPosition[1] - base.reach < base.position[1]))
                     player.TakeDamage(base.damage, base.piercing);
 
-
                 return false;
             }
             else
@@ -148,7 +146,6 @@ namespace RogueValley.Entities
                 {
                     y = mov[1];
                 }
-
                 if (x < 0)
                 {
                     if (y < 0)
@@ -199,7 +196,6 @@ namespace RogueValley.Entities
                         }
                     }
                 }
-
                 int n = x + y;
 
                 base.position[0] += (int)(((float)mov[0] / (float)n) * base.speed);
@@ -251,7 +247,7 @@ namespace RogueValley.Entities
                 for (int i = 0; i < enemy.Count; i++)
                 {
 
-                    if ((enemy[i].position[0] + base.reach > base.position[0] && enemy[i].position[0] - base.reach < base.position[0] && enemy[i].position[1] + base.reach > base.position[1] && enemy[i].position[1] - base.reach < base.position[1]))
+                    if ((enemy[i].targetPosition[0] + base.reach > base.position[0] && enemy[i].targetPosition[0] - base.reach < base.position[0] && enemy[i].targetPosition[1] + base.reach > base.position[1] && enemy[i].targetPosition[1] - base.reach < base.position[1]))
                         enemy[i].TakeDamage(base.damage, base.piercing);
                 }
                 return false;
@@ -340,11 +336,6 @@ namespace RogueValley.Entities
 
                 base.Animation();
             }
-            for (int i = 0; i < enemy.Count; i++)
-            {
-                if ((enemy[i].position[0] + base.reach > base.position[0] && enemy[i].position[0] - base.reach < base.position[0] && enemy[i].position[1] + base.reach > base.position[1] && enemy[i].position[1] - base.reach < base.position[1]))
-                    enemy[i].TakeDamage(base.damage, base.piercing);
-            }
             return false;
         }
     }
@@ -373,7 +364,7 @@ namespace RogueValley.Entities
             this.finalExpPos[1] = finalPos[1] - (base.finalSize[1] / 2);
 
             base.speed = 15;
-            base.reach = 250;
+            base.reach = 150;
 
 
             base.piercing = piercing;

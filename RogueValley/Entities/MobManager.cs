@@ -11,6 +11,7 @@ namespace RogueValley.Entities
     class MobManager
     {
         private Texture2D[][][][] sprites;
+        private Texture2D[] hBarSprites;
         public List<Enemies> mobList, deadList;
         private Random rnd;
 
@@ -30,8 +31,9 @@ namespace RogueValley.Entities
             this.bgSize = bgSize;
         }
 
-        public void LoadContent(Texture2D[][][][] sprites) {
+        public void LoadContent(Texture2D[][][][] sprites, Texture2D[] hBarSprites) {
             this.sprites = sprites;
+            this.hBarSprites = hBarSprites;
         }
         public void RmList() {
             this.mobList.Clear();
@@ -57,36 +59,60 @@ namespace RogueValley.Entities
                 switch (this.wave) {
                     case 1:
                         
-                        if (random < 90)
+                        if (random < 80)
                         {
                             Zombie zombie = new Zombie(pos);
-                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie]);
+                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie], this.hBarSprites);
                             this.mobList.Add(zombie);
+
                         }
-                        else if (random >= 90)
+                        else if (random >= 80)
                         {
-                            // here we spawn other stuff for example Mages
-                            Mage mage = new Mage(pos);
-                            mage.LoadContent(this.sprites[(int)enums.Entity.Mage]);
-                            mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
-                            this.mobList.Add(mage);
+                            if (random >= 95)
+                            {
+
+                                Ogre ogre = new Ogre(pos);
+                                ogre.LoadContent(this.sprites[(int)enums.Entity.Ogre], this.hBarSprites);
+                                this.mobList.Add(ogre);
+
+                            }
+                            else
+                            {
+                                // here we spawn other stuff for example Mages
+                                Mage mage = new Mage(pos);
+                                mage.LoadContent(this.sprites[(int)enums.Entity.Mage], this.hBarSprites);
+                                mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
+                                this.mobList.Add(mage);
+                            }
                         }
                         break;
 
                     default:
-                        if (random < 90)
+                        if (random < 80 - this.wave * 2)
                         {
                             Zombie zombie = new Zombie(pos);
-                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie]);
+                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie], this.hBarSprites);
                             this.mobList.Add(zombie);
+
                         }
-                        else if (random >= 90)
+                        else if (random >= 80 - this.wave * 2)
                         {
-                            // here we spawn other stuff for example Mages
-                            Mage mage = new Mage(pos);
-                            mage.LoadContent(this.sprites[(int)enums.Entity.Mage]);
-                            mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
-                            this.mobList.Add(mage);
+                            if (random >= 95 - this.wave)
+                            {
+
+                                Ogre ogre = new Ogre(pos);
+                                ogre.LoadContent(this.sprites[(int)enums.Entity.Ogre], this.hBarSprites);
+                                this.mobList.Add(ogre);
+
+                            }
+                            else
+                            {
+                                // here we spawn other stuff for example Mages
+                                Mage mage = new Mage(pos);
+                                mage.LoadContent(this.sprites[(int)enums.Entity.Mage], this.hBarSprites);
+                                mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
+                                this.mobList.Add(mage);
+                            }
                         }
                         break;
                 }
@@ -113,7 +139,7 @@ namespace RogueValley.Entities
                 {
                     if (this.mobList[i].Update(player) == -1)
                     {
-                        this.deadList.Add(new Dead(this.mobList[i].position, this.sprites[(int)enums.Entity.Dead][0][0][0], this.sprites[(int)enums.Entity.Zombie][(int)enums.Movement.DEAD]));
+                        this.deadList.Add(new Dead(this.mobList[i].position, this.sprites[(int)enums.Entity.Dead][0][0][0], this.sprites[(int)enums.Entity.Zombie][(int)enums.Movement.DEAD], this.mobList[i].spriteSize));
                         this.mobList.RemoveAt(i);
                     }
                 }

@@ -18,8 +18,8 @@ namespace RogueValley
         {
             Zombie = 0,
             Mage = 1,
-
-            Dead = 2, // lets make this the last.
+            Ogre = 2,
+            Dead = 3, // lets make this the last.
         }
         public enum Direction
         {

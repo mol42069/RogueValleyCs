@@ -9,26 +9,30 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RogueValley.Entities;
 using RogueValley.Maps;
+using static RogueValley.enums;
+using UI = RogueValley.Maps.UI;
 
 namespace RogueValley.Entities
 {
     class Enemies
     {
 
-        protected int hp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing, targetId;
-        protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer;
+        public int hp, maxhp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing, targetId;
+        protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer, AttackCooldownMax;
+        protected int random, immunityFrames, maxImmunityFrames;
 
         protected float sAttackMult;
 
-        protected int[] spriteSize, lastMove;
-        protected int[] mov;
-        public int[] position, drawPosition;
+        public int[] spriteSize;
+        protected int[] mov, lastMove;
+        public int[] position, drawPosition, targetPosition;
         protected List<Projectiles> projectilesList;
 
         protected Texture2D[][] movSprites, idleSprites, pAttackSprite, sAttackSprite, deathAnimation;
         protected Texture2D sprite;
 
         protected Random rnd;
+        protected EnemyUI ui;
 
         public void Init()
         {
@@ -42,12 +46,25 @@ namespace RogueValley.Entities
             this.spriteSize[0] = 100;
             this.spriteSize[1] = 100;
 
+            this.ui = new EnemyUI();
+
             this.targetId = -1;
+            this.immunityFrames = 0;
+            this.maxImmunityFrames = 25;
+
+            this.targetPosition = new int[2];
+
+            if (this is not Dead) {
+                this.targetPosition[0] = this.position[0] + this.spriteSize[0] / 2;
+                this.targetPosition[1] = this.position[1] + this.spriteSize[1] / 2;
+            }
 
             rnd = new Random();
+            this.random = rnd.Next(0, 6);
+
         }
 
-        public void LoadContent(Texture2D[][][] sprites)
+        public void LoadContent(Texture2D[][][] sprites, Texture2D[] healthSprites)
         {
             this.movSprites = sprites[(int)enums.Movement.MOVE];
             this.idleSprites = sprites[(int)enums.Movement.IDLE];
@@ -55,6 +72,7 @@ namespace RogueValley.Entities
             this.sAttackSprite = sprites[(int)enums.Movement.SATTACK];
             this.deathAnimation = sprites[(int)enums.Movement.DEAD];
 
+            this.ui.LoadContent(healthSprites);
 
             this.sprite = idleSprites[0][0];
         }
@@ -76,6 +94,8 @@ namespace RogueValley.Entities
             // we draw the enemy.
             this.drawPosition = CalcdrawPos(m);
             _spriteBatch.Draw(this.sprite, new Rectangle(this.drawPosition[0], this.drawPosition[1], this.spriteSize[0], this.spriteSize[1]), Color.White);
+            if(this is not Dead)
+                _spriteBatch = this.ui.EnemyHealthBarDraw(_spriteBatch, m, this);
 
             if (this.projectilesList != null)
             {
@@ -154,98 +174,41 @@ namespace RogueValley.Entities
 
         public virtual int Update(Player player)
         {
-            return 0;
-        }
+            // we just call the ai func. and return the entity hp.
 
-        protected virtual Player Ai(Player player)
-        {
-            return player;
-        }
-
-        public void TakeDamage(int damage, float piercing)
-        {
-            // same as in the player class check there for explanation.
-            if (piercing < this.defence)
+            if (this.immunityFrames > 0)
             {
-                this.hp -= (int)((float)damage * ((float)piercing / (float)this.defence));
+                this.immunityFrames--;
             }
             else
             {
-                this.hp -= damage;
+                this.immunityFrames = 0;
             }
-            this.aniCount = 0;
-            if (this.hp < 0) {
-                this.hp = 0;
-            }
-        }
-        public virtual Player PrimaryAttack(Player player)
-        {
-            return player;
-        }
 
-        public void PrimaryAttackAni()
-        {
+            this.ui.EnemyHealthbarUpdate(this);
 
-        }
-
-        public virtual Player SecondaryAttack(Player player)
-        {
-            return player;
-        }
-
-    }
-    class Zombie : Enemies
-    {
-
-        int random;
-
-        public Zombie(int[] pos)
-        {
-            base.pAttackTimer = 0;
-            base.pAttackTimerMax = 5;
-
-            base.sAttackTimer = 0;
-            base.sAttackTimerMax = 10;
-
-            base.lastMove = new int[2] { 0, 0 };
-
-            base.hp = 100;
-            base.damage = 10;
-            base.sAttackMult = 1.3f;
-
-            base.position = pos;
-            base.defence = 1;
-            base.reach = 100;
-            base.speed = 7;
-            base.piercing = 0;
-
-            base.Init();
-
-            this.random = rnd.Next(0, 6);
-        }
-
-        public override int Update(Player player)
-        {
-            // we just call the ai func. and return the entity hp.
-            if (base.hp == 0)
+            this.targetPosition[0] = this.position[0] + this.spriteSize[0] / 2;
+            this.targetPosition[1] = this.position[1] + this.spriteSize[1] / 2;
+            if (this.hp == 0)
             {
-                if (base.aniCount != 6)
+                if (this.aniCount != 6)
                 {
-                    base.DeathAnimation();
+                    this.DeathAnimation();
                     return 0;
                 }
-                else {
+                else
+                {
                     return -1;
                 }
             }
             else
             {
                 this.Ai(player);
-                return base.hp;
+                return this.hp;
             }
         }
 
-        protected override Player Ai(Player player)
+        protected virtual Player Ai(Player player)
         {
             // we move the entity towards the player until it is in reach. Then we tell the Zombie to attack as well as when this zombie is in reach of
             // the player we add this to the target list.
@@ -253,8 +216,8 @@ namespace RogueValley.Entities
             int x = 0;
             int y = 0;
 
-            mov[0] = (int)(((float)player.playerPosition[0]) - base.position[0]);
-            mov[1] = (int)(((float)player.playerPosition[1]) - base.position[1]);
+            mov[0] = (int)(((float)player.playerPosition[0]) - this.position[0]);
+            mov[1] = (int)(((float)player.playerPosition[1]) - this.position[1]);
 
             if (mov[0] < 0)
             {
@@ -273,20 +236,20 @@ namespace RogueValley.Entities
             {
                 y = mov[1];
             }
-           
+
 
             int n = x + y;
 
-            if (n <= player.weapon.reach && n >= -player.weapon.reach) 
+            if (n <= player.weapon.reach && n >= -player.weapon.reach)
             {
                 this.targetId = player.target.Count;
                 player.target.Add(this);
             }
 
-            if (n <= base.reach && n >= -base.reach)
+            if (n <= this.reach && n >= -this.reach)
             {
-                base.lastMove[0] = 0;
-                base.lastMove[1] = 0;
+                this.lastMove[0] = 0;
+                this.lastMove[1] = 0;
 
                 if (random != 0)
                 {
@@ -299,75 +262,135 @@ namespace RogueValley.Entities
             }
             else
             {
-                if (base.pAttackTimer != 0 || base.sAttackTimer != 0)
+                if (this.pAttackTimer != 0 || this.sAttackTimer != 0)
                 {
-                    this.random = base.rnd.Next(0, 6);
+                    this.random = this.rnd.Next(0, 6);
                 }
-                base.pAttackTimer = 0;
-                base.sAttackTimer = 0;
+                this.pAttackTimer = 0;
+                this.sAttackTimer = 0;
 
                 mov[0] += rnd.Next(-100, 101);
                 mov[1] += rnd.Next(-100, 101);
 
-                base.lastMove[0] = (int)(((float)mov[0] / (float)n) * base.speed);
-                base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
+                this.lastMove[0] = (int)(((float)mov[0] / (float)n) * this.speed);
+                this.lastMove[1] = (int)(((float)mov[1] / (float)n) * this.speed);
 
-                base.position[0] += base.lastMove[0];
-                base.position[1] += base.lastMove[1];
+                this.position[0] += this.lastMove[0];
+                this.position[1] += this.lastMove[1];
 
-                base.Animation();
+                this.Animation();
             }
-            if (base.pAttackTimer == 0 && base.sAttackTimer == 0)
+            if (this.pAttackTimer == 0 && this.sAttackTimer == 0)
             {
-                base.Animation();
+                this.Animation();
             }
             return player;
         }
-        public override Player PrimaryAttack(Player player)
+
+        public void TakeDamage(int damage, float piercing)
         {
-            // we attack the player every so often. Same as in player basicly but this only attacks the player
-            if (base.AttackCooldown == 0)
+            if (this.immunityFrames == 0)
             {
-                base.pAttackTimer++;
-                if (base.pAttackTimer >= base.pAttackTimerMax * (base.pAttackSprite[base.lastDir].Length - 1))
+                this.immunityFrames = this.maxImmunityFrames;
+                // same as in the player class check there for explanation.
+                if (piercing < this.defence)
                 {
-                    base.pAttackTimer = 0;
-                    player.TakeDamage(base.damage, base.piercing);
-                    this.random = rnd.Next(0, 6);
-                    base.AttackCooldown = 20;
+                    this.hp -= (int)(((float)damage * ((float)piercing / (float)this.defence)) + 0.1);
                 }
-                if (base.pAttackTimer % base.pAttackTimerMax == 0)
+                else
                 {
-                    base.sprite = base.pAttackSprite[base.lastDir][(int)(base.pAttackTimer / base.pAttackTimerMax)];
+                    this.hp -= damage;
                 }
+                this.aniCount = 0;
+                if (this.hp < 0)
+                {
+                    this.hp = 0;
+                }
+            }
+        }
+        public virtual Player PrimaryAttack(Player player)
+        {
+            {
+                // we attack the player every so often. Same as in player basicly but this only attacks the player
+                if (this.AttackCooldown == 0)
+                {
+                    this.pAttackTimer++;
+                    if (this.pAttackTimer >= this.pAttackTimerMax * (this.pAttackSprite[this.lastDir].Length - 1))
+                    {
+                        this.pAttackTimer = 0;
+                        player.TakeDamage(this.damage, this.piercing);
+                        this.AttackCooldown = this.AttackCooldownMax;
+                        this.random = rnd.Next(0, 6);
+                    }
+                    if (this.pAttackTimer % this.pAttackTimerMax == 0)
+                    {
+                        this.sprite = this.pAttackSprite[this.lastDir][(int)(this.pAttackTimer / this.pAttackTimerMax)];
+                    }
+                    return player;
+                }
+                this.AttackCooldown--;
                 return player;
             }
-            base.AttackCooldown--;
-            return player;
         }
 
-        public override Player SecondaryAttack(Player player)
-        // we attack the player every so often. Same as in player basicly but this only attacks the player
+        public void PrimaryAttackAni()
         {
-            if (base.AttackCooldown == 0)
+
+        }
+
+        public virtual Player SecondaryAttack(Player player)
+        {
             {
-                base.sAttackTimer++;
-                if (base.sAttackTimer >= base.sAttackTimerMax * (base.sAttackSprite[base.lastDir].Length - 1))
+                if (this.AttackCooldown == 0)
                 {
-                    base.sAttackTimer = 0;
-                    player.TakeDamage((int)(base.damage * base.sAttackMult), base.piercing);
-                    this.random = rnd.Next(0, 6);
-                    base.AttackCooldown = 20;
+                    this.sAttackTimer++;
+                    if (this.sAttackTimer >= this.sAttackTimerMax * (this.sAttackSprite[this.lastDir].Length - 1))
+                    {
+                        this.sAttackTimer = 0;
+                        player.TakeDamage((int)(this.damage * this.sAttackMult), this.piercing);
+                        this.random = rnd.Next(0, 6);
+                        this.AttackCooldown = this.AttackCooldownMax;
+                    }
+                    if (this.sAttackTimer % this.sAttackTimerMax == 0)
+                    {
+                        this.sprite = this.sAttackSprite[this.lastDir][(int)(this.sAttackTimer / this.sAttackTimerMax)];
+                    }
+                    return player;
                 }
-                if (base.sAttackTimer % base.sAttackTimerMax == 0)
-                {
-                    base.sprite = base.sAttackSprite[base.lastDir][(int)(base.sAttackTimer / base.sAttackTimerMax)];
-                }
+                this.AttackCooldown--;
                 return player;
             }
-            base.AttackCooldown--;
-            return player;
         }
+
+    }
+    class Zombie : Enemies
+    {
+
+        public Zombie(int[] pos)
+        {
+            base.pAttackTimer = 0;
+            base.pAttackTimerMax = 5;
+
+            base.sAttackTimer = 0;
+            base.sAttackTimerMax = 10;
+
+            base.lastMove = new int[2] { 0, 0 };
+
+            base.hp = 100;
+            base.maxhp = 100;
+            base.damage = 10;
+            base.sAttackMult = 1.3f;
+            base.AttackCooldownMax = 20;
+
+            base.position = pos;
+            base.defence = 1;
+            base.reach = 100;
+            base.speed = 7;
+            base.piercing = 0;
+
+            base.Init();
+
+        }        
     }
 
     class Mage : Enemies 
@@ -387,6 +410,7 @@ namespace RogueValley.Entities
             base.lastMove = new int[2] { 0, 0 };
 
             base.hp = 100;
+            base.maxhp = 100;
             base.damage = 15;
             base.sAttackMult = 1.5f;
 
@@ -395,7 +419,8 @@ namespace RogueValley.Entities
             base.reach = 500;
             base.speed = 5;
             base.piercing = 8;
-            base.AttackCooldown = 50;
+            base.AttackCooldown = 0;
+            base.AttackCooldownMax = 50;
 
             base.Init();
 
@@ -412,6 +437,19 @@ namespace RogueValley.Entities
         {
             // we just call the ai func. and return the entity hp.
 
+            if (this.immunityFrames > 0)
+            {
+                this.immunityFrames--;
+            }
+            else
+            {
+                this.immunityFrames = 0;
+            }
+
+            this.ui.EnemyHealthbarUpdate(this);
+
+            this.targetPosition[0] = this.position[0] + this.spriteSize[0] / 2;
+            this.targetPosition[1] = this.position[1] + this.spriteSize[1] / 2;
             for (int i = 0; i < base.projectilesList.Count; i++) {
                 if (base.projectilesList[i].Update(player)) {
                     base.projectilesList.RemoveAt(i);
@@ -520,7 +558,7 @@ namespace RogueValley.Entities
 
                     projectilesList.Add(new FlameBall(this.projectiles, (int[])base.position.Clone(), tempPos, base.damage, base.piercing));
                     this.random = rnd.Next(0, 6);
-                    base.AttackCooldown = 50;
+                    base.AttackCooldown = base.AttackCooldownMax;
                 }
                 if (base.pAttackTimer % base.pAttackTimerMax == 0)
                 {
@@ -543,7 +581,7 @@ namespace RogueValley.Entities
                     base.sAttackTimer = 0;
                     player.TakeDamage((int)(base.damage * base.sAttackMult), base.piercing);
                     this.random = rnd.Next(0, 6);
-                    base.AttackCooldown = 20;
+                    base.AttackCooldown = base.AttackCooldownMax;
                 }
                 if (base.sAttackTimer % base.sAttackTimerMax == 0)
                 {
@@ -556,15 +594,51 @@ namespace RogueValley.Entities
         }
     }
 
+    class Ogre : Enemies {
+
+        public Ogre(int[] pos) {
+
+            // Basic Stats:
+            base.speed = 4;
+            base.hp = 1000;
+            base.maxhp = 1000;
+            base.defence = 5;
+            base.piercing = 5;
+            base.damage = 50;
+            base.AttackCooldown = 0;
+            base.AttackCooldownMax = 100;
+            base.reach = 200;
+            base.position = pos;
+
+            // Other:
+
+            base.pAttackTimer = 0;
+            base.pAttackTimerMax = 10;
+
+            base.sAttackTimer = 0;
+            base.sAttackTimerMax = 20;
+
+            base.lastMove = new int[2] { 0, 0 };
+
+            base.sAttackMult = 2.0f;
+
+            base.Init();
+
+            base.spriteSize[0] = 200;
+            base.spriteSize[1] = 200;
+        }
+    
+    }
+
     class Dead : Enemies {
 
-
-        public Dead(int[] pos, Texture2D sprite, Texture2D[][]deathAnimation)
+        public Dead(int[] pos, Texture2D sprite, Texture2D[][]deathAnimation, int[] spriteSize)
         {
             base.Init();
             base.position = pos;
             base.sprite = sprite;
             base.deathAnimation = deathAnimation;
+            base.spriteSize = spriteSize;
         }
 
         public override int Update(Player player) {

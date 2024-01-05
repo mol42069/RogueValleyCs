@@ -82,8 +82,8 @@ namespace RogueValley.Entities
                 this.hp = 100;
                 this.maxhp = 100;
                 this.defence = 5;
-                this.immunityFrames = 0;
-                this.maxImmFrames = 20;
+                this.immunityFrames = 00;
+                this.maxImmFrames = 30;
                 this.piercing = 5.0f;
                 this.damage = 100;
                 this.sAttackMulit = 2.5f;
@@ -116,6 +116,7 @@ namespace RogueValley.Entities
         public void Movement(int[] direction, Map map)
         {
             this.lastMovement = direction;
+            if (this.weapon is null) return;
 
             if (!(direction[0] == 0 && direction[1] == 0))
             {
@@ -144,9 +145,9 @@ namespace RogueValley.Entities
                     }
                 }
             }
-
-            if (weapon.AttackCooldown > 0) {
-                weapon.AttackCooldown--;
+            if (this.weapon is null) return;
+            if (this.weapon.AttackCooldown > 0) {
+                this.weapon.AttackCooldown--;
             }
 
             if (immunityFrames > 0)
@@ -168,7 +169,7 @@ namespace RogueValley.Entities
 
                 for (int i = 0; i < this.target.Count; i++)
                 {
-                    if (this.target[i].position[0] < this.playerPosition[0])
+                    if (this.target[i].targetPosition[0] < this.playerPosition[0])
                     {
                         lCount++;
                     }
@@ -184,7 +185,7 @@ namespace RogueValley.Entities
                     this.playerDirection = 1;
                     for (int i = 0; i < this.target.Count; i++)
                     {
-                        if (this.target[i].position[0] < this.playerPosition[0])
+                        if (this.target[i].targetPosition[0] < this.playerPosition[0])
                         {
                             tenemies.Add(this.target[i]);
                         }
@@ -195,7 +196,7 @@ namespace RogueValley.Entities
                     this.playerDirection = 0;
                     for (int i = 0; i < this.target.Count; i++)
                     {
-                        if (this.target[i].position[0] > this.playerPosition[0])
+                        if (this.target[i].targetPosition[0] > this.playerPosition[0])
                         {
                             tenemies.Add(this.target[i]);
                         }
@@ -207,14 +208,14 @@ namespace RogueValley.Entities
                     {
                         if (this.playerDirection == 0)
                         {
-                            if (this.target[i].position[0] > this.playerPosition[0])
+                            if (this.target[i].targetPosition[0] > this.playerPosition[0])
                             {
                                 tenemies.Add(this.target[i]);
                             }
                         }
                         else
                         {
-                            if (this.target[i].position[0] < this.playerPosition[0])
+                            if (this.target[i].targetPosition[0] < this.playerPosition[0])
                             {
                                 tenemies.Add(this.target[i]);
                             }
@@ -300,7 +301,7 @@ namespace RogueValley.Entities
         protected int[] getTargetPos() {
             int[] targetPos = new int[2];
 
-            targetPos = this.target[rnd.Next(0, this.target.Count)].position;
+            targetPos = this.target[rnd.Next(0, this.target.Count)].targetPosition;
 
             return targetPos;
         }
@@ -356,6 +357,7 @@ namespace RogueValley.Entities
                     this.hp -= damage;
                 }
                 if (this.hp <= 0){
+                    this.hp = 0;
                     this.GameOver();
                 }
             }

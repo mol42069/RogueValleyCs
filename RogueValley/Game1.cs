@@ -85,7 +85,7 @@ namespace RogueValley
             Texture2D[][][] pAtckSprites, sAtckSprites;
 
             Texture2D[][] IdleSprites;
-            Texture2D[][][][] sprites = new Texture2D[3][][][];
+            Texture2D[][][][] sprites = new Texture2D[4][][][];
 
 
 
@@ -559,9 +559,140 @@ namespace RogueValley
 
                 sprites[(int)enums.Entity.Mage] = MageSprites;
             }
-            // Staff Projectiles:
+
+            // Load Ogre Sprites:
 
             {
+                Texture2D[][][] OgreSprites = new Texture2D[6][][];
+                // idleSprites:
+                OgreSprites[(int)enums.Movement.IDLE] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    OgreSprites[(int)enums.Movement.IDLE][i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Ogre/idle/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Ogre/idle/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            OgreSprites[(int)enums.Movement.IDLE][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                // movSprites
+                OgreSprites[(int)enums.Movement.MOVE] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    OgreSprites[(int)enums.Movement.MOVE][i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Ogre/move/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Ogre/move/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            OgreSprites[(int)enums.Movement.MOVE][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                // pAttackSprite
+                OgreSprites[(int)enums.Movement.PATTACK] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    OgreSprites[(int)enums.Movement.PATTACK][i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Ogre/pAttack/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Ogre/pAttack/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            OgreSprites[(int)enums.Movement.PATTACK][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+                //sAttackSprite
+                OgreSprites[(int)enums.Movement.SATTACK] = new Texture2D[2][];
+                for (int i = 0; i < 2; i++)
+                {
+                    OgreSprites[(int)enums.Movement.SATTACK][i] = new Texture2D[6];
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        string name = null;
+
+                        switch (i)
+                        {
+                            case 0:
+                                name = "Entity/Enemies/Ogre/sAttack/Right/" + j.ToString();
+                                break;
+
+                            case 1:
+                                name = "Entity/Enemies/Ogre/sAttack/Left/" + j.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+                        if (name != null)
+                        {
+                            Console.WriteLine(name);
+                            OgreSprites[(int)enums.Movement.SATTACK][i][j] = Content.Load<Texture2D>(name);
+                        }
+                    }
+                }
+
+                OgreSprites[(int)enums.Movement.DEAD] = deathSprites;
+
+                sprites[(int)enums.Entity.Ogre] = OgreSprites;
+            }
+
+            // Staff Projectiles:
+
+            
                 Texture2D[][][] StaffProjSprites = new Texture2D[2][][];
                 StaffProjSprites[(int)enums.Projectile.FireBall] = new Texture2D[5][];
                 for (int i = 0; i < 4; i++)
@@ -613,9 +744,10 @@ namespace RogueValley
 
                     StaffProjSprites[(int)enums.Projectile.EplodingBall][1][i] = Content.Load<Texture2D>(name);
                 }
-                
 
 
+
+            
             
 
             // Load the UI Sprites:
@@ -638,9 +770,9 @@ namespace RogueValley
                 SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
 
                 ui.LoadContent(textures, font);
-            }
+            
 
-            this.mobManager.LoadContent(sprites);
+            this.mobManager.LoadContent(sprites, textures);
         }
 
         protected override void Update(GameTime gameTime)
@@ -698,7 +830,7 @@ namespace RogueValley
 
         protected void InGameUpdate() {
             // here is everything we update if we are in Game.
-            if (this.player.hp <= 0)
+            if (this.player.hp <= 0 || this.player.weapon is null)
             {
                 this.gameState = 0;
 

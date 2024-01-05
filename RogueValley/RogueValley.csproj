@@ -23,7 +23,15 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Content\Entity\Enemies\Zombie\idle\Left\" />
+    <Folder Include="Content\Entity\Enemies\Zombie\idle\Right\" />
+    <Folder Include="Content\Entity\Enemies\Zombie\move\Left\" />
+    <Folder Include="Content\Entity\Enemies\Zombie\move\Right\" />
+    <Folder Include="Content\Entity\Enemies\Zombie\pAttack\Left\" />
+    <Folder Include="Content\Entity\Enemies\Zombie\pAttack\Right\" />
     <Folder Include="Content\Entity\Enemies\Zombie\sAttack\" />
+    <Folder Include="Content\Entity\Enemies\Zombie\sAttack\Left\" />
+    <Folder Include="Content\Entity\Enemies\Zombie\sAttack\Right\" />
     <Folder Include="Content\Entity\Player\sAttack\" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
