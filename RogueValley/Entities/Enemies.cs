@@ -12,11 +12,11 @@ using RogueValley.Maps;
 using static RogueValley.enums;
 using UI = RogueValley.Maps.UI;
 
+
 namespace RogueValley.Entities
 {
     class Enemies
     {
-
         public int hp, maxhp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing, targetId;
         protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer, AttackCooldownMax;
         protected int random, immunityFrames, maxImmunityFrames;
@@ -58,10 +58,8 @@ namespace RogueValley.Entities
                 this.targetPosition[0] = this.position[0] + this.spriteSize[0] / 2;
                 this.targetPosition[1] = this.position[1] + this.spriteSize[1] / 2;
             }
-
             rnd = new Random();
             this.random = rnd.Next(0, 6);
-
         }
 
         public void LoadContent(Texture2D[][][] sprites, Texture2D[] healthSprites)
@@ -104,7 +102,6 @@ namespace RogueValley.Entities
                     this.projectilesList[i].Draw(_spriteBatch, m);
                 }
             }
-
             return _spriteBatch;
         }
 
@@ -184,7 +181,6 @@ namespace RogueValley.Entities
             {
                 this.immunityFrames = 0;
             }
-
             this.ui.EnemyHealthbarUpdate(this);
 
             this.targetPosition[0] = this.position[0] + this.spriteSize[0] / 2;
@@ -361,11 +357,9 @@ namespace RogueValley.Entities
                 return player;
             }
         }
-
     }
     class Zombie : Enemies
     {
-
         public Zombie(int[] pos)
         {
             base.pAttackTimer = 0;
@@ -395,7 +389,6 @@ namespace RogueValley.Entities
 
     class Mage : Enemies 
     {
-        int random;
         Texture2D[][] projectiles;
         
 
@@ -626,12 +619,10 @@ namespace RogueValley.Entities
 
             base.spriteSize[0] = 200;
             base.spriteSize[1] = 200;
-        }
-    
+        }    
     }
 
     class Dead : Enemies {
-
         public Dead(int[] pos, Texture2D sprite, Texture2D[][]deathAnimation, int[] spriteSize)
         {
             base.Init();
@@ -640,11 +631,9 @@ namespace RogueValley.Entities
             base.deathAnimation = deathAnimation;
             base.spriteSize = spriteSize;
         }
-
         public override int Update(Player player) {
             return 0;
         }
-
         public override bool DeleteDead() {
             this.aniTimer++;
 
@@ -660,10 +649,7 @@ namespace RogueValley.Entities
             else {
                 return true;
             }
-
-
             return false;
         }
-
     }
 }

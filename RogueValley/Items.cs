@@ -190,7 +190,7 @@ namespace RogueValley
             base.animationTimerMax = 5;
 
             base.AttackCooldown = 0;
-            base.AttackCooldownMax = 20;
+            base.AttackCooldownMax = 25;
 
             base.pAttackTimer = 0;
             base.pAttackTimerMax = 2;
@@ -221,7 +221,7 @@ namespace RogueValley
 
                     player.projectiles.Add(new PlayerFireBall(this.projectiles[(int)enums.Projectile.FireBall], tempPos, (int[])targetPos.Clone(), base.damage, (int)base.piercing));
 
-                    base.AttackCooldown = 10;
+                    base.AttackCooldown = base.AttackCooldownMax;
                 }
                 if (base.pAttackTimer % base.pAttackTimerMax == 0)
                 {
@@ -255,7 +255,7 @@ namespace RogueValley
 
                     player.sAttackTrigger = false;
                     player.targetPos = null;
-                    base.AttackCooldown = 30;
+                    base.AttackCooldown = AttackCooldownMax;
                 }
                 if (base.sAttackTimer % base.sAttackTimerMax == 0)
                 {

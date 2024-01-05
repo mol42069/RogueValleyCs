@@ -26,7 +26,6 @@ namespace RogueValley
 
         private int[] movement, bgSize;
 
-        private int fps;
         private System.Diagnostics.Stopwatch watch;
 
         public bool clicked, past_clicked;
@@ -34,8 +33,6 @@ namespace RogueValley
         public int gameState, score;
 
         private UpgradeManager upgradeManager;
-
-
 
         public Game1()
         {
@@ -51,7 +48,6 @@ namespace RogueValley
 
         protected override void Initialize()
         {
-
             movement = new int[2]; // 0=X-Axis | 1=y-Axis
 
             this.gameState = 0;
@@ -65,7 +61,6 @@ namespace RogueValley
 
             player = new Player(tempPos, 8, 100);
 
-            this.fps = 60;
             watch = System.Diagnostics.Stopwatch.StartNew();
 
             mobManager = new MobManager(this.player, this.bgSize);
@@ -87,14 +82,11 @@ namespace RogueValley
             Texture2D[][] IdleSprites;
             Texture2D[][][][] sprites = new Texture2D[4][][][];
 
-
-
             bg = Content.Load<Texture2D>("Background/grass");
             int[] screenSize = { 1920, 1080 };
             bgSprite = new Map(player.playerPosition, screenSize, bg, screenSize, this.bgSize);
 
             // Load death Sprites:
-
             {
                 deathSprites = new Texture2D[2][];
                 deathSprites[0] = new Texture2D[6];
@@ -108,7 +100,6 @@ namespace RogueValley
                         deathSprites[0][j] = Content.Load<Texture2D>(name);
                     }
                 }
-
                 Texture2D[][][] dead = new Texture2D[1][][];
                 dead[0] = new Texture2D[1][];
                 dead[0][0] = new Texture2D[1];
@@ -131,8 +122,6 @@ namespace RogueValley
                 sprites[(int)enums.Entity.Dead] = new Texture2D[3][][];
                 sprites[(int)enums.Entity.Dead] = dead;
             }
-
-
             // Load the Player Sprites:
             {
                 AniSprites = new Texture2D[2][];
@@ -262,7 +251,6 @@ namespace RogueValley
                 sAtckSprites[1] = sAtckSprites[0];
                 player.LoadContent(AniSprites, IdleSprites, pAtckSprites, sAtckSprites);
             }
-
             // Load the Zombie Sprites:
             {
                 Texture2D[][][] zombieSprites = new Texture2D[5][][];
@@ -551,7 +539,7 @@ namespace RogueValley
                 for (int i = 0; i < 7; i++) {
                     string name = "Entity/Enemies/Mage/Projectile/Final/" + i.ToString();
 
-                    MageSprites[(int)enums.Movement.PROJECTILE][(int) enums.Direction.EXP][i] = Content.Load<Texture2D>(name);
+                    MageSprites[(int)enums.Movement.PROJECTILE][(int)enums.Direction.EXP][i] = Content.Load<Texture2D>(name);
                 }
 
 
@@ -559,9 +547,7 @@ namespace RogueValley
 
                 sprites[(int)enums.Entity.Mage] = MageSprites;
             }
-
             // Load Ogre Sprites:
-
             {
                 Texture2D[][][] OgreSprites = new Texture2D[6][][];
                 // idleSprites:
@@ -684,15 +670,11 @@ namespace RogueValley
                         }
                     }
                 }
-
                 OgreSprites[(int)enums.Movement.DEAD] = deathSprites;
-
                 sprites[(int)enums.Entity.Ogre] = OgreSprites;
             }
-
-            // Staff Projectiles:
-
-            
+            // Load Other Stuff:
+            {
                 Texture2D[][][] StaffProjSprites = new Texture2D[2][][];
                 StaffProjSprites[(int)enums.Projectile.FireBall] = new Texture2D[5][];
                 for (int i = 0; i < 4; i++)
@@ -744,11 +726,8 @@ namespace RogueValley
 
                     StaffProjSprites[(int)enums.Projectile.EplodingBall][1][i] = Content.Load<Texture2D>(name);
                 }
-
-
-
             
-            
+
 
             // Load the UI Sprites:
             
@@ -766,13 +745,12 @@ namespace RogueValley
                 upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][2] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseStaff");
 
                 upgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
-
                 SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
-
-                ui.LoadContent(textures, font);
-            
+                ui.LoadContent(textures, font);           
 
             this.mobManager.LoadContent(sprites, textures);
+
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -791,25 +769,19 @@ namespace RogueValley
             else {
                 this.clicked = false;
             }
-            if (mouseState.LeftButton == ButtonState.Pressed){
-
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
                 this.past_clicked = true;
-
             }
-
-
-
             // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
 
             switch (this.gameState) {
                 case 0:
                     StartScreen();
                     break;
-
                 case 1:
                     InGameUpdate();
                     break;
-
                 case 2:
                     this.player = this.upgradeManager.Update(this.player, this.clicked);
                     if (this.player.weapon != null)
@@ -823,7 +795,6 @@ namespace RogueValley
                 default:
                     break;
             }
-
             base.Update(gameTime);
 
         }
@@ -835,13 +806,13 @@ namespace RogueValley
                 this.gameState = 0;
 
                 // Delete the Enemies on death:
+
                 this.mobManager.RmList();
                 this.player.target.Clear();
                 this.mobManager.wave = 0;
                 this.mobManager.ammount = 10;
                 this.player.weapon = null;
             }
-
             InGameKeyHandler();
 
             this.player.Movement(movement, bgSprite);
@@ -854,9 +825,8 @@ namespace RogueValley
         protected void StartScreen() {
             // here is everything we update if we are on the Start Screen.
             var mouseState = Mouse.GetState();
-            if (this.clicked) {
-
-
+            if (this.clicked) 
+            {
                 Point mousePos = new Point(mouseState.X, mouseState.Y);
                 this.gameState = ui.Click(mousePos);
 
@@ -879,7 +849,6 @@ namespace RogueValley
             // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
 
             GraphicsDevice.Clear(Color.Black);
-
             _spriteBatch.Begin();
 
             switch (this.gameState) {
@@ -898,9 +867,6 @@ namespace RogueValley
                 default:
                     break;
             }
-
-
-
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -920,9 +886,7 @@ namespace RogueValley
                     this.player.projectiles[i].Draw(_spriteBatch, this.bgSprite);
                 }
             }
-
             _spriteBatch.Draw(this.player.playerSprite, new Rectangle(this.player.drawPosition[0], this.player.drawPosition[1], 100, 100), Color.White);
-
 
             this.ui.DrawInGameUI(_spriteBatch, this.player, this.mobManager, this.score);
         }

@@ -18,7 +18,7 @@ namespace RogueValley.Entities
     {
         // PLAYER VARIABLES:
 
-        public int damage, hp, defence, maxhp, maxtarget, reach;
+        public int damage, hp, defence, maxhp, maxtarget, reach, regeneration;
         public float piercing, sAttackMulit;
         public List<Enemies> target, mobList;
         public List<Projectiles> projectiles;
@@ -40,11 +40,12 @@ namespace RogueValley.Entities
         // Player Animation Variables:
 
         public int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames, AttackCooldown, pAttackTimer, pAttackTimerMax, sAttackTimer, sAttackTimerMax;
-
+        public int damageDrawChange_x, damageDrawChangeMax_x, damageDrawChange_y;
         // OTHER:
 
         Random rnd;
-        int random, AttackCooldownMax;
+        int random, damageTaken;
+        bool damageAni;
 
         public Player(int[] pos, int animax = 8, int speed = 20)
         {
@@ -68,13 +69,18 @@ namespace RogueValley.Entities
                 this.playerDirection = 1;       // 0 = right | 1 = left
 
                 this.AttackCooldown = 0;
-                this.AttackCooldownMax = 10;
 
                 this.pAttackTimer = 0;
                 this.pAttackTimerMax = 3;
 
                 this.sAttackTimer = 0;
                 this.sAttackTimerMax = 5;
+
+                this.damageDrawChange_x = 20;
+                this.damageDrawChangeMax_x = -10;
+                this.damageDrawChange_y = 20;
+
+
             }
             // other Player Variables:
             {
@@ -88,6 +94,11 @@ namespace RogueValley.Entities
                 this.damage = 100;
                 this.sAttackMulit = 2.5f;
                 this.sAttackTrigger = false;
+                this.damageTaken = 0;
+
+                this.damageAni = false;
+
+                this.regeneration = 25;
 
                 this.reach = 200;
 
@@ -121,10 +132,10 @@ namespace RogueValley.Entities
             if (!(direction[0] == 0 && direction[1] == 0))
             {
                 weapon.ResetAnimation();
-                /*
+                
                 this.pAttackTimer = 0;
                 this.sAttackTimer = 0;
-                this.AttackCooldown = 0;*/
+                //this.AttackCooldown = 0;
             }
             if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
             {
@@ -140,7 +151,7 @@ namespace RogueValley.Entities
         {
             if (projectiles.Count > 0) {
                 for (int i = 0; i < projectiles.Count; i++) {
-                    if (projectiles[i].UpdatePlayer(this, this.target)) {
+                    if (projectiles[i].UpdatePlayer(this, this.mobList)) {
                         projectiles.RemoveAt(i);
                     }
                 }
@@ -317,10 +328,7 @@ namespace RogueValley.Entities
                 }
 
             }
-
-
             targetPos = this.target[finalIdx].targetPosition;
-
             return targetPos;
         }
 
@@ -364,21 +372,34 @@ namespace RogueValley.Entities
             if (this.immunityFrames == 0)
             {
                 this.immunityFrames = this.maxImmFrames;
+                this.damageAni = true;
                 // we calculate if the enemy pierces the players defence if not we calculate the new damage so the
                 // enemy does less damage.
                 if (piercing < this.defence)
                 {
                     this.hp -= (int)((float)damage * ((float)((float)piercing/(float)this.defence) + 0.2f));
+                    this.damageTaken = (int)((float)damage * ((float)((float)piercing / (float)this.defence) + 0.2f));
                 }
                 else
                 {
                     this.hp -= damage;
+                    this.damageTaken = damage;
                 }
                 if (this.hp <= 0){
                     this.hp = 0;
                     this.GameOver();
                 }
             }
+        }
+
+        public SpriteBatch DrawDamage(SpriteBatch _spriteBatch, SpriteFont font) {
+
+            // TODO: THE WRITING HAS TO BE WIGGLING UPWARDS MAYBE WE CHANGE THE X DIRECTION USING SINUS OR COSINUS AND GO UP CONTINUOSLY...
+
+            _spriteBatch.DrawString(font, this.damageTaken.ToString(), new Microsoft.Xna.Framework.Vector2());
+
+
+            return _spriteBatch;
         }
 
         public void GameOver()

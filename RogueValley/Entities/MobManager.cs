@@ -153,8 +153,8 @@ namespace RogueValley.Entities
                             case Zombie:
                                 g1.score += 1;
                                 break;
-
                         }
+
                         this.mobList.RemoveAt(i);
                     }
                 }
@@ -165,6 +165,9 @@ namespace RogueValley.Entities
                 {
 
                     this.mobList.Clear();
+
+                    player.hp += player.regeneration;
+                    if (player.hp > player.maxhp) player.hp = player.maxhp;
 
                     this.wave++;
                     //this.maxRandom *= this.wave;

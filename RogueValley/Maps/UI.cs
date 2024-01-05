@@ -22,7 +22,7 @@ namespace RogueValley.Maps
         private SpriteFont font;
 
         private int[] bgPos, startBPos, startBSize, hBarSizeMax, hBgSize, hBgPos;
-        private int hBarSize, enemyHBarSize;
+        private int hBarSize;
         public UI() {
             // StartScreen Size and Position Variables
             {
