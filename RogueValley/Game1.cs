@@ -31,7 +31,7 @@ namespace RogueValley
         public bool clicked, past_clicked;
 
         public int gameState, score;
-
+        SpriteFont font;
         private UpgradeManager upgradeManager;
 
         public Game1()
@@ -745,7 +745,7 @@ namespace RogueValley
                 upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][2] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseStaff");
 
                 upgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
-                SpriteFont font = Content.Load<SpriteFont>("Font/gameFont");
+                this.font = Content.Load<SpriteFont>("Font/gameFont");
                 ui.LoadContent(textures, font);           
 
             this.mobManager.LoadContent(sprites, textures);
@@ -885,9 +885,11 @@ namespace RogueValley
                 {
                     this.player.projectiles[i].Draw(_spriteBatch, this.bgSprite);
                 }
-            }
+            }            
             _spriteBatch.Draw(this.player.playerSprite, new Rectangle(this.player.drawPosition[0], this.player.drawPosition[1], 100, 100), Color.White);
-
+            
+            this.player.DrawDamage(_spriteBatch, this.font);
+            
             this.ui.DrawInGameUI(_spriteBatch, this.player, this.mobManager, this.score);
         }
         protected void StartScreenDraw() {

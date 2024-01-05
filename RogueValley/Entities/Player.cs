@@ -40,12 +40,14 @@ namespace RogueValley.Entities
         // Player Animation Variables:
 
         public int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames, AttackCooldown, pAttackTimer, pAttackTimerMax, sAttackTimer, sAttackTimerMax;
-        public int damageDrawChange_x, damageDrawChangeMax_x, damageDrawChange_y;
+        public int damageDrawChangeMax_y, damageDrawChange_y, damageDrawTimer, damageDrawTimerMax, damageDrawChange_x;
         // OTHER:
 
         Random rnd;
-        int random, damageTaken;
+        int random, damageTaken, damagePos_x, damagePos_y;
         bool damageAni;
+
+        List<PlayerUI> damageIndicatorList;
 
         public Player(int[] pos, int animax = 8, int speed = 20)
         {
@@ -76,10 +78,7 @@ namespace RogueValley.Entities
                 this.sAttackTimer = 0;
                 this.sAttackTimerMax = 5;
 
-                this.damageDrawChange_x = 20;
-                this.damageDrawChangeMax_x = -10;
-                this.damageDrawChange_y = 20;
-
+                this.damageIndicatorList = new List<PlayerUI>();
 
             }
             // other Player Variables:
@@ -378,12 +377,12 @@ namespace RogueValley.Entities
                 if (piercing < this.defence)
                 {
                     this.hp -= (int)((float)damage * ((float)((float)piercing/(float)this.defence) + 0.2f));
-                    this.damageTaken = (int)((float)damage * ((float)((float)piercing / (float)this.defence) + 0.2f));
+                    this.damageIndicatorList.Add(new PlayerUI((int)((float)damage * ((float)((float)piercing / (float)this.defence) + 0.2f))));
                 }
                 else
                 {
                     this.hp -= damage;
-                    this.damageTaken = damage;
+                    this.damageIndicatorList.Add(new PlayerUI(damage));
                 }
                 if (this.hp <= 0){
                     this.hp = 0;
@@ -392,18 +391,19 @@ namespace RogueValley.Entities
             }
         }
 
-        public SpriteBatch DrawDamage(SpriteBatch _spriteBatch, SpriteFont font) {
+        public void DrawDamage(SpriteBatch _spriteBatch, SpriteFont font) {
 
-            // TODO: THE WRITING HAS TO BE WIGGLING UPWARDS MAYBE WE CHANGE THE X DIRECTION USING SINUS OR COSINUS AND GO UP CONTINUOSLY...
-
-            _spriteBatch.DrawString(font, this.damageTaken.ToString(), new Microsoft.Xna.Framework.Vector2());
-
-
-            return _spriteBatch;
+            if (this.damageIndicatorList.Count != 0) {
+                for (int i = 0; i < this.damageIndicatorList.Count; i++) {
+                    if (this.damageIndicatorList[i].DrawDamage(_spriteBatch, font, this)) {
+                        this.damageIndicatorList.RemoveAt(i);
+                    }
+                }            
+            }
         }
-
         public void GameOver()
         {
+            this.damageIndicatorList.Clear();
             return;
         }
     }

@@ -105,9 +105,6 @@ namespace RogueValley.Maps
             _spriteBatch.DrawString(this.font, player.hp.ToString(), new Microsoft.Xna.Framework.Vector2(this.hBgPos[0] + (this.hBgSize[0]/2) - 10, this.hBgPos[1] + (this.hBgSize[1] / 2) - 10), Color.White);
             
         }
-
-       
-
     }
 
     class EnemyUI {
@@ -129,7 +126,6 @@ namespace RogueValley.Maps
 
         public SpriteBatch EnemyHealthBarDraw(SpriteBatch _spriteBatch, Map m, Enemies enemy)
         {
-
             _spriteBatch.Draw(this.sprites[(int)enums.UI.hBg], new Rectangle(enemy.drawPosition[0], enemy.drawPosition[1] - 13, enemy.spriteSize[0], 10), Color.White);
             _spriteBatch.Draw(this.sprites[(int)enums.UI.hBar], new Rectangle(enemy.drawPosition[0] + 2, enemy.drawPosition[1] - 12, this.enemyHBarSize, 8), Color.White);
 
@@ -137,5 +133,50 @@ namespace RogueValley.Maps
         }
 
 
+    }
+    class PlayerUI {
+
+        private int damageDrawTimer, damageDrawTimerMax, damageDrawChange_y, damageDrawChange_x, damagePos_x, damagePos_y, damageDrawChangeMax_y, damageTaken;
+
+        public PlayerUI(int damageTaken) {
+            this.damageTaken = damageTaken;
+
+            this.damageDrawChangeMax_y = 20;
+            this.damageDrawChange_y = 0;
+            this.damageDrawChange_x = 0;
+            this.damageDrawTimer = 0;
+            this.damageDrawTimerMax = 2;
+
+            this.damagePos_x = 0;
+            this.damagePos_y = 0;
+        }
+
+        public bool DrawDamage(SpriteBatch _spriteBatch, SpriteFont font, Player player)
+        {
+            // TODO: THE WRITING HAS TO BE WIGGLING UPWARDS MAYBE WE CHANGE THE X DIRECTION USING SINUS OR COSINUS AND GO UP CONTINUOSLY...
+
+                this.damageDrawTimer++;
+                if (this.damageDrawTimer == this.damageDrawTimerMax)
+                {
+                    this.damageDrawTimer = 0;
+                    this.damageDrawChange_y++;
+                }
+                int a = this.damageDrawChange_y * 9;
+                double b = (a * (Math.PI)) / 180;
+
+                this.damageDrawChange_x = (int)(Math.Sin(b) * 10) + 40;
+
+                this.damagePos_x = player.drawPosition[0] + this.damageDrawChange_x;
+                this.damagePos_y = player.drawPosition[1] - this.damageDrawChange_y - 10;
+
+                String s = this.damageTaken.ToString();
+                _spriteBatch.DrawString(font, s, new Microsoft.Xna.Framework.Vector2(this.damagePos_x, this.damagePos_y), Color.Red);
+
+                if (this.damageDrawChange_y == this.damageDrawChangeMax_y)
+                {
+                    return true;
+                }
+            return false;
+        }
     }
 }
