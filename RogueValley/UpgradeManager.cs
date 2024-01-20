@@ -19,20 +19,20 @@ namespace RogueValley
 
         protected Texture2D[][] sprites;
         protected Texture2D[][][] projectiles;
-
+        protected UpgradeUI upgradeUI;
         public UpgradeManager() {
-        
+            this.upgradeUI = new UpgradeUI();
 
         }
         public void LoadContent(Texture2D[][] sprites, Texture2D[][][] projectiles) {
             this.sprites = sprites;
             this.projectiles = projectiles;
+            this.upgradeUI.LoadContent(this.sprites[(int)enums.UpgradeManager.UpgradeScreen]);
         }
 
         public virtual SpriteBatch Draw(SpriteBatch _spriteBatch)
         {
-
-
+            this.upgradeUI.Draw(_spriteBatch);
 
             return _spriteBatch;
         }
@@ -42,6 +42,11 @@ namespace RogueValley
 
             return player;
         }
+
+        public bool AfterWaveUpgrade(Player player, Game1 g1) {
+            return this.upgradeUI.Update(player, g1);
+        }
+
     }
     class WeaponSelecScreen : UpgradeManager {
         protected Rectangle[] choices;

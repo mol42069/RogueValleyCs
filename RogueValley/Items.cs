@@ -21,7 +21,7 @@ namespace RogueValley
     {
         public int damage, reach, AttackCooldown, pAttackTimer, pAttackTimerMax, sAttackTimer, maxTarget;
         protected int animationCount, animationTimer, animationTimerMax, AttackCooldownMax, sAttackTimerMax;
-        protected float secondaryMulti, piercing;
+        protected float secondaryMulti, piercing, damageMultiplier;
 
         protected Texture2D[][][] pAttackSprite, sAttackSprite;
 
@@ -33,6 +33,11 @@ namespace RogueValley
             this.pAttackSprite = pAttackSprite;
             this.sAttackSprite = sAttackSprite;
         }
+        public int Update(int reach) {
+
+            this.reach += reach;
+            return 0;        
+        }
 
         public void Animation() { 
 
@@ -41,7 +46,15 @@ namespace RogueValley
         {
 
         }
+        public virtual void PrimaryAttack(Enemies ene, Player player, int[] targetPos)
+        {
+
+        }
         public virtual void PrimaryAttack(List<Enemies> ene, Player player)
+        {
+
+        }
+        public virtual void PrimaryAttack(Enemies ene, Player player)
         {
 
         }
@@ -71,8 +84,8 @@ namespace RogueValley
     }
     class StandartSword:Weapon {
         public StandartSword(Player player) {
-            
-            base.damage = 100;
+            base.damageMultiplier = 1f;
+            base.damage = (int)(base.damageMultiplier * player.damage);
             base.piercing = 5.0f;
             base.reach = 200;
             base.maxTarget = 5;
@@ -93,14 +106,14 @@ namespace RogueValley
             base.sAttackTimer = 0;
             base.sAttackTimerMax = 5;
 
-            player.reach = base.reach;
 
 
 
         }
 
-        public override void PrimaryAttack(List<Enemies> ene, Player player)
+        public override void PrimaryAttack(Enemies ene, Player player)
         {
+            base.damage = (int)(base.damageMultiplier * player.damage);
             if (base.AttackCooldown == 0)
             {
                 base.pAttackTimer++;
@@ -109,7 +122,7 @@ namespace RogueValley
                     base.pAttackTimer = 0;
                     // we want to attack all enemies in the list e:
                     // but maximum this.maxtarget ammount.
-                    if (ene.Count < base.maxTarget)
+                    /*if (ene.Count < base.maxTarget)
                     {
                         for (int i = 0; i < ene.Count; i++)
                         {
@@ -122,7 +135,10 @@ namespace RogueValley
                         {
                             ene[i].TakeDamage(base.damage, base.piercing);
                         }
-                    }
+                    }*/
+
+                    ene.TakeDamage(base.damage, base.piercing);
+
                     base.AttackCooldown = base.AttackCooldownMax;
                 }
                 if (base.pAttackTimer % base.pAttackTimerMax == 0)
@@ -136,6 +152,7 @@ namespace RogueValley
 
         public override void SecondaryAttack(List<Enemies> e, Player player)
         {
+            base.damage = (int)(base.damageMultiplier * player.damage);
             if (base.AttackCooldown == 0)
             {
                 base.sAttackTimer++;
@@ -177,7 +194,8 @@ namespace RogueValley
         Texture2D[][][] projectiles;
         public Staff(Player player)
         {
-            base.damage = 50;
+            base.damageMultiplier = 0.5f;
+            base.damage = (int)(base.damageMultiplier * player.damage);
             base.piercing = 10.0f;
             base.reach = 800;
             base.maxTarget = 5;
@@ -190,15 +208,13 @@ namespace RogueValley
             base.animationTimerMax = 5;
 
             base.AttackCooldown = 0;
-            base.AttackCooldownMax = 25;
+            base.AttackCooldownMax = 40;
 
             base.pAttackTimer = 0;
-            base.pAttackTimerMax = 2;
+            base.pAttackTimerMax = 4;
 
             base.sAttackTimer = 0;
             base.sAttackTimerMax = 10;
-
-            player.reach = base.reach;
 
         }
 
@@ -211,6 +227,8 @@ namespace RogueValley
 
         public override void PrimaryAttack(List<Enemies> ene, Player player, int[] targetPos)
         {
+            base.damage = (int)(base.damageMultiplier * player.damage);
+
             if (base.AttackCooldown == 0)
             {
                 base.pAttackTimer++;
@@ -235,6 +253,7 @@ namespace RogueValley
 
         public override void SecondaryAttack(List<Enemies> e, Player player, int[] targetPos)
         {
+            base.damage = (int)(base.damageMultiplier * player.damage);
             if (base.AttackCooldown == 0)
             {
                 if (player.playerPosition[0] < targetPos[0])

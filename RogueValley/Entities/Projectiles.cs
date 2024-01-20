@@ -247,8 +247,9 @@ namespace RogueValley.Entities
                 for (int i = 0; i < enemy.Count; i++)
                 {
 
-                    if ((enemy[i].targetPosition[0] + base.reach > base.position[0] && enemy[i].targetPosition[0] - base.reach < base.position[0] && enemy[i].targetPosition[1] + base.reach > base.position[1] && enemy[i].targetPosition[1] - base.reach < base.position[1]))
+                    if ((enemy[i].targetPosition[0] + base.reach > base.position[0] && enemy[i].targetPosition[0] - base.reach < base.position[0] && enemy[i].targetPosition[1] + base.reach > base.position[1] && enemy[i].targetPosition[1] - base.reach < base.position[1] && this.aniHitCount == 1)){
                         enemy[i].TakeDamage(base.damage, base.piercing);
+                    }
                 }
                 return false;
             }

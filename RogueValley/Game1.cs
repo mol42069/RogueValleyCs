@@ -32,7 +32,7 @@ namespace RogueValley
 
         public int gameState, score;
         SpriteFont font;
-        private UpgradeManager upgradeManager;
+        private UpgradeManager upgradeManager, awUpgradeManager;
 
         public Game1()
         {
@@ -69,6 +69,7 @@ namespace RogueValley
             this.clicked = false;
 
             upgradeManager = new WeaponSelecScreen();
+            this.awUpgradeManager = new UpgradeManager();
 
             base.Initialize();
         }
@@ -738,13 +739,21 @@ namespace RogueValley
                 textures[(int)enums.UI.hBar] = Content.Load<Texture2D>("Utility/HealthBar/HBarHealth");
                 textures[(int)enums.UI.hBg] = Content.Load<Texture2D>("Utility/HealthBar/HBarBg");
 
-                Texture2D[][] upgradeSprites = new Texture2D[1][];
+                Texture2D[][] upgradeSprites = new Texture2D[2][];
                 upgradeSprites[(int)enums.UpgradeManager.WeaponSelect] = new Texture2D[3];
                 upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][0] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/WeaponChoiceBg");
                 upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][1] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseSword");
                 upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][2] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseStaff");
 
-                upgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
+                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen] = new Texture2D[5];
+                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.damageUP] = Content.Load<Texture2D>("Utility/UpgradeScreen/damageUP");
+                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.defenceUP] = Content.Load<Texture2D>("Utility/UpgradeScreen/defenceUP");
+                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.reachUP] = Content.Load<Texture2D>("Utility/UpgradeScreen/reachUP");
+                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.speedUP] = Content.Load<Texture2D>("Utility/UpgradeScreen/speedUP");
+                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.background] = Content.Load<Texture2D>("Utility/UpgradeScreen/UpgradeChoiceBg");
+
+                this.upgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
+                this.awUpgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
                 this.font = Content.Load<SpriteFont>("Font/gameFont");
                 ui.LoadContent(textures, font);           
 
@@ -773,24 +782,38 @@ namespace RogueValley
             {
                 this.past_clicked = true;
             }
+
+
             // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
 
             switch (this.gameState) {
-                case 0:
+                case 0:                     // Start Screen:
+
                     StartScreen();
                     break;
-                case 1:
+
+                case 1:                     // ingame Updates:
+
                     InGameUpdate();
                     break;
-                case 2:
+
+                case 2:                     // Weapon select:
+
                     this.player = this.upgradeManager.Update(this.player, this.clicked);
                     if (this.player.weapon != null)
                         this.gameState = 1;
 
-                    if (this.player.weapon is Staff){
-                        this.player.reach = 200;
-                    }
+                   
                     break;
+
+                case 3:                     // Upgrade after Wave:
+
+                    if (this.awUpgradeManager.AfterWaveUpgrade(player, this)) { 
+                        this.mobManager.afterWaveUp = 2;
+                        this.gameState = 1;
+                    }
+
+                        break;
 
                 default:
                     break;
@@ -818,7 +841,7 @@ namespace RogueValley
             this.player.Movement(movement, bgSprite);
             this.player.Update(this.bgSprite);
             this.ui.InGameUpdate(this.player);
-            this.mobManager.Update(this.player, this);
+            this.mobManager.Update(this.player, this, this.upgradeManager);
 
             bgSprite.Update(this.player);
         }
@@ -862,6 +885,12 @@ namespace RogueValley
 
                 case 2:
                     _spriteBatch = upgradeManager.Draw(_spriteBatch);
+                    break;
+
+                case 3:     // Here are the Upgrades after waves...
+
+                    _spriteBatch = this.awUpgradeManager.Draw(_spriteBatch);
+
                     break;
 
                 default:

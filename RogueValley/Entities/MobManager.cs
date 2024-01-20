@@ -16,12 +16,14 @@ namespace RogueValley.Entities
         private Random rnd;
 
         private int[] spawnRate, bgSize;
-        public int ammount, wave, maxRandom;
+        public int ammount, wave, maxRandom, afterWaveUp;
 
         public MobManager(Player player, int[] bgSize) {
             this.mobList = new List<Enemies>();
             this.deadList = new List<Enemies>();
             this.rnd = new Random();
+
+            this.afterWaveUp = 0;
 
             this.ammount = 10;
             this.wave = 0;
@@ -39,7 +41,7 @@ namespace RogueValley.Entities
             this.mobList.Clear();
             this.deadList.Clear();
         }
-        
+
         public void Spawn(Player player) {
             // we spawn an specific ammount of enemies at random positions that arent ont the screen.
             // And we add them to a list.
@@ -58,7 +60,7 @@ namespace RogueValley.Entities
                 int random = rnd.Next(0, 100);
                 switch (this.wave) {
                     case 1:
-                        
+
                         if (random < 80)
                         {
                             Zombie zombie = new Zombie(pos);
@@ -116,8 +118,9 @@ namespace RogueValley.Entities
                         }
                         break;
                 }
-            }            
+            }
         }
+
 
         protected bool DeleteDead() {
             for (int i = 0; i < this.deadList.Count; i++) {
@@ -129,12 +132,78 @@ namespace RogueValley.Entities
             return false;
         }
 
-        public void Update(Player player, Game1 g1) {
+        protected Enemies[] swap(Enemies[] arr, int i, int j) {
+
+            Enemies temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+
+            return arr;
+        }
+
+        protected int partition(Enemies[] arr, int low, int high) {
+
+            int pivot = arr[high].distance;
+
+            int i = (low - 1);
+
+            for (int j = low; j <= high; j++) {
+
+                if (arr[j].distance < pivot) {
+                    i++;
+                    arr = this.swap(arr, i, j);
+                }            
+            }
+            arr = this.swap(arr, i + 1, high);
+            return (i + 1);
+        
+        }
+
+        protected void quickSort(Enemies[] arr, int low, int high) {
+
+            if (low < high) {
+
+                int pi = this.partition(arr, low, high);
+
+                quickSort(arr, low, pi - 1);
+                quickSort(arr, pi + 1, high);
+            }
+        
+        }
+
+        protected void MobSorter() {
+        
+            Enemies[] Arr = new Enemies[this.mobList.Count];
+            for (int i = 0; i < this.mobList.Count; i++) {
+                Arr[i] = this.mobList[i];
+            }
+            this.quickSort(Arr, 0, this.mobList.Count - 1);
+
+            this.mobList.Clear();
+
+            for (int i = 0; i < Arr.Length; i++)
+            {
+                this.mobList.Add(Arr[i]);
+            }
+        }
+
+        public void Update(Player player, Game1 g1, UpgradeManager upgradeManager) {
             // we go through all enemies in our mobList and Update them.
-            //if they are dead we remove them from the list so they basicly dont exist anymore.
+            //if they are dead we remove them from the list so they basicly dont exist anymore.            
             player.target.Clear();
+
+            if (this.wave == 0) {
+
+                this.wave++;
+                //this.maxRandom *= this.wave;
+                this.ammount = 10 * this.wave;
+
+                this.Spawn(player);
+            }
+
             if (this.mobList.Count != 0)
             {
+
                 for (int i = 0; i < this.mobList.Count; i++)
                 {
                     if (this.mobList[i].Update(player) == -1)
@@ -154,27 +223,39 @@ namespace RogueValley.Entities
                                 g1.score += 1;
                                 break;
                         }
-
                         this.mobList.RemoveAt(i);
                     }
                 }
+                if (this.mobList.Count > 1)
+                {
+                    this.MobSorter();
+                }
+                
             }
             else
             {
                 if (DeleteDead())
                 {
-
                     this.mobList.Clear();
 
-                    player.hp += player.regeneration;
-                    if (player.hp > player.maxhp) player.hp = player.maxhp;
-
-                    this.wave++;
-                    //this.maxRandom *= this.wave;
-                    this.ammount = 10 * this.wave;
-
                     this.deadList.Clear();
-                    this.Spawn(player);
+                    if (this.afterWaveUp == 0) { 
+                        this.afterWaveUp = 1;
+                        g1.gameState = 3;
+                    }
+                    if (this.afterWaveUp == 2)
+                    {
+                        player.hp += player.regeneration;
+                        if (player.hp > player.maxhp) player.hp = player.maxhp;
+
+                        this.wave++;
+                        //this.maxRandom *= this.wave;
+                        this.ammount = 10 * this.wave;
+
+                        this.Spawn(player);
+
+                        this.afterWaveUp = 0;
+                    }
                 }
             }
             player.mobList = this.mobList;

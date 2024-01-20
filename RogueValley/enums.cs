@@ -56,8 +56,16 @@ namespace RogueValley
 
         public enum UpgradeManager {
             WeaponSelect = 0,
-
+            UpgradeScreen = 1,
         }
+        public enum UpgardeScreen {
+            damageUP = 0,
+            defenceUP = 1,
+            reachUP = 2,
+            speedUP = 3,
+            background = 4,
+        }
+
         public enum Projectile {
             FireBall = 0,
             EplodingBall = 1,        

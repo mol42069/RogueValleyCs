@@ -11,6 +11,7 @@ using Color = Microsoft.Xna.Framework.Color;
 using Point = Microsoft.Xna.Framework.Point;
 using RogueValley.Entities;
 using System.Numerics;
+using Microsoft.Xna.Framework.Input;
 
 namespace RogueValley.Maps
 {
@@ -178,5 +179,83 @@ namespace RogueValley.Maps
                 }
             return false;
         }
+    }
+
+    class UpgradeUI {
+
+        private int[] spriteSize;
+        private int[][] pos;
+
+        private Texture2D[] sprites;
+        private Rectangle[] ButtonRecs;
+
+        public UpgradeUI() {
+
+            this.spriteSize = new int[2] { 300, 300 };
+
+            this.pos = new int[4][];
+            this.pos[0] = new int[2] { 100, 500 };
+            this.pos[1] = new int[2] { this.pos[0][0] + this.spriteSize[0] + 150, this.pos[0][1] };
+            this.pos[2] = new int[2] { this.pos[1][0] + this.spriteSize[0] + 150, this.pos[1][1] };
+            this.pos[3] = new int[2] { this.pos[2][0] + this.spriteSize[0] + 150, this.pos[2][1] };
+
+            this.ButtonRecs = new Rectangle[4];
+            this.ButtonRecs[(int)enums.UpgardeScreen.damageUP] = new Rectangle(this.pos[(int)enums.UpgardeScreen.damageUP][0], this.pos[(int)enums.UpgardeScreen.damageUP][1], this.spriteSize[0], this.spriteSize[1]);
+            this.ButtonRecs[(int)enums.UpgardeScreen.defenceUP] = new Rectangle(this.pos[(int)enums.UpgardeScreen.defenceUP][0], this.pos[(int)enums.UpgardeScreen.defenceUP][1], this.spriteSize[0], this.spriteSize[1]);
+            this.ButtonRecs[(int)enums.UpgardeScreen.reachUP] = new Rectangle(this.pos[(int)enums.UpgardeScreen.reachUP][0], this.pos[(int)enums.UpgardeScreen.reachUP][1], this.spriteSize[0], this.spriteSize[1]);
+            this.ButtonRecs[(int)enums.UpgardeScreen.speedUP] = new Rectangle(this.pos[(int)enums.UpgardeScreen.speedUP][0], this.pos[(int)enums.UpgardeScreen.speedUP][1], this.spriteSize[0], this.spriteSize[1]);
+
+        }
+
+        public void LoadContent(Texture2D[] sprites) {
+            this.sprites = sprites;        
+        }
+
+        public bool Update(Player player, Game1 g1) {
+            var mouseState = Mouse.GetState();
+
+            if (g1.clicked) {
+                Point mousePos = new Point(mouseState.X, mouseState.Y);
+
+                for (int i = 0; i < this.ButtonRecs.Length; i++) {
+                    if (this.ButtonRecs[i].Contains(mousePos)) {
+                        switch (i){
+                        
+                            case (int)enums.UpgardeScreen.damageUP:
+                                player.damage += 20;
+                                break;
+
+                            case (int)enums.UpgardeScreen.defenceUP:
+                                player.defence += 2;
+                                break;
+
+                            case (int)enums.UpgardeScreen.reachUP:
+                                player.reach += 20;
+                                break;
+
+                            case (int)enums.UpgardeScreen.speedUP:
+                                player.speed += 5;
+                                break;
+
+                        }
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public void Draw(SpriteBatch _spriteBatch)
+        {
+            _spriteBatch.Draw(this.sprites[(int)enums.UpgardeScreen.background], new Rectangle(0, 0, 1920, 1080), Color.White);
+            _spriteBatch.Draw(this.sprites[(int)enums.UpgardeScreen.damageUP],this.ButtonRecs[(int)enums.UpgardeScreen.damageUP],Color.White);
+            _spriteBatch.Draw(this.sprites[(int)enums.UpgardeScreen.defenceUP],this.ButtonRecs[(int)enums.UpgardeScreen.defenceUP],Color.White);
+            _spriteBatch.Draw(this.sprites[(int)enums.UpgardeScreen.reachUP],this.ButtonRecs[(int)enums.UpgardeScreen.reachUP],Color.White);
+            _spriteBatch.Draw(this.sprites[(int)enums.UpgardeScreen.speedUP],this.ButtonRecs[(int)enums.UpgardeScreen.speedUP],Color.White);
+
+        }
+
+    
     }
 }

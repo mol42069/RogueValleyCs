@@ -18,7 +18,7 @@ namespace RogueValley.Entities
     {
         // PLAYER VARIABLES:
 
-        public int damage, hp, defence, maxhp, maxtarget, reach, regeneration;
+        public int damage, hp, defence, maxhp, maxtarget, regeneration, reach;
         public float piercing, sAttackMulit;
         public List<Enemies> target, mobList;
         public List<Projectiles> projectiles;
@@ -40,7 +40,6 @@ namespace RogueValley.Entities
         // Player Animation Variables:
 
         public int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames, AttackCooldown, pAttackTimer, pAttackTimerMax, sAttackTimer, sAttackTimerMax;
-        public int damageDrawChangeMax_y, damageDrawChange_y, damageDrawTimer, damageDrawTimerMax, damageDrawChange_x;
         // OTHER:
 
         Random rnd;
@@ -79,6 +78,7 @@ namespace RogueValley.Entities
                 this.sAttackTimerMax = 5;
 
                 this.damageIndicatorList = new List<PlayerUI>();
+                this.reach = 0;
 
             }
             // other Player Variables:
@@ -99,7 +99,6 @@ namespace RogueValley.Entities
 
                 this.regeneration = 25;
 
-                this.reach = 200;
 
                 this.target = new List<Enemies>();
                 this.maxtarget = 20;
@@ -148,10 +147,12 @@ namespace RogueValley.Entities
 
         public void Update(Map map)
         {
-            if (projectiles.Count > 0) {
-                for (int i = 0; i < projectiles.Count; i++) {
-                    if (projectiles[i].UpdatePlayer(this, this.mobList)) {
-                        projectiles.RemoveAt(i);
+            if (this.reach != 0) this.reach = this.weapon.Update(this.reach);
+
+            if (this.projectiles.Count > 0) {
+                for (int i = 0; i < this.projectiles.Count; i++) {
+                    if (this.projectiles[i].UpdatePlayer(this, this.mobList)) {
+                        this.projectiles.RemoveAt(i);
                     }
                 }
             }
@@ -171,12 +172,10 @@ namespace RogueValley.Entities
 
             if (this.lastMovement[0] == 0 && this.lastMovement[1] == 0)
             {
-                int rCount = 0;
-                int lCount = 0;
                 List<Enemies> tenemies = new List<Enemies>();
 
                 // We count where the enemies are:
-
+                /*
                 for (int i = 0; i < this.target.Count; i++)
                 {
                     if (this.target[i].targetPosition[0] < this.playerPosition[0])
@@ -231,26 +230,30 @@ namespace RogueValley.Entities
                             }
                         }
                     }
-                }
+                }*/
+
                 // we attack the previous generated List with either primary or secondary wich we choose randomly:
                 if (!this.sAttackTrigger)
                 {
-                    if (tenemies.Count != 0)
-                        this.PrimaryAttack(tenemies);
+                    if (this.mobList is not null)
+                    {
+                        if (this.mobList.Count != 0)
+                        {
+                            if (this.mobList[0] is not null && this.mobList[0].distance <= this.weapon.reach)
+                            {
+                                this.playerDirection = (int)enums.Direction.RIGHT;
+                                if (this.mobList[0].position[0] < this.playerPosition[0])
+                                    this.playerDirection = (int)enums.Direction.LEFT;
+                                this.PrimaryAttack();
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    if (this.weapon is not Staff)
-                    {
-                        if (tenemies.Count != 0)
-                            this.SecondAttack(tenemies, map);
-                    }
-                    else {
-                        this.SecondAttack(this.mobList, map);
-                    }
+                    this.SecondAttack(this.mobList, map);
                 }
                 // after all we clear our list so we dont attack non-existend enemies:
-                tenemies.Clear();
             }
             else 
             {
@@ -308,39 +311,14 @@ namespace RogueValley.Entities
             }
         }
 
-        protected int[] getTargetPos() {
-            int[] targetPos = new int[2];
-
-            int distance = 1000;
-            int finalIdx = 0;
-            for (int i = 0; i < this.target.Count; i++) {
-
-                int x = this.target[i].position[0] - this.playerPosition[0];
-                if (x < 0) x = -x;
-                
-                int y = this.target[i].position[1] - this.playerPosition[1];
-                if (y < 0) y = -y;
-
-                if (x + y < distance) { 
-                    distance = x + y;
-                    finalIdx = i;
-                }
-
-            }
-            targetPos = this.target[finalIdx].targetPosition;
-            return targetPos;
-        }
-
-        public void PrimaryAttack(List<Enemies> e)
+        public void PrimaryAttack()
         {
-
             if (weapon is Staff) {
-                int[] targetPos = new int[2];
-                targetPos = this.getTargetPos();
-                weapon.PrimaryAttack(e, this, targetPos);
+                int[] targetPos = this.mobList[0].targetPosition;
+                weapon.PrimaryAttack(this.mobList, this, targetPos);
             }
             else if (weapon is StandartSword){
-                weapon.PrimaryAttack(e, this);
+                weapon.PrimaryAttack(this.mobList[0], this);
             }
         }
 
@@ -357,7 +335,6 @@ namespace RogueValley.Entities
                     this.targetPos[1] = mousePos.Y - map.map_position[1];
                 }
                 weapon.SecondaryAttack(e, this, targetPos);
-                
             }
             else if (weapon is StandartSword)
             {
@@ -390,7 +367,6 @@ namespace RogueValley.Entities
                 }
             }
         }
-
         public void DrawDamage(SpriteBatch _spriteBatch, SpriteFont font) {
 
             if (this.damageIndicatorList.Count != 0) {

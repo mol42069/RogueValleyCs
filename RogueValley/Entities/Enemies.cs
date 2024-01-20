@@ -17,7 +17,7 @@ namespace RogueValley.Entities
 {
     class Enemies
     {
-        public int hp, maxhp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing, targetId;
+        public int hp, maxhp, defence, damage, speed, aniCount, aniTimer, aniTimerMax, entityDir, lastDir, reach, piercing, targetId, distance;
         protected int pAttackTimer, pAttackTimerMax, AttackCooldown, sAttackTimerMax, sAttackTimer, AttackCooldownMax;
         protected int random, immunityFrames, maxImmunityFrames;
 
@@ -47,6 +47,8 @@ namespace RogueValley.Entities
             this.spriteSize[1] = 100;
 
             this.ui = new EnemyUI();
+
+            this.distance = 99999;
 
             this.targetId = -1;
             this.immunityFrames = 0;
@@ -107,6 +109,8 @@ namespace RogueValley.Entities
 
         protected void DeathAnimation() {
             this.aniTimer++;
+
+            this.distance = 99999;
 
             if (this.aniTimer == this.aniTimerMax)
             {
@@ -199,7 +203,9 @@ namespace RogueValley.Entities
             }
             else
             {
+                if(player.weapon is not null)
                 this.Ai(player);
+
                 return this.hp;
             }
         }
@@ -234,15 +240,15 @@ namespace RogueValley.Entities
             }
 
 
-            int n = x + y;
+            this.distance = x + y;
 
-            if (n <= player.weapon.reach && n >= -player.weapon.reach)
+            if (this.distance <= player.weapon.reach && this.distance >= -player.weapon.reach)
             {
                 this.targetId = player.target.Count;
                 player.target.Add(this);
             }
 
-            if (n <= this.reach && n >= -this.reach)
+            if (this.distance <= this.reach && this.distance >= -this.reach)
             {
                 this.lastMove[0] = 0;
                 this.lastMove[1] = 0;
@@ -268,8 +274,8 @@ namespace RogueValley.Entities
                 mov[0] += rnd.Next(-100, 101);
                 mov[1] += rnd.Next(-100, 101);
 
-                this.lastMove[0] = (int)(((float)mov[0] / (float)n) * this.speed);
-                this.lastMove[1] = (int)(((float)mov[1] / (float)n) * this.speed);
+                this.lastMove[0] = (int)(((float)mov[0] / (float)this.distance) * this.speed);
+                this.lastMove[1] = (int)(((float)mov[1] / (float)this.distance) * this.speed);
 
                 this.position[0] += this.lastMove[0];
                 this.position[1] += this.lastMove[1];
@@ -285,7 +291,7 @@ namespace RogueValley.Entities
 
         public void TakeDamage(int damage, float piercing)
         {
-            if (this.immunityFrames == 0)
+            if (this.immunityFrames == 0 && this.hp > 0)
             {
                 this.immunityFrames = this.maxImmunityFrames;
                 // same as in the player class check there for explanation.
@@ -462,7 +468,8 @@ namespace RogueValley.Entities
             }
             else
             {
-                this.Ai(player);
+                if (player.weapon is not null)
+                    this.Ai(player);
                 return base.hp;
             }
         }
@@ -497,15 +504,15 @@ namespace RogueValley.Entities
             }
 
 
-            int n = x + y;
+            base.distance = x + y;
 
-            if (n <= player.weapon.reach && n >= -player.weapon.reach)
+            if (base.distance <= player.weapon.reach && base.distance >= -player.weapon.reach)
             {
                 this.targetId = player.target.Count;
                 player.target.Add(this);
             }
 
-            if (n <= base.reach && n >= -base.reach)
+            if (base.distance <= base.reach && base.distance >= -base.reach)
             {
                 base.lastMove[0] = 0;
                 base.lastMove[1] = 0;
@@ -524,8 +531,8 @@ namespace RogueValley.Entities
                 mov[0] += rnd.Next(-100, 101);
                 mov[1] += rnd.Next(-100, 101);
 
-                base.lastMove[0] = (int)(((float)mov[0] / (float)n) * base.speed);
-                base.lastMove[1] = (int)(((float)mov[1] / (float)n) * base.speed);
+                base.lastMove[0] = (int)(((float)mov[0] / (float)base.distance) * base.speed);
+                base.lastMove[1] = (int)(((float)mov[1] / (float)base.distance) * base.speed);
 
                 base.position[0] += base.lastMove[0];
                 base.position[1] += base.lastMove[1];
