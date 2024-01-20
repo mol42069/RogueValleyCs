@@ -870,7 +870,7 @@ namespace RogueValley
         protected override void Draw(GameTime gameTime)
         {
             // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
-
+            
             GraphicsDevice.Clear(Color.Black);
             _spriteBatch.Begin();
 

@@ -174,65 +174,7 @@ namespace RogueValley.Entities
             {
                 List<Enemies> tenemies = new List<Enemies>();
 
-                // We count where the enemies are:
-                /*
-                for (int i = 0; i < this.target.Count; i++)
-                {
-                    if (this.target[i].targetPosition[0] < this.playerPosition[0])
-                    {
-                        lCount++;
-                    }
-                    else
-                    {
-                        rCount++;
-                    }
-                }
-                // then we add the enemies wich are on the side of the player with the most enemies to an List:
-                // if they are equal we just add them on the last direction into the list.
-                if (rCount < lCount)
-                {
-                    this.playerDirection = 1;
-                    for (int i = 0; i < this.target.Count; i++)
-                    {
-                        if (this.target[i].targetPosition[0] < this.playerPosition[0])
-                        {
-                            tenemies.Add(this.target[i]);
-                        }
-                    }
-                }
-                else if (rCount > lCount)
-                {
-                    this.playerDirection = 0;
-                    for (int i = 0; i < this.target.Count; i++)
-                    {
-                        if (this.target[i].targetPosition[0] > this.playerPosition[0])
-                        {
-                            tenemies.Add(this.target[i]);
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < this.target.Count; i++)
-                    {
-                        if (this.playerDirection == 0)
-                        {
-                            if (this.target[i].targetPosition[0] > this.playerPosition[0])
-                            {
-                                tenemies.Add(this.target[i]);
-                            }
-                        }
-                        else
-                        {
-                            if (this.target[i].targetPosition[0] < this.playerPosition[0])
-                            {
-                                tenemies.Add(this.target[i]);
-                            }
-                        }
-                    }
-                }*/
-
-                // we attack the previous generated List with either primary or secondary wich we choose randomly:
+                // we attack the closest enemy and change the direction of the player:
                 if (!this.sAttackTrigger)
                 {
                     if (this.mobList is not null)
@@ -253,10 +195,10 @@ namespace RogueValley.Entities
                 {
                     this.SecondAttack(this.mobList, map);
                 }
-                // after all we clear our list so we dont attack non-existend enemies:
             }
             else 
             {
+                this.sAttackTrigger = false;
                 this.Animation();
                 this.targetPos = null;
             }

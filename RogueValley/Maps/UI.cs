@@ -242,7 +242,6 @@ namespace RogueValley.Maps
                     }
                 }
             }
-
             return false;
         }
 
@@ -253,9 +252,6 @@ namespace RogueValley.Maps
             _spriteBatch.Draw(this.sprites[(int)enums.UpgardeScreen.defenceUP],this.ButtonRecs[(int)enums.UpgardeScreen.defenceUP],Color.White);
             _spriteBatch.Draw(this.sprites[(int)enums.UpgardeScreen.reachUP],this.ButtonRecs[(int)enums.UpgardeScreen.reachUP],Color.White);
             _spriteBatch.Draw(this.sprites[(int)enums.UpgardeScreen.speedUP],this.ButtonRecs[(int)enums.UpgardeScreen.speedUP],Color.White);
-
-        }
-
-    
+        }    
     }
 }

@@ -12,15 +12,18 @@ namespace RogueValley.Entities
     {
         private Texture2D[][][][] sprites;
         private Texture2D[] hBarSprites;
-        public List<Enemies> mobList, deadList;
+        public List<Enemies> mobList, deadList, drawList;
         private Random rnd;
 
         private int[] spawnRate, bgSize;
         public int ammount, wave, maxRandom, afterWaveUp;
 
         public MobManager(Player player, int[] bgSize) {
+
             this.mobList = new List<Enemies>();
             this.deadList = new List<Enemies>();
+            this.drawList = new List<Enemies>();
+
             this.rnd = new Random();
 
             this.afterWaveUp = 0;
@@ -132,7 +135,9 @@ namespace RogueValley.Entities
             return false;
         }
 
-        protected Enemies[] swap(Enemies[] arr, int i, int j) {
+        // WE CHANGE THE ORDER OF THE MOBLIST VIA QUICKSORT SO THAT THE CLOSEST ENEMIES ARE FIRST:
+
+        private Enemies[] swap(Enemies[] arr, int i, int j) {
 
             Enemies temp = arr[i];
             arr[i] = arr[j];
@@ -141,7 +146,7 @@ namespace RogueValley.Entities
             return arr;
         }
 
-        protected int partition(Enemies[] arr, int low, int high) {
+        private int partition(Enemies[] arr, int low, int high) {
 
             int pivot = arr[high].distance;
 
@@ -152,14 +157,13 @@ namespace RogueValley.Entities
                 if (arr[j].distance < pivot) {
                     i++;
                     arr = this.swap(arr, i, j);
-                }            
+                }
             }
             arr = this.swap(arr, i + 1, high);
             return (i + 1);
-        
         }
 
-        protected void quickSort(Enemies[] arr, int low, int high) {
+        private void quickSort(Enemies[] arr, int low, int high) {
 
             if (low < high) {
 
@@ -168,11 +172,11 @@ namespace RogueValley.Entities
                 quickSort(arr, low, pi - 1);
                 quickSort(arr, pi + 1, high);
             }
-        
+
         }
 
-        protected void MobSorter() {
-        
+        private void MobSorter() {
+
             Enemies[] Arr = new Enemies[this.mobList.Count];
             for (int i = 0; i < this.mobList.Count; i++) {
                 Arr[i] = this.mobList[i];
@@ -185,6 +189,50 @@ namespace RogueValley.Entities
             {
                 this.mobList.Add(Arr[i]);
             }
+        }
+
+
+        // WE SORT ENEMIES SO WE CAN DRAW THE LOWER ONES LATER THAN THE UPPER-ONES:
+        private int partitionDraw(Enemies[] arr, int low, int high) {
+            int pivot = arr[high].position[1] + arr[high].spriteSize[1] - 20;
+
+            int i = (low - 1);
+
+            for (int j = low; j <= high; j++)
+            {
+
+                if (arr[j].position[1] + arr[j].spriteSize[1] - 20 < pivot)
+                {
+                    i++;
+                    arr = this.swap(arr, i, j);
+                }
+            }
+            arr = this.swap(arr, i + 1, high);
+            return (i + 1);
+        }
+
+        private void quickSortDraw(Enemies[] arr, int low, int high) {
+            if (low < high) {
+                int pi = this.partitionDraw(arr, low, high);
+
+                this.quickSortDraw(arr, low, pi - 1);
+                this.quickSortDraw(arr, pi + 1, high);
+            }
+        }
+
+        private void MobSorterDraw() {
+            Enemies[] Arr = new Enemies[this.mobList.Count];
+            for (int i = 0; i < this.mobList.Count; i++) {
+                Arr[i] = this.mobList[i];
+            }
+
+            this.quickSort(Arr, 0, this.mobList.Count - 1);
+            this.drawList.Clear();
+            for (int i = 0; i < this.mobList.Count; i++) 
+            {
+                this.drawList.Add(Arr[i]);
+            }
+
         }
 
         public void Update(Player player, Game1 g1, UpgradeManager upgradeManager) {
@@ -229,6 +277,7 @@ namespace RogueValley.Entities
                 if (this.mobList.Count > 1)
                 {
                     this.MobSorter();
+                    //this.MobSorterDraw();
                 }
                 
             }
@@ -237,8 +286,8 @@ namespace RogueValley.Entities
                 if (DeleteDead())
                 {
                     this.mobList.Clear();
-
                     this.deadList.Clear();
+
                     if (this.afterWaveUp == 0) { 
                         this.afterWaveUp = 1;
                         g1.gameState = 3;
@@ -264,12 +313,17 @@ namespace RogueValley.Entities
         public void Draw(SpriteBatch _spriteBatch, Map m) {
             // we go through the enemy list and draw them all.
 
+            //for (int i = 0; i < this.drawList.Count; i++)
+            //    this.drawList[i].Draw(_spriteBatch, m);
+
+            this.MobSorterDraw();
+
             for (int i = 0; i < this.deadList.Count; i++) {
                 this.deadList[i].Draw(_spriteBatch, m);
             }
-            for (int i = 0; i < this.mobList.Count; i++)
+            for (int i = this.drawList.Count - 1; i >= 0 ; i--)
             {
-                this.mobList[i].Draw(_spriteBatch, m);
+                this.drawList[i].Draw(_spriteBatch, m);
             }           
         }
     }
