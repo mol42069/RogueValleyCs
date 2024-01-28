@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RogueValley.Maps;
+using System.Diagnostics;
+using Microsoft.Xna.Framework;
 
 namespace RogueValley.Entities
 {
@@ -12,11 +14,13 @@ namespace RogueValley.Entities
     {
         private Texture2D[][][][] sprites;
         private Texture2D[] hBarSprites;
+        private SpriteFont font;
         public List<Enemies> mobList, deadList, drawList;
         private Random rnd;
+        public Stopwatch timer;
 
         private int[] spawnRate, bgSize;
-        public int ammount, wave, maxRandom, afterWaveUp;
+        public int ammount, wave, maxRandom, afterWaveUp, spawnTimer, spawnTimerMax, spawnTimerRnd, spawnAmmount, roundTimerMax, roundTimer;
 
         public MobManager(Player player, int[] bgSize) {
 
@@ -25,6 +29,7 @@ namespace RogueValley.Entities
             this.drawList = new List<Enemies>();
 
             this.rnd = new Random();
+            this.timer = new Stopwatch();
 
             this.afterWaveUp = 0;
 
@@ -32,19 +37,111 @@ namespace RogueValley.Entities
             this.wave = 0;
             this.maxRandom = 100;
 
+            this.spawnTimer = 0;
+            this.spawnTimerMax = 100;
+            this.spawnAmmount = 2;
+            this.roundTimerMax = 60;
+            this.roundTimer = this.roundTimerMax;
+
             this.spawnRate = new int[2];
             this.bgSize = bgSize;
         }
 
-        public void LoadContent(Texture2D[][][][] sprites, Texture2D[] hBarSprites) {
+        public void LoadContent(Texture2D[][][][] sprites, Texture2D[] hBarSprites, SpriteFont font) {
             this.sprites = sprites;
             this.hBarSprites = hBarSprites;
+            this.font = font;
         }
         public void RmList() {
             this.mobList.Clear();
             this.deadList.Clear();
         }
+        protected void Spawn(Player player) {
+            for (int i = 0; i < this.spawnAmmount; i++)
+            {
 
+                int[] pos = new int[2];
+                pos[0] = player.playerPosition[0];
+                pos[1] = player.playerPosition[1];
+
+                this.spawnTimerRnd = rnd.Next(10) - 5;
+
+
+                while (!(!(pos[1] < (player.playerPosition[1] + 1080) && pos[1] > (player.playerPosition[1] - 1080)) || !(pos[0] < (player.playerPosition[0] + 1920) && pos[0] > (player.playerPosition[0] - 1920))))
+                {
+                    pos[0] = rnd.Next(0, this.bgSize[0]);
+                    pos[1] = rnd.Next(0, this.bgSize[1]);
+                }
+
+
+
+                int random = rnd.Next(0, 100);
+                switch (this.wave)
+                {
+                    case 1:
+
+                        if (random < 80)
+                        {
+                            Zombie zombie = new Zombie(pos);
+                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie], this.hBarSprites);
+                            this.mobList.Add(zombie);
+
+                        }
+                        else if (random >= 80)
+                        {
+                            if (random >= 95)
+                            {
+
+                                Ogre ogre = new Ogre(pos);
+                                ogre.LoadContent(this.sprites[(int)enums.Entity.Ogre], this.hBarSprites);
+                                this.mobList.Add(ogre);
+
+                            }
+                            else
+                            {
+                                // here we spawn other stuff for example Mages
+                                Mage mage = new Mage(pos);
+                                mage.LoadContent(this.sprites[(int)enums.Entity.Mage], this.hBarSprites);
+                                mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
+                                this.mobList.Add(mage);
+                            }
+                        }
+                        break;
+
+                    default:
+                        if (random < 80 - this.wave * 2)
+                        {
+                            Zombie zombie = new Zombie(pos);
+                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie], this.hBarSprites);
+                            this.mobList.Add(zombie);
+
+                        }
+                        else if (random >= 80 - this.wave * 2)
+                        {
+                            if (random >= 95 - this.wave)
+                            {
+
+                                Ogre ogre = new Ogre(pos);
+                                ogre.LoadContent(this.sprites[(int)enums.Entity.Ogre], this.hBarSprites);
+                                this.mobList.Add(ogre);
+
+                            }
+                            else
+                            {
+                                // here we spawn other stuff for example Mages
+                                Mage mage = new Mage(pos);
+                                mage.LoadContent(this.sprites[(int)enums.Entity.Mage], this.hBarSprites);
+                                mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
+                                this.mobList.Add(mage);
+                            }
+                        }
+                        break;
+                }
+            }
+
+        } 
+
+        /*
         public void Spawn(Player player) {
             // we spawn an specific ammount of enemies at random positions that arent ont the screen.
             // And we add them to a list.
@@ -123,7 +220,7 @@ namespace RogueValley.Entities
                 }
             }
         }
-
+        */
 
         protected bool DeleteDead() {
             for (int i = 0; i < this.deadList.Count; i++) {
@@ -245,12 +342,29 @@ namespace RogueValley.Entities
                 this.wave++;
                 //this.maxRandom *= this.wave;
                 this.ammount = 10 * this.wave;
-
-                this.Spawn(player);
+                this.timer.Start();
             }
+            
+            
 
-            if (this.mobList.Count != 0)
+
+            if (this.roundTimer != 0)
             {
+
+                this.spawnTimer++;
+
+                if (this.spawnTimer >= this.spawnTimerMax + this.spawnTimerRnd)
+                {
+                    this.Spawn(player);
+                    this.spawnTimer = 0;
+                }
+                if (this.timer.Elapsed.Seconds == 1)
+                {
+                    this.roundTimer--;
+                    this.timer.Stop();
+                    this.timer.Reset();
+                    this.timer.Start();
+                }
 
                 for (int i = 0; i < this.mobList.Count; i++)
                 {
@@ -294,14 +408,26 @@ namespace RogueValley.Entities
                     }
                     if (this.afterWaveUp == 2)
                     {
+                        this.roundTimer = roundTimerMax;
+
                         player.hp += player.regeneration;
                         if (player.hp > player.maxhp) player.hp = player.maxhp;
 
                         this.wave++;
                         //this.maxRandom *= this.wave;
                         this.ammount = 10 * this.wave;
+                        this.spawnTimer = 0;
+                        if (this.spawnTimerMax * 0.8 < 40)
+                        {
+                            this.spawnAmmount += this.rnd.Next(3);
+                        }
+                        else {
+                            this.spawnTimerMax = (int)(this.spawnTimerMax * 0.8);
+                        }
 
-                        this.Spawn(player);
+                        this.timer.Stop();
+                        this.timer.Reset();
+                        this.timer.Start();
 
                         this.afterWaveUp = 0;
                     }
@@ -324,7 +450,9 @@ namespace RogueValley.Entities
             for (int i = this.drawList.Count - 1; i >= 0 ; i--)
             {
                 this.drawList[i].Draw(_spriteBatch, m);
-            }           
+            }
+            _spriteBatch.DrawString(this.font, this.roundTimer.ToString(), new Microsoft.Xna.Framework.Vector2(900, 50), Color.White);
+
         }
     }
 }

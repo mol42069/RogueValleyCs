@@ -3356,6 +3356,13 @@
 /processorParam:TextureFormat=Compressed
 /build:Font/gameFont.spritefont
 
+#begin Font/timerFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Font/timerFont.spritefont
+
 #begin Utility/HealthBar/HBarBg.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -755,9 +755,10 @@ namespace RogueValley
                 this.upgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
                 this.awUpgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
                 this.font = Content.Load<SpriteFont>("Font/gameFont");
-                ui.LoadContent(textures, font);           
+                ui.LoadContent(textures, font);
 
-            this.mobManager.LoadContent(sprites, textures);
+                SpriteFont timerFont = Content.Load<SpriteFont>("Font/timerFont");
+            this.mobManager.LoadContent(sprites, textures, timerFont);
 
             }
         }
@@ -958,11 +959,6 @@ namespace RogueValley
             {
                 movement[1] = 0;
             }
-            if (state.IsKeyDown(Keys.L))
-            {
-                mobManager.Spawn(player);
-            }
-
             var mouseState = Mouse.GetState();
             if (this.clicked)            
                 this.player.sAttackTrigger = true;
