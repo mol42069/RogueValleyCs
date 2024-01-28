@@ -41,7 +41,7 @@ namespace RogueValley.Entities
 
         public int animationCount, animationTimer, animationMaxTime, immunityFrames, maxImmFrames, AttackCooldown, pAttackTimer, pAttackTimerMax, sAttackTimer, sAttackTimerMax;
         // OTHER:
-
+        public Rectangle playerRec;
         Random rnd;
         int random, damageTaken, damagePos_x, damagePos_y;
         bool damageAni;
@@ -59,7 +59,10 @@ namespace RogueValley.Entities
                 this.drawPosition = new int[2];
                 this.drawPosition[0] = pos[0];
                 this.drawPosition[1] = pos[1];
-            }
+
+                this.playerRec = new Rectangle(pos[0], pos[1], 100, 100);
+
+    }
             // Player Animation Variables:
             {
                 this.animationCount = 0;
@@ -123,8 +126,17 @@ namespace RogueValley.Entities
             this.sAttackSprite = sAttack;
         }
         public void Movement(int[] direction, Map map)
-        {
+        {//
             this.lastMovement = direction;
+            
+            if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
+            {
+                this.playerPosition[0] += (this.speed / 10) * direction[0];
+            }
+            if (0 <= (this.playerPosition[1] + (this.speed / 10) * direction[1]) && (this.playerPosition[1] + (this.speed / 10) * direction[1]) <= map.mapSize[1] - 90)
+            {
+                this.playerPosition[1] += (this.speed / 10) * direction[1];
+            }
             if (this.weapon is null) return;
 
             if (!(direction[0] == 0 && direction[1] == 0))
@@ -135,18 +147,21 @@ namespace RogueValley.Entities
                 this.sAttackTimer = 0;
                 //this.AttackCooldown = 0;
             }
-            if (0 <= (this.playerPosition[0] + (this.speed / 10) * direction[0]) && (this.playerPosition[0] + (this.speed / 10) * direction[0]) <= map.mapSize[0] - 35)
-            {
-                this.playerPosition[0] += (this.speed / 10) * direction[0];
-            }
-            if (0 <= (this.playerPosition[1] + (this.speed / 10) * direction[1]) && (this.playerPosition[1] + (this.speed / 10) * direction[1]) <= map.mapSize[1] - 90)
-            {
-                this.playerPosition[1] += (this.speed / 10) * direction[1];
-            }
+
+        }
+
+        private void PlayerDrawPos(Map map) {
+            this.drawPosition[0] = map.CalcdrawPosX(this.playerPosition[0]);
+            this.drawPosition[1] = map.CalcdrawPosY(this.playerPosition[1]);
         }
 
         public void Update(Map map)
         {
+            this.PlayerDrawPos(map);
+
+            this.playerRec.X = this.playerPosition[0];
+            this.playerRec.Y = this.playerPosition[1];
+
             if (this.reach != 0) this.reach = this.weapon.Update(this.reach);
 
             if (this.projectiles.Count > 0) {
@@ -155,10 +170,6 @@ namespace RogueValley.Entities
                         this.projectiles.RemoveAt(i);
                     }
                 }
-            }
-            if (this.weapon is null) return;
-            if (this.weapon.AttackCooldown > 0) {
-                this.weapon.AttackCooldown--;
             }
 
             if (immunityFrames > 0)
@@ -205,6 +216,12 @@ namespace RogueValley.Entities
             if (this.target.Count == 0 && (!this.sAttackTrigger && this.weapon is not Staff) || (this.weapon is Staff && this.targetPos is null)) {
                 this.Animation();
             }
+            if (this.weapon is null) return;
+            if (this.weapon.AttackCooldown > 0)
+            {
+                this.weapon.AttackCooldown--;
+            }
+
         }
 
         protected void Animation()

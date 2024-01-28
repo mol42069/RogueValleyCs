@@ -24,7 +24,7 @@ namespace RogueValley
         private MobManager mobManager;
         private UI ui;
 
-        private int[] movement, bgSize;
+        private int[] movement, bgSize, screenSize;
 
         private System.Diagnostics.Stopwatch watch;
 
@@ -33,6 +33,8 @@ namespace RogueValley
         public int gameState, score;
         SpriteFont font;
         private UpgradeManager upgradeManager, awUpgradeManager;
+
+        private MenuScreen menu;
 
         public Game1()
         {
@@ -48,7 +50,10 @@ namespace RogueValley
 
         protected override void Initialize()
         {
+
             movement = new int[2]; // 0=X-Axis | 1=y-Axis
+            this.screenSize = new int[]{ 1920, 1080 };
+            menu = new MenuScreen(this.screenSize);
 
             this.gameState = 0;
             this.bgSize = new int[] {7000, 4000};
@@ -84,8 +89,7 @@ namespace RogueValley
             Texture2D[][][][] sprites = new Texture2D[4][][][];
 
             bg = Content.Load<Texture2D>("Background/grass");
-            int[] screenSize = { 1920, 1080 };
-            bgSprite = new Map(player.playerPosition, screenSize, bg, screenSize, this.bgSize);
+            bgSprite = new Map(bg, this.screenSize, this.bgSize);
 
             // Load death Sprites:
             {
@@ -732,32 +736,96 @@ namespace RogueValley
 
             // Load the UI Sprites:
             
-                Texture2D[] textures = new Texture2D[4];
-
-                textures[(int)enums.StartScreen.bg] = Content.Load<Texture2D>("Utility/StartScreen/StartGame");
-                textures[(int)enums.StartScreen.sButton] = Content.Load<Texture2D>("Utility/StartScreen/StartButton");
+                Texture2D[] textures = new Texture2D[2];
                 textures[(int)enums.UI.hBar] = Content.Load<Texture2D>("Utility/HealthBar/HBarHealth");
                 textures[(int)enums.UI.hBg] = Content.Load<Texture2D>("Utility/HealthBar/HBarBg");
 
-                Texture2D[][] upgradeSprites = new Texture2D[2][];
-                upgradeSprites[(int)enums.UpgradeManager.WeaponSelect] = new Texture2D[3];
-                upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][0] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/WeaponChoiceBg");
-                upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][1] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseSword");
-                upgradeSprites[(int)enums.UpgradeManager.WeaponSelect][2] = Content.Load<Texture2D>("Utility/WeaponChoiceScreen/chooseStaff");
+                Texture2D[][][] menuSprites = new Texture2D[(int)enums.MenuSprite.max][][];
 
-                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen] = new Texture2D[5];
-                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.damageUP] = Content.Load<Texture2D>("Utility/UpgradeScreen/damageUP");
-                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.defenceUP] = Content.Load<Texture2D>("Utility/UpgradeScreen/defenceUP");
-                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.reachUP] = Content.Load<Texture2D>("Utility/UpgradeScreen/reachUP");
-                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.speedUP] = Content.Load<Texture2D>("Utility/UpgradeScreen/speedUP");
-                upgradeSprites[(int)enums.UpgradeManager.UpgradeScreen][(int)enums.UpgardeScreen.background] = Content.Load<Texture2D>("Utility/UpgradeScreen/UpgradeChoiceBg");
+                // START-SCREEN-SPRITES:
 
-                this.upgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
-                this.awUpgradeManager.LoadContent(upgradeSprites, StaffProjSprites);
+                menuSprites[(int)enums.MenuSprite.StartS] = new Texture2D[(int)enums.StartScreenS.max][];
+
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Bg] = new Texture2D[1];
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Bg][0] = Content.Load<Texture2D>("Utility/Menus/StartScreen/Background/Bg");
+
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Start] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Start][0] = Content.Load<Texture2D>("Utility/Menus/StartScreen/Start/Norm");
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Start][1] = Content.Load<Texture2D>("Utility/Menus/StartScreen/Start/Hover");
+
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Quit] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Quit][0] = Content.Load<Texture2D>("Utility/Menus/StartScreen/Quit/Norm");
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Quit][1] = Content.Load<Texture2D>("Utility/Menus/StartScreen/Quit/Hover");
+
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Record] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Record][0] = Content.Load<Texture2D>("Utility/Menus/StartScreen/Record/Norm");
+                menuSprites[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Record][1] = Content.Load<Texture2D>("Utility/Menus/StartScreen/Record/Hover");
+
+                // UPGRADE-SCREEN-SPRITES:
+
+                menuSprites[(int)enums.MenuSprite.Upgrade] = new Texture2D[(int)enums.UpgradeScreenS.max][];
+                // Background:
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.Bg] = new Texture2D[1];
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.Bg][0] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/Background/Bg");
+                // damage:
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.damage] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.damage][0] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/damage/Norm");
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.damage][1] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/damage/Hover");
+                // defence:
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.defence] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.defence][0] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/defence/Norm");
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.defence][1] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/defence/Hover");
+                // reach:
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.reach] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.reach][0] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/reach/Norm");
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.reach][1] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/reach/Hover");
+                // speed:
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.speed] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.speed][0] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/speed/Norm");
+                menuSprites[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.speed][1] = Content.Load<Texture2D>("Utility/Menus/UpgradeScreen/speed/Hover");
+
+                // WEAPON-CHOICE-SCREEN-SPRITES:
+
+                menuSprites[(int)enums.MenuSprite.WeaponC] = new Texture2D[(int)enums.WeaponChoiceS.max][];
+                // Background:
+                menuSprites[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Bg] = new Texture2D[1];
+                menuSprites[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Bg][0] = Content.Load<Texture2D>("Utility/Menus/WeaponSelectScreen/Background/Bg");
+                // Staff:
+                menuSprites[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Staff] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Staff][0] = Content.Load<Texture2D>("Utility/Menus/WeaponSelectScreen/Staff/Norm");
+                menuSprites[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Staff][1] = Content.Load<Texture2D>("Utility/Menus/WeaponSelectScreen/Staff/Hover");
+                // Sword:
+                menuSprites[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Sword] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Sword][0] = Content.Load<Texture2D>("Utility/Menus/WeaponSelectScreen/Sword/Norm");
+                menuSprites[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Sword][1] = Content.Load<Texture2D>("Utility/Menus/WeaponSelectScreen/Sword/Hover");
+
+                // PAUSE-SCREEN-SPRITES:
+
+                menuSprites[(int)enums.MenuSprite.Pause] = new Texture2D[(int)enums.PauseScreenS.max][];
+                // Background:
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Bg] = new Texture2D[1];
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Bg][0] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Background/Bg");
+                // damage:
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Continue] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Continue][0] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Continue/Norm");
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Continue][1] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Continue/Hover");
+                // defence:
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Home] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Home][0] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Home/Norm");
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Home][1] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Home/Hover");
+                // reach:
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit] = new Texture2D[2];
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit][0] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Quit/Norm");
+                menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit][1] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Quit/Hover");
+
+
+                this.menu.LoadConent(menuSprites, StaffProjSprites);
+
                 this.font = Content.Load<SpriteFont>("Font/gameFont");
                 ui.LoadContent(textures, font);
 
                 SpriteFont timerFont = Content.Load<SpriteFont>("Font/timerFont");
+
             this.mobManager.LoadContent(sprites, textures, timerFont);
 
             }
@@ -786,37 +854,17 @@ namespace RogueValley
 
 
             // we want to switch between gameStates for start-screen, in-Game or Game-Over-Screen etc.
+            InGameKeyHandler();
 
             switch (this.gameState) {
-                case 0:                     // Start Screen:
-
-                    StartScreen();
-                    break;
-
                 case 1:                     // ingame Updates:
-
                     InGameUpdate();
                     break;
 
-                case 2:                     // Weapon select:
-
-                    this.player = this.upgradeManager.Update(this.player, this.clicked);
-                    if (this.player.weapon != null)
-                        this.gameState = 1;
-
-                   
-                    break;
-
-                case 3:                     // Upgrade after Wave:
-
-                    if (this.awUpgradeManager.AfterWaveUpgrade(player, this)) { 
-                        this.mobManager.afterWaveUp = 2;
-                        this.gameState = 1;
-                    }
-
-                        break;
-
                 default:
+                    this.menu.player = this.player;
+                    this.gameState = this.menu.Update(this.gameState, this.movement);
+                    this.player = this.menu.player;
                     break;
             }
             base.Update(gameTime);
@@ -836,9 +884,7 @@ namespace RogueValley
                 this.mobManager.wave = 0;
                 this.mobManager.ammount = 10;
                 this.player.weapon = null;
-            }
-            InGameKeyHandler();
-
+            }            
             this.player.Movement(movement, bgSprite);
             this.player.Update(this.bgSprite);
             this.ui.InGameUpdate(this.player);
@@ -876,25 +922,12 @@ namespace RogueValley
             _spriteBatch.Begin();
 
             switch (this.gameState) {
-                case 0:
-                    StartScreenDraw();
-                    break;
-
                 case 1:
                     InGameDraw();
                     break;
 
-                case 2:
-                    _spriteBatch = upgradeManager.Draw(_spriteBatch);
-                    break;
-
-                case 3:     // Here are the Upgrades after waves...
-
-                    _spriteBatch = this.awUpgradeManager.Draw(_spriteBatch);
-
-                    break;
-
                 default:
+                    this.menu.Draw(_spriteBatch, this.gameState);
                     break;
             }
             _spriteBatch.End();
@@ -937,27 +970,27 @@ namespace RogueValley
             }
             if (state.IsKeyDown(Keys.A) && !(state.IsKeyDown(Keys.D)))
             {
-                movement[0] = -1;
+                this.movement[0] = -1;
             }
             else if (state.IsKeyDown(Keys.D) && !(state.IsKeyDown(Keys.A)))
             {
-                movement[0] = 1;
+                this.movement[0] = 1;
             }
             else
             {
-                movement[0] = 0;
+                this.movement[0] = 0;
             }
             if (state.IsKeyDown(Keys.W) && !(state.IsKeyDown(Keys.S)))
             {
-                movement[1] = -1;
+                this.movement[1] = -1;
             }
             else if (state.IsKeyDown(Keys.S) && !(state.IsKeyDown(Keys.W)))
             {
-                movement[1] = 1;
+                this.movement[1] = 1;
             }
             else
             {
-                movement[1] = 0;
+                this.movement[1] = 0;
             }
             var mouseState = Mouse.GetState();
             if (this.clicked)            

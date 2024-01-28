@@ -13,7 +13,7 @@ namespace RogueValley.Maps
         public int[] map_position, mapSize, sSize;
         private Texture2D mapSprite;
 
-        public Map(int[] playerPosition, int[] screenSize, Texture2D mapSprite, int[] sSize, int[] bgSize) {
+        public Map(Texture2D mapSprite, int[] sSize, int[] bgSize) {
             this.mapSize = bgSize;
 
             this.sSize = sSize;
@@ -64,6 +64,17 @@ namespace RogueValley.Maps
                 player.drawPosition[1] = this.sSize[1] / 2;
             }            
         }
+
+        public int CalcdrawPosX(int x)
+        {
+            return x + this.map_position[0];
+        }
+
+        public int CalcdrawPosY(int y)
+        {
+            return y + this.map_position[1];
+        }
+
         public Texture2D get_map() {
             // return the map sprite
             return mapSprite;

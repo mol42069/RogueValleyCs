@@ -9,7 +9,7 @@ namespace RogueValley
     public class enums
     {
 
-        public enum SpawnRate 
+        public enum SpawnRate
         {
             Zombie = 90,
             Mage = 10,
@@ -38,15 +38,15 @@ namespace RogueValley
             DEAD = 4,
             PROJECTILE = 5
         }
-        public enum StartScreen 
+        public enum StartScreen
         {
             bg = 0,
             sButton = 1,
         }
-        public enum UI 
+        public enum UI
         {
-            hBar = 2,
-            hBg = 3,
+            hBar = 0,
+            hBg = 1,
         }
         public enum Weapon
         {
@@ -68,7 +68,50 @@ namespace RogueValley
 
         public enum Projectile {
             FireBall = 0,
-            EplodingBall = 1,        
+            EplodingBall = 1,
+        }
+
+        public enum Menu {
+            False = 0,
+        }
+
+        public enum MenuSprite {
+            StartS,
+            Upgrade,
+            WeaponC,
+            Pause,
+            max,
+        }
+        public enum StartScreenS
+        {
+            Bg,
+            Start,
+            Quit,
+            Record,
+            max,
+        }
+        public enum UpgradeScreenS
+        {
+            Bg,
+            damage,
+            defence,
+            reach,
+            speed,
+            max,
+        }
+        public enum WeaponChoiceS
+        {
+            Bg,
+            Staff,
+            Sword,
+            max,
+        }
+        public enum PauseScreenS{
+            Bg,
+            Continue,
+            Home,
+            Quit,
+            max
         }
 
     }
