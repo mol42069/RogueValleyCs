@@ -28,11 +28,11 @@ namespace RogueValley.Maps
 
         public MenuScreen(int[] screenSize) {
 
-            this.startPos = new int[] { 1280, 750 };
+            this.startPos = new int[] { 640, 375 };
 
             this.inited = false;
             this.screenSize = screenSize;
-            this.bgSize = new int[] {4000, 2000};
+            this.bgSize = new int[] {1920, 1080};
             this.hoverTimer = 100;
             this.playerPos = null;
             // 350, 100...... 1825,
@@ -114,12 +114,12 @@ namespace RogueValley.Maps
             this.buttons[(int)enums.MenuSprite.StartS] = new Rectangle[this.sprites[(int)enums.MenuSprite.StartS].Length - 1];
             this.buttonPos[(int)enums.MenuSprite.StartS] = new int[this.sprites[(int)enums.MenuSprite.StartS].Length - 1][];
 
-            this.buttons[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Start - 1] = new Rectangle(950, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Start - 1] = new int[] {950, 1300};
-            this.buttons[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Quit - 1] = new Rectangle(1750, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Quit - 1] = new int[] { 1750, 1300 };
-            this.buttons[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Record - 1] = new Rectangle(2550, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Record - 1] = new int[] { 2550, 1300 };
+            this.buttons[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Start - 1] = new Rectangle(475, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Start - 1] = new int[] { 475, 650 };
+            this.buttons[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Quit - 1] = new Rectangle(875, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Quit - 1] = new int[] { 875, 650 };
+            this.buttons[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Record - 1] = new Rectangle(1275, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Record - 1] = new int[] { 1275, 650 };
 
             // Upgrade-Screen-Button-Rectangles:
 
@@ -200,7 +200,11 @@ namespace RogueValley.Maps
             bottomPoint.X = player.drawPosition[0] + 50;
             bottomPoint.Y = player.drawPosition[1] + 85;
             int check = hover.Length;
-
+            if (this.hoverTimer > 0)
+                this.hoverTimer--;
+            else
+                this.hoverTimer = 0;
+            
             for (int i = 0; i < rec.Length; i++) 
             {
                 if (rec[i].X < bottomPoint.X && rec[i].X + rec[i].Width > bottomPoint.X && rec[i].Y < bottomPoint.Y && rec[i].Y + rec[i].Height > bottomPoint.Y)
@@ -210,18 +214,12 @@ namespace RogueValley.Maps
                 else
                 {
                     hover[i] = false;
-                }
-                if (hover[i])
-                {
-                    if (this.hoverTimer > 0)
-                        this.hoverTimer--;
-                    else
-                        this.hoverTimer = 0;
-                }
-                else
                     check--;
-                if (check <= 0)
-                    this.hoverTimer = 100;
+
+                    if (check <= 0)
+                        this.hoverTimer = 100;
+                }
+                
             }
             return hover;
         }
@@ -285,7 +283,7 @@ namespace RogueValley.Maps
         }
         private void DrawStartScreen(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(this.map[(int)enums.MenuSprite.StartS].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.StartS].map_position[0], this.map[(int)enums.MenuSprite.StartS].map_position[1], 4000, 2000), Color.White);
+            _spriteBatch.Draw(this.map[(int)enums.MenuSprite.StartS].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.StartS].map_position[0], this.map[(int)enums.MenuSprite.StartS].map_position[1], this.bgSize[0], this.bgSize[1]), Color.White);
 
             for (int i = 1; i < this.sprites[(int)enums.MenuSprite.StartS].Length; i++) {
                 int x = 0;
@@ -298,7 +296,7 @@ namespace RogueValley.Maps
 
         private void DrawWeaponScreen(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(this.map[(int)enums.MenuSprite.WeaponC].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.WeaponC].map_position[0], this.map[(int)enums.MenuSprite.WeaponC].map_position[1], 4000, 2000), Color.White);
+            _spriteBatch.Draw(this.map[(int)enums.MenuSprite.WeaponC].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.WeaponC].map_position[0], this.map[(int)enums.MenuSprite.WeaponC].map_position[1], this.bgSize[0], this.bgSize[1]), Color.White);
 
             for (int i = 1; i < this.sprites[(int)enums.MenuSprite.WeaponC].Length; i++)
             {
@@ -311,7 +309,7 @@ namespace RogueValley.Maps
 
         private void DrawUpgradeScreen(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(this.map[(int)enums.MenuSprite.Upgrade].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.Upgrade].map_position[0], this.map[(int)enums.MenuSprite.Upgrade].map_position[1], 4000, 2000), Color.White);
+            _spriteBatch.Draw(this.map[(int)enums.MenuSprite.Upgrade].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.Upgrade].map_position[0], this.map[(int)enums.MenuSprite.Upgrade].map_position[1], this.bgSize[0], this.bgSize[1]), Color.White);
 
             for (int i = 1; i < this.sprites[(int)enums.MenuSprite.Upgrade].Length; i++)
             {
@@ -324,7 +322,7 @@ namespace RogueValley.Maps
 
         private void DrawPauseScreen(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(this.map[(int)enums.MenuSprite.Pause].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.Pause].map_position[0], this.map[(int)enums.MenuSprite.Pause].map_position[1], 4000, 2000), Color.White);
+            _spriteBatch.Draw(this.map[(int)enums.MenuSprite.Pause].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.Pause].map_position[0], this.map[(int)enums.MenuSprite.Pause].map_position[1], this.bgSize[0], this.bgSize[1]), Color.White);
 
             for (int i = 1; i < this.sprites[(int)enums.MenuSprite.Pause].Length; i++)
             {
