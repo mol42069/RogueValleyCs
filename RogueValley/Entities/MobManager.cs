@@ -40,7 +40,7 @@ namespace RogueValley.Entities
             this.spawnTimer = 0;
             this.spawnTimerMax = 100;
             this.spawnAmmount = 2;
-            this.roundTimerMax = 60;
+            this.roundTimerMax = 10;
             this.roundTimer = this.roundTimerMax;
 
             this.spawnRate = new int[2];
@@ -141,87 +141,7 @@ namespace RogueValley.Entities
 
         } 
 
-        /*
-        public void Spawn(Player player) {
-            // we spawn an specific ammount of enemies at random positions that arent ont the screen.
-            // And we add them to a list.
-            for (int i = 0; i < this.ammount; i++)
-            {
-                int[] pos = new int[2];
-                pos[0] = player.playerPosition[0];
-                pos[1] = player.playerPosition[1];
-
-                while (!(!(pos[1] < (player.playerPosition[1] + 1080) && pos[1] > (player.playerPosition[1] - 1080)) || !(pos[0] < (player.playerPosition[0] + 1920) && pos[0] > (player.playerPosition[0] - 1920))))
-                {
-                    pos[0] = rnd.Next(0, this.bgSize[0]);
-                    pos[1] = rnd.Next(0, this.bgSize[1]);
-                }
-
-                int random = rnd.Next(0, 100);
-                switch (this.wave) {
-                    case 1:
-
-                        if (random < 80)
-                        {
-                            Zombie zombie = new Zombie(pos);
-                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie], this.hBarSprites);
-                            this.mobList.Add(zombie);
-
-                        }
-                        else if (random >= 80)
-                        {
-                            if (random >= 95)
-                            {
-
-                                Ogre ogre = new Ogre(pos);
-                                ogre.LoadContent(this.sprites[(int)enums.Entity.Ogre], this.hBarSprites);
-                                this.mobList.Add(ogre);
-
-                            }
-                            else
-                            {
-                                // here we spawn other stuff for example Mages
-                                Mage mage = new Mage(pos);
-                                mage.LoadContent(this.sprites[(int)enums.Entity.Mage], this.hBarSprites);
-                                mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
-                                this.mobList.Add(mage);
-                            }
-                        }
-                        break;
-
-                    default:
-                        if (random < 80 - this.wave * 2)
-                        {
-                            Zombie zombie = new Zombie(pos);
-                            zombie.LoadContent(this.sprites[(int)enums.Entity.Zombie], this.hBarSprites);
-                            this.mobList.Add(zombie);
-
-                        }
-                        else if (random >= 80 - this.wave * 2)
-                        {
-                            if (random >= 95 - this.wave)
-                            {
-
-                                Ogre ogre = new Ogre(pos);
-                                ogre.LoadContent(this.sprites[(int)enums.Entity.Ogre], this.hBarSprites);
-                                this.mobList.Add(ogre);
-
-                            }
-                            else
-                            {
-                                // here we spawn other stuff for example Mages
-                                Mage mage = new Mage(pos);
-                                mage.LoadContent(this.sprites[(int)enums.Entity.Mage], this.hBarSprites);
-                                mage.LoadProjectile(this.sprites[(int)enums.Entity.Mage][(int)enums.Movement.PROJECTILE]);
-                                this.mobList.Add(mage);
-                            }
-                        }
-                        break;
-                }
-            }
-        }
-        */
-
+       
         protected bool DeleteDead() {
             for (int i = 0; i < this.deadList.Count; i++) {
                 if (this.deadList[i].DeleteDead())
@@ -336,7 +256,6 @@ namespace RogueValley.Entities
             // we go through all enemies in our mobList and Update them.
             //if they are dead we remove them from the list so they basicly dont exist anymore.            
             player.target.Clear();
-
             if (this.wave == 0) {
 
                 this.wave++;
@@ -344,13 +263,8 @@ namespace RogueValley.Entities
                 this.ammount = 10 * this.wave;
                 this.timer.Start();
             }
-            
-            
-
-
             if (this.roundTimer != 0)
             {
-
                 this.spawnTimer++;
 
                 if (this.spawnTimer >= this.spawnTimerMax + this.spawnTimerRnd)
@@ -393,7 +307,7 @@ namespace RogueValley.Entities
                     this.MobSorter();
                     //this.MobSorterDraw();
                 }
-                
+                this.afterWaveUp = 0;
             }
             else
             {
@@ -409,8 +323,8 @@ namespace RogueValley.Entities
                     if (this.afterWaveUp == 2)
                     {
                         this.roundTimer = roundTimerMax;
-
                         player.hp += player.regeneration;
+
                         if (player.hp > player.maxhp) player.hp = player.maxhp;
 
                         this.wave++;

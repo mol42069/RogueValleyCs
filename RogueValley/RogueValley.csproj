@@ -33,6 +33,7 @@
     <Folder Include="Content\Entity\Enemies\Zombie\sAttack\Left\" />
     <Folder Include="Content\Entity\Enemies\Zombie\sAttack\Right\" />
     <Folder Include="Content\Entity\Player\sAttack\" />
+    <Folder Include="Content\Utility\Menus\Hover\" />
     <Folder Include="Content\Utility\Menus\StartScreen\Background\" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">

@@ -16,6 +16,7 @@ namespace RogueValley.Maps
     internal class MenuScreen
     {
         Texture2D[][][] sprites, projectiles;
+        Texture2D hoverEff;
         Rectangle[][] buttons;
         int[][][] buttonPos;
         int[] playerPos, screenSize, bgSize, startPos;
@@ -25,6 +26,8 @@ namespace RogueValley.Maps
         Map[] map;
         bool inited;
         bool[][] hover;
+
+        SpriteFont font;
 
         public MenuScreen(int[] screenSize) {
 
@@ -40,9 +43,12 @@ namespace RogueValley.Maps
 
         }
 
-        public void LoadConent(Texture2D[][][] sprites, Texture2D[][][] projectiles) {
+        public void LoadConent(Texture2D[][][] sprites, Texture2D[][][] projectiles, SpriteFont font, Texture2D HoverEff) {
             this.sprites = sprites;
             this.projectiles = projectiles;
+            this.hoverEff = HoverEff;
+
+            this.font = font;
         }
         public int Update(int gameState, int[] movement)
         {
@@ -126,36 +132,36 @@ namespace RogueValley.Maps
             this.buttons[(int)enums.MenuSprite.Upgrade] = new Rectangle[this.sprites[(int)enums.MenuSprite.Upgrade].Length - 1];
             this.buttonPos[(int)enums.MenuSprite.Upgrade] = new int[this.sprites[(int)enums.MenuSprite.Upgrade].Length - 1][];
 
-            this.buttons[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.damage - 1] = new Rectangle(700, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.damage - 1] = new int[] { 700, 1300 };
-            this.buttons[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.defence - 1] = new Rectangle(1400, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.defence - 1] = new int[] { 1400, 1300 };
-            this.buttons[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.reach - 1] = new Rectangle(2100, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.reach - 1] = new int[] { 2100, 1300 };
-            this.buttons[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.speed - 1] = new Rectangle(2800, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.speed - 1] = new int[] { 2800, 1300 };
+            this.buttons[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.damage - 1] = new Rectangle(350, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.damage - 1] = new int[] { 350, 650 };
+            this.buttons[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.defence - 1] = new Rectangle(700, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.defence - 1] = new int[] { 700, 650 };
+            this.buttons[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.reach - 1] = new Rectangle(1050, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.reach - 1] = new int[] { 1050, 650 };
+            this.buttons[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.speed - 1] = new Rectangle(1400, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.speed - 1] = new int[] { 1400, 650 };
 
             // WeaponChoice-Screen-Button-Rectangles:
 
             this.buttons[(int)enums.MenuSprite.WeaponC] = new Rectangle[this.sprites[(int)enums.MenuSprite.WeaponC].Length - 1];
             this.buttonPos[(int)enums.MenuSprite.WeaponC] = new int[this.sprites[(int)enums.MenuSprite.WeaponC].Length - 1][];
 
-            this.buttons[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Staff - 1] = new Rectangle(1250, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Staff - 1] = new int[] { 1250, 1300 };
-            this.buttons[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Sword - 1] = new Rectangle(2250, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Sword - 1] = new int[] { 2250, 1300 };
+            this.buttons[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Staff - 1] = new Rectangle(625, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Staff - 1] = new int[] { 625, 650 };
+            this.buttons[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Sword - 1] = new Rectangle(1125, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.WeaponC][(int)enums.WeaponChoiceS.Sword - 1] = new int[] { 1125, 650 };
 
             // Pause-Screen-Button-Rectangles:
 
             this.buttons[(int)enums.MenuSprite.Pause] = new Rectangle[this.sprites[(int)enums.MenuSprite.Pause].Length - 1];
             this.buttonPos[(int)enums.MenuSprite.Pause] = new int[this.sprites[(int)enums.MenuSprite.Pause].Length - 1][];
 
-            this.buttons[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Continue - 1] = new Rectangle(950, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Continue - 1] = new int[] { 950, 1300 };
-            this.buttons[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Home - 1] = new Rectangle(1750, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Home - 1] = new int[] { 1750, 1300 };
-            this.buttons[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit - 1] = new Rectangle(2550, 1300, 500, 500);
-            this.buttonPos[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit - 1] = new int[] { 2550, 1300 };
+            this.buttons[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Continue - 1] = new Rectangle(475, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Continue - 1] = new int[] { 475, 650 };
+            this.buttons[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Home - 1] = new Rectangle(875, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Home - 1] = new int[] { 875, 650 };
+            this.buttons[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit - 1] = new Rectangle(1275, 650, 250, 250);
+            this.buttonPos[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit - 1] = new int[] { 1275, 650 };
 
         }
 
@@ -207,8 +213,8 @@ namespace RogueValley.Maps
             
             for (int i = 0; i < rec.Length; i++) 
             {
-                if (rec[i].X < bottomPoint.X && rec[i].X + rec[i].Width > bottomPoint.X && rec[i].Y < bottomPoint.Y && rec[i].Y + rec[i].Height > bottomPoint.Y)
-                {
+                if (rec[i].Contains(bottomPoint))
+                {// rec[i].X < bottomPoint.X && rec[i].X + rec[i].Width > bottomPoint.X && rec[i].Y < bottomPoint.Y && rec[i].Y + rec[i].Height > bottomPoint.Y
                     hover[i] = true;
                 }
                 else
@@ -224,12 +230,15 @@ namespace RogueValley.Maps
             return hover;
         }
 
+       
+
         private int UpdateStartScreen(Player player)
         {
             this.buttons[(int)enums.MenuSprite.StartS] = this.UpdateRectanglePos(this.buttons[(int)enums.MenuSprite.StartS], enums.MenuSprite.StartS, this.buttonPos[(int)enums.MenuSprite.StartS]);
             this.map[(int)enums.MenuSprite.StartS].Update(this.player);
 
             this.hover[(int)enums.MenuSprite.StartS] = this.CheckHover(this.hover[(int)enums.MenuSprite.StartS], this.buttons[(int)enums.MenuSprite.StartS], player);
+            
 
             if (this.hover[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Start - 1] && this.hoverTimer == 0)
                 return 2;
@@ -239,6 +248,8 @@ namespace RogueValley.Maps
 
             else if (this.hover[(int)enums.MenuSprite.StartS][(int)enums.StartScreenS.Record - 1] && this.hoverTimer == 0)
                 return 0;               // TODO: here we need to go to the record page.
+
+
 
             return 0;
         }
@@ -270,6 +281,28 @@ namespace RogueValley.Maps
         {
             this.buttons[(int)enums.MenuSprite.Upgrade] = this.UpdateRectanglePos(this.buttons[(int)enums.MenuSprite.Upgrade], enums.MenuSprite.Upgrade, this.buttonPos[(int)enums.MenuSprite.Upgrade]);
             this.map[(int)enums.MenuSprite.Upgrade].Update(this.player);
+            this.hover[(int)enums.MenuSprite.Upgrade] = this.CheckHover(this.hover[(int)enums.MenuSprite.Upgrade], this.buttons[(int)enums.MenuSprite.Upgrade], player);
+
+            if (this.hover[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.damage - 1] && this.hoverTimer == 0)
+            {
+                player.damage += 20;
+                return 1;
+            }
+            else if (this.hover[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.defence - 1] && this.hoverTimer == 0)
+            {
+                player.defence += 2;
+                return 1;
+            }
+            else if (this.hover[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.reach - 1] && this.hoverTimer == 0)
+            {
+                player.reach += 20;
+                return 1;
+            }
+            else if (this.hover[(int)enums.MenuSprite.Upgrade][(int)enums.UpgradeScreenS.speed - 1] && this.hoverTimer == 0)
+            {
+                player.speed += 5;
+                return 1;
+            }
 
             return 3;
         }
@@ -278,12 +311,41 @@ namespace RogueValley.Maps
         {
             this.buttons[(int)enums.MenuSprite.Pause] = this.UpdateRectanglePos(this.buttons[(int)enums.MenuSprite.Pause], enums.MenuSprite.Pause, this.buttonPos[(int)enums.MenuSprite.Pause]);
             this.map[(int)enums.MenuSprite.Pause].Update(this.player);
+            this.hover[(int)enums.MenuSprite.WeaponC] = this.CheckHover(this.hover[(int)enums.MenuSprite.WeaponC], this.buttons[(int)enums.MenuSprite.WeaponC], player);
 
             return 4;
         }
+
+        private void DrawHoverEffect(bool[] hover, Rectangle[] recs, SpriteBatch _spriteBatch)
+        {
+
+            for (int i = 0; i < hover.Length; i++)
+            {
+                if (hover[i])
+                {
+                    if (this.hoverTimer != 0)
+                    {
+                        int height = this.hoverTimer;
+                        if (height < 10)
+                            height = 10;
+                        _spriteBatch.Draw(this.hoverEff, new Rectangle(recs[i].X - 5, recs[i].Y - 5, (int)((((float)recs[i].Width) * ((110f - (float)height) / 100f))), (int)((((float)recs[i].Height) * ((110f - (float)height) / 100f)))), Color.Red);
+
+
+                        _spriteBatch.Draw(this.hoverEff, new Rectangle(recs[i].X + recs[i].Width, ((recs[i].Y + recs[i].Height - 5) - (int)((100 - height) * (2.5f))) - 15, 5,  (int)((((float)recs[i].Height) * ((110f - (float)height) / 100f)))), Color.Red);
+
+                        _spriteBatch.Draw(this.hoverEff, new Rectangle(((recs[i].X + recs[i].Width - 5) - (int)((100 - height) * (2.5f))) - 15, recs[i].Y + recs[i].Height, (int)((((float)recs[i].Width) * ((110f - (float)height) / 100f))), 5), Color.Red);
+
+                    }
+                }
+            }
+        }
+
+
         private void DrawStartScreen(SpriteBatch _spriteBatch)
         {
             _spriteBatch.Draw(this.map[(int)enums.MenuSprite.StartS].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.StartS].map_position[0], this.map[(int)enums.MenuSprite.StartS].map_position[1], this.bgSize[0], this.bgSize[1]), Color.White);
+
+            this.DrawHoverEffect(this.hover[(int)enums.MenuSprite.StartS], this.buttons[(int)enums.MenuSprite.StartS], _spriteBatch);
 
             for (int i = 1; i < this.sprites[(int)enums.MenuSprite.StartS].Length; i++) {
                 int x = 0;
@@ -297,6 +359,7 @@ namespace RogueValley.Maps
         private void DrawWeaponScreen(SpriteBatch _spriteBatch)
         {
             _spriteBatch.Draw(this.map[(int)enums.MenuSprite.WeaponC].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.WeaponC].map_position[0], this.map[(int)enums.MenuSprite.WeaponC].map_position[1], this.bgSize[0], this.bgSize[1]), Color.White);
+            this.DrawHoverEffect(this.hover[(int)enums.MenuSprite.WeaponC], this.buttons[(int)enums.MenuSprite.WeaponC], _spriteBatch);
 
             for (int i = 1; i < this.sprites[(int)enums.MenuSprite.WeaponC].Length; i++)
             {
@@ -310,6 +373,7 @@ namespace RogueValley.Maps
         private void DrawUpgradeScreen(SpriteBatch _spriteBatch)
         {
             _spriteBatch.Draw(this.map[(int)enums.MenuSprite.Upgrade].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.Upgrade].map_position[0], this.map[(int)enums.MenuSprite.Upgrade].map_position[1], this.bgSize[0], this.bgSize[1]), Color.White);
+            this.DrawHoverEffect(this.hover[(int)enums.MenuSprite.Upgrade], this.buttons[(int)enums.MenuSprite.Upgrade], _spriteBatch);
 
             for (int i = 1; i < this.sprites[(int)enums.MenuSprite.Upgrade].Length; i++)
             {
@@ -323,6 +387,7 @@ namespace RogueValley.Maps
         private void DrawPauseScreen(SpriteBatch _spriteBatch)
         {
             _spriteBatch.Draw(this.map[(int)enums.MenuSprite.Pause].get_map(), new Rectangle(this.map[(int)enums.MenuSprite.Pause].map_position[0], this.map[(int)enums.MenuSprite.Pause].map_position[1], this.bgSize[0], this.bgSize[1]), Color.White);
+            this.DrawHoverEffect(this.hover[(int)enums.MenuSprite.Pause], this.buttons[(int)enums.MenuSprite.Pause], _spriteBatch);
 
             for (int i = 1; i < this.sprites[(int)enums.MenuSprite.Pause].Length; i++)
             {

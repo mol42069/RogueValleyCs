@@ -818,10 +818,10 @@ namespace RogueValley
                 menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit][0] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Quit/Norm");
                 menuSprites[(int)enums.MenuSprite.Pause][(int)enums.PauseScreenS.Quit][1] = Content.Load<Texture2D>("Utility/Menus/PauseScreen/Quit/Hover");
 
-
-                this.menu.LoadConent(menuSprites, StaffProjSprites);
+                Texture2D hoverSprite = Content.Load<Texture2D>("Utility/Menus/HoverEff");
 
                 this.font = Content.Load<SpriteFont>("Font/gameFont");
+                this.menu.LoadConent(menuSprites, StaffProjSprites, this.font, hoverSprite);
                 ui.LoadContent(textures, font);
 
                 SpriteFont timerFont = Content.Load<SpriteFont>("Font/timerFont");
@@ -864,6 +864,8 @@ namespace RogueValley
                 default:
                     this.menu.player = this.player;
                     this.gameState = this.menu.Update(this.gameState, this.movement);
+                    if(this.gameState == 1)
+                        this.mobManager.afterWaveUp = 2;
                     this.player = this.menu.player;
                     break;
             }
